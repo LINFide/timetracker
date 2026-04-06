@@ -11,7 +11,7 @@
 <style>
 :root{
   --bg:#0a0a0a;--sur:#141414;--sur2:#1c1c1c;--sur3:#222;
-  --acc:#e8ff47;--red:#ff4747;--blue:#47b8ff;--grn:#47ff9f;
+  --acc:#e8ff47;--badge:#e8ff47;--badgeText:#000;--red:#ff4747;--blue:#47b8ff;--grn:#47ff9f;
   --txt:#f0f0f0;--mut:#555;--bor:#252525;--nav:64px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -31,14 +31,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 
 /* ── PING ── */
 #sp{align-items:center;padding:14px 16px 8px;gap:0}
-.clk-wrap{display:flex;align-items:baseline;gap:6px;margin-bottom:2px}
-.clk-hm{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:1;color:var(--acc);letter-spacing:3px}
-.clk-sec{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#7a8a1a;letter-spacing:2px;padding-bottom:4px}
+.clk-wrap{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:2px;width:100%}
+.clk-hm{font-family:'Bebas Neue',sans-serif;font-size:88px;line-height:1;color:var(--acc);letter-spacing:3px;text-align:center}
+.clk-sec{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;color:#7a8a1a;letter-spacing:2px;padding-top:12px}
 .clks{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
-.pq{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--txt);margin-bottom:6px;text-align:center}
-.pq-badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:7px 14px;margin:0 auto 10px;background:var(--acc);border:1px solid var(--acc);border-radius:999px;color:#000;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.pq{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--txt);margin-bottom:8px;text-align:center}
+.pq-badge{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 14px;background:var(--badge);border:1px solid var(--badge);border-radius:999px;color:var(--badgeText);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
 .ping-tools{display:flex;justify-content:center;width:100%;margin:-2px 0 10px}
-.main-sync-btn{padding:7px 14px;background:var(--sur2);border:1px solid var(--bor);border-radius:999px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer}
+.ping-tools-row{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:0 0 10px;flex-wrap:wrap}
+.main-sync-btn{padding:7px 14px;background:var(--sur2);border:1px solid var(--bor);border-radius:999px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;white-space:nowrap}
 .main-sync-btn.connected{border-color:var(--acc);color:var(--acc)}
 .main-sync-btn:disabled{opacity:.55;cursor:default}
 .main-sync-btn:active{opacity:.75}
@@ -109,6 +110,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .hg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
 .hl{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
 .hc{aspect-ratio:1;border-radius:3px;background:var(--bor)}
+.hm-wrap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.hday{background:var(--sur2);border:1px solid var(--bor);border-radius:6px;padding:3px;display:grid;grid-template-columns:repeat(6,1fr);gap:2px;min-height:58px}
+.hslot{aspect-ratio:1;border-radius:2px;background:var(--bor)}
+.hslot.empty{background:rgba(255,255,255,.03)}
+.hslot.future{background:transparent}
+.hslot.border{outline:1px solid rgba(255,255,255,.04)}
+.hm-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:10px}
+.hm-legend-item{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--txt);min-width:0}
+.hm-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.hm-legend-item span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .legr{display:flex;align-items:center;gap:5px;margin-top:7px;font-size:9px;color:var(--mut)}
 .legc{display:flex;gap:3px}
 .lc{width:11px;height:11px;border-radius:2px}
@@ -150,22 +161,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .xbtn:active{color:var(--red)}
 .arcbtn{background:none;border:1px solid var(--bor);border-radius:6px;padding:3px 7px;font-size:9px;color:var(--mut);cursor:pointer;font-family:'IBM Plex Mono',monospace;flex-shrink:0}
 .arcbtn:active{color:var(--blue);border-color:var(--blue)}
-.colorbtn{width:20px;height:20px;border-radius:50%;border:1px solid var(--bor);cursor:pointer;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,.06) inset}
-.colorbtn:active{transform:scale(.94)}
-.color-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
-.color-option{height:44px;border-radius:12px;border:1px solid var(--bor);cursor:pointer;position:relative;overflow:hidden}
-.color-option.selected::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#000;font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;text-shadow:0 1px 0 rgba(255,255,255,.25)}
-.custom-color-wrap{margin-top:14px;padding-top:14px;border-top:1px solid var(--bor)}
-.custom-color-row{display:flex;gap:10px;align-items:center}
-.custom-color-input{width:58px;height:42px;border:none;background:none;padding:0;cursor:pointer}
-.custom-color-input::-webkit-color-swatch-wrapper{padding:0}
-.custom-color-input::-webkit-color-swatch{border:none;border-radius:10px}
-.custom-color-label{font-size:10px;color:var(--mut);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase}
 .dbtn{width:100%;padding:10px;border:1px dashed var(--bor);border-radius:10px;background:none;color:var(--mut);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;margin-top:3px}
 .dbtn:active{color:var(--acc);border-color:var(--acc)}
 .dbtn.danger:active{color:var(--red);border-color:var(--red)}
 .irow{display:flex;align-items:center;gap:10px}
 .ninp{background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:9px 11px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:13px;width:72px;outline:none}
+.color-inp{appearance:none;-webkit-appearance:none;background:var(--sur);border:1px solid var(--bor);border-radius:10px;width:64px;height:42px;padding:4px;cursor:pointer}
+.color-inp::-webkit-color-swatch-wrapper{padding:0}
+.color-inp::-webkit-color-swatch{border:none;border-radius:6px}
 .mt{color:var(--mut);font-size:11px}
 .bigbtn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--acc);color:#000;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;letter-spacing:1px;cursor:pointer}
 .bigbtn:active{opacity:.75}
@@ -237,8 +240,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
    </div>
    <div class="clks">СЕЙЧАС</div>
    <div class="pq" id="pq-text">ЧТО ТЫ ДЕЛАЛ</div>
-   <div class="pq-badge" id="pq-badge">СЕЙЧАС</div>
-   <div class="ping-tools"><button class="main-sync-btn" id="main-sync-btn" onclick="gSyncFromMain()">☁️ SYNC</button></div>
+   <div class="ping-tools-row">
+    <div class="pq-badge" id="pq-badge">СЕЙЧАС</div>
+    <button class="main-sync-btn" id="main-sync-btn" onclick="gSyncFromMain()">☁️ SYNC</button>
+   </div>
    <div class="pgrid" id="ping-grid"></div>
    <div class="skiprow"><button class="skipbtn" onclick="skip()">ПРОПУСТИТЬ</button></div>
   </div>
@@ -319,6 +324,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
      <span class="mt">минут</span>
     </div>
 
+    <div class="slbl">ЦВЕТ ПЛАШКИ ВРЕМЕНИ</div>
+    <div class="irow">
+     <input class="color-inp" type="color" id="badge-color" value="#e8ff47">
+     <span class="mt">меняет только зелёную плашку на главной</span>
+    </div>
+
     <div class="slbl">УВЕДОМЛЕНИЯ</div>
     <button class="bigbtn" onclick="reqNotify()">ВКЛЮЧИТЬ УВЕДОМЛЕНИЯ</button>
 
@@ -394,22 +405,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
  </div>
 </div>
 
-<!-- Color picker -->
-<div class="overlay" id="color-modal" onclick="closeModal('color-modal',event)">
- <div class="modal">
-  <div class="modal-title">ЦВЕТ АКТИВНОСТИ</div>
-  <div id="color-grid" class="color-grid"></div>
-  <div class="custom-color-wrap">
-   <div class="custom-color-label">СВОЙ ЦВЕТ</div>
-   <div class="custom-color-row">
-    <input type="color" id="custom-color-input" class="custom-color-input" value="#e8ff47">
-    <button class="bigbtn" onclick="applyCustomColor()">ПРИМЕНИТЬ СВОЙ ЦВЕТ</button>
-   </div>
-  </div>
-  <button class="cancel-btn" onclick="closeModal('color-modal')">ОТМЕНА</button>
- </div>
-</div>
-
 <!-- Emoji picker -->
 <div class="epo" id="epo" onclick="closeEP(event)">
  <div class="epp">
@@ -423,25 +418,24 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 // CONSTANTS & STATE
 // ══════════════════════════════════════════════════════
 const EMOJIS=['💻','📚','🏃','🍳','😴','🧹','📱','🎮','🎵','🚗','🤝','🧘','✍️','📞','🛒','🎨','🍔','☕','🏋️','🧠','👨‍👩‍👦','🌿','📺','🎯','🎲','🔧','💼','✈️','🛁','🎭','🐶','🌙','🎤','🖥️','📝','🏠','🎪','🎸','🚴','🏊','🌅'];
-const ACTIVITY_COLOR_PRESETS=['#e8ff47','#47b8ff','#47ff9f','#ff9f47','#ff6b6b','#b47dff','#47fff2','#ff6bd6','#b8ff47'];
-const DEFAULT_ACTIVITY_COLOR=ACTIVITY_COLOR_PRESETS[0];
+const PIE_COL=['#e8ff47','#47b8ff','#ff4747','#ff9f47','#b847ff','#47ff9f','#ff47b8','#47ffff','#ffb847','#47ffb8','#b8ff47','#ff47ff','#6b47ff','#ffff47','#ff6b47','#47ff6b'];
 
 let S={
-  schemaVersion:2,
+  schemaVersion:3,
   deviceId:null,
   activities:[
-    {id:'1',emoji:'💻',name:'Работа',color:ACTIVITY_COLOR_PRESETS[0],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'2',emoji:'📚',name:'Учёба',color:ACTIVITY_COLOR_PRESETS[1],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'3',emoji:'🍳',name:'Еда',color:ACTIVITY_COLOR_PRESETS[2],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'4',emoji:'😴',name:'Отдых / сон',color:ACTIVITY_COLOR_PRESETS[3],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'5',emoji:'🏃',name:'Спорт',color:ACTIVITY_COLOR_PRESETS[4],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'6',emoji:'📱',name:'Соцсети',color:ACTIVITY_COLOR_PRESETS[5],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'7',emoji:'🎮',name:'Игры',color:ACTIVITY_COLOR_PRESETS[6],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'8',emoji:'🤝',name:'Общение',color:ACTIVITY_COLOR_PRESETS[7],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'9',emoji:'🧹',name:'Дела по дому',color:ACTIVITY_COLOR_PRESETS[8],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'10',emoji:'🚗',name:'В дороге',color:ACTIVITY_COLOR_PRESETS[0],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'11',emoji:'🎵',name:'Музыка / хобби',color:ACTIVITY_COLOR_PRESETS[1],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'12',emoji:'🧘',name:'Медитация',color:ACTIVITY_COLOR_PRESETS[2],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'1',emoji:'💻',name:'Работа',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'2',emoji:'📚',name:'Учёба',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'3',emoji:'🍳',name:'Еда',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'4',emoji:'😴',name:'Отдых / сон',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'5',emoji:'🏃',name:'Спорт',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'6',emoji:'📱',name:'Соцсети',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'7',emoji:'🎮',name:'Игры',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'8',emoji:'🤝',name:'Общение',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'9',emoji:'🧹',name:'Дела по дому',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'10',emoji:'🚗',name:'В дороге',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'11',emoji:'🎵',name:'Музыка / хобби',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'12',emoji:'🧘',name:'Медитация',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
   ],
   logs:[],
   intervalMinutes:15,
@@ -451,12 +445,13 @@ let S={
   gBackupFolderId:null,
   gMainFileId:null,
   lastSyncAt:null,
+  badgeColor:'#e8ff47',
   customFrom:null,customTo:null,
 };
 
 let period='today',aView='bars',histFilter='all';
 let epIdx=null,pingTimer=null;
-let editLogId=null,splitLogId=null,splitSecondCatId=null,colorActIdx=null;
+let editLogId=null,splitLogId=null,splitSecondCatId=null;
 let gToken=null;
 
 // Timer/Stopwatch
@@ -488,7 +483,7 @@ function load(){
 function migrateState(){
   const nowIso=nowISO();
   if(!S.deviceId)S.deviceId=genId();
-  S.schemaVersion=2;
+  S.schemaVersion=3;
 
   S.activities=(S.activities||[]).map((a,idx)=>normalizeActivity(a, idx + 1, nowIso));
   S.logs=(S.logs||[]).map(normalizeLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
@@ -497,6 +492,7 @@ function migrateState(){
   if(typeof S.gBackupFolderId==='undefined')S.gBackupFolderId=null;
   if(typeof S.gMainFileId==='undefined')S.gMainFileId=null;
   if(typeof S.lastSyncAt==='undefined')S.lastSyncAt=null;
+  if(typeof S.badgeColor==='undefined')S.badgeColor='#e8ff47';
 }
 
 function nowISO(){return new Date().toISOString();}
@@ -514,7 +510,6 @@ function normalizeActivity(a,fallbackId,nowIso=nowISO()){
     id:String(a?.id??fallbackId??genId()),
     emoji:a?.emoji||'❓',
     name:a?.name||'',
-    color:normalizeHexColor(a?.color)||presetColorByIndex((parseInt(fallbackId,10)||1)-1),
     archived:!!a?.archived,
     createdAt,
     updatedAt:a?.updatedAt||createdAt,
@@ -524,53 +519,55 @@ function normalizeActivity(a,fallbackId,nowIso=nowISO()){
 
 function normalizeLog(l){
   const createdAt=l?.createdAt||l?.updatedAt||l?.ts||nowISO();
+  const answeredAt=l?.answeredAt||l?.createdAt||l?.updatedAt||l?.ts||createdAt;
   return {
     id:String(l?.id??genId()),
     activityId:l?.activityId===null||typeof l?.activityId==='undefined'?null:String(l.activityId),
     emoji:l?.emoji||'—',
     name:l?.name||'',
-    color:normalizeHexColor(l?.color)||DEFAULT_ACTIVITY_COLOR,
     ts:l?.ts||createdAt,
     skipped:!!l?.skipped,
     durationSec:Math.max(1,parseInt(l?.durationSec)||1),
     createdAt,
     updatedAt:l?.updatedAt||createdAt,
+    answeredAt,
     deletedAt:l?.deletedAt||null,
     deviceId:l?.deviceId||S.deviceId||null,
   };
 }
 
 function isDeleted(item){return !!item?.deletedAt;}
-function presetColorByIndex(index){return ACTIVITY_COLOR_PRESETS[((index%ACTIVITY_COLOR_PRESETS.length)+ACTIVITY_COLOR_PRESETS.length)%ACTIVITY_COLOR_PRESETS.length];}
-function normalizeHexColor(color){
-  const value=String(color||'').trim();
-  if(/^#[0-9a-fA-F]{6}$/.test(value))return value.toLowerCase();
-  if(/^#[0-9a-fA-F]{3}$/.test(value)){
-    return '#'+value.slice(1).split('').map(ch=>ch+ch).join('').toLowerCase();
-  }
-  return '';
-}
-function rgbaFromHex(color,alpha=.18){
-  const hex=normalizeHexColor(color)||DEFAULT_ACTIVITY_COLOR;
-  const raw=hex.slice(1);
-  const bigint=parseInt(raw,16);
-  const r=(bigint>>16)&255;
-  const g=(bigint>>8)&255;
-  const b=bigint&255;
-  return `rgba(${r},${g},${b},${alpha})`;
-}
-function activityColor(activity,index=0){return normalizeHexColor(activity?.color)||presetColorByIndex(index);}
 function activeActivities(){return S.activities.filter(a=>!a.archived&&!isDeleted(a));}
 function visibleLogs(){return S.logs.filter(l=>!isDeleted(l));}
 function visibleLogById(logId){return S.logs.find(l=>String(l.id)===String(logId)&&!isDeleted(l));}
-function latestVisibleLog(){
-  let latest=null;
-  visibleLogs().forEach(log=>{
-    if(!latest||new Date(log.ts).getTime()>new Date(latest.ts).getTime())latest=log;
-  });
-  return latest;
-}
 function touchItem(item){item.updatedAt=nowISO();return item;}
+
+function lastAnsweredTime(){
+  const logs=visibleLogs();
+  if(!logs.length)return null;
+  const latest=logs.reduce((best,log)=>{
+    const bestTs=new Date(best?.answeredAt||best?.createdAt||best?.updatedAt||best?.ts||0).getTime();
+    const currentTs=new Date(log?.answeredAt||log?.createdAt||log?.updatedAt||log?.ts||0).getTime();
+    return currentTs>bestTs?log:best;
+  },logs[0]);
+  return new Date(latest?.answeredAt||latest?.createdAt||latest?.updatedAt||latest?.ts||0).getTime();
+}
+
+function applyTheme(){
+  const badgeColor=S.badgeColor||'#e8ff47';
+  document.documentElement.style.setProperty('--badge',badgeColor);
+  document.documentElement.style.setProperty('--badgeText',getContrastColor(badgeColor));
+}
+
+function getContrastColor(hex){
+  const value=String(hex||'').replace('#','');
+  if(value.length!==6)return '#000';
+  const r=parseInt(value.slice(0,2),16);
+  const g=parseInt(value.slice(2,4),16);
+  const b=parseInt(value.slice(4,6),16);
+  const luminance=(0.299*r+0.587*g+0.114*b)/255;
+  return luminance>0.62?'#000':'#fff';
+}
 
 // ══════════════════════════════════════════════════════
 // CLOCK (main screen)
@@ -590,29 +587,28 @@ function updatePQ(){
   const badge=document.getElementById('pq-badge');
   if(title)title.textContent='ЧТО ТЫ ДЕЛАЛ';
   if(!badge)return;
-  const last=lastLogTime();
-  if(!last){
-    badge.textContent='СЕЙЧАС';
-    return;
-  }
+  const last=lastAnsweredTime();
+  if(!last){badge.textContent='СЕЙЧАС';return;}
   const elapsedSec=Math.max(0,Math.floor((Date.now()-last)/1000));
   if(elapsedSec<60){
-    badge.textContent=elapsedSec<=1?'1 СЕК':'%SEC% СЕК'.replace('%SEC%',elapsedSec);
+    badge.textContent='МЕНЬШЕ МИНУТЫ';
     return;
   }
   const mins=Math.floor(elapsedSec/60);
-  if(mins<60){
-    badge.textContent=`ПОСЛЕДНИЕ ${mins} МИН`;
+  const hours=Math.floor(mins/60);
+  if(hours>=24){
+    badge.textContent='ДАВНО';
     return;
   }
-  const hours=Math.floor(mins/60);
-  const remMins=mins%60;
-  badge.textContent=remMins?`${hours}Ч ${remMins}М`:`${hours}Ч`;
+  if(hours>0){
+    badge.textContent=`${hours}Ч ${mins%60}М НАЗАД`;
+    return;
+  }
+  badge.textContent=`${mins} МИН НАЗАД`;
 }
 
 function lastLogTime(){
-  const last=latestVisibleLog();
-  return last?new Date(last.ts).getTime():null;
+  return lastAnsweredTime();
 }
 
 // ══════════════════════════════════════════════════════
@@ -633,24 +629,16 @@ function goScreen(id){
 // PING
 // ══════════════════════════════════════════════════════
 function renderPG(){
-  const g=document.getElementById('ping-grid');
-  g.innerHTML='';
-  activeActivities().slice(0,16).forEach((a,idx)=>{
-    const b=document.createElement('button');
-    b.className='abt';
-    const color=activityColor(a,idx);
-    b.style.borderColor=color;
-    b.style.boxShadow=`0 0 0 1px ${rgbaFromHex(color,.22)} inset`;
-    b.style.background=`linear-gradient(180deg, ${rgbaFromHex(color,.12)} 0%, var(--sur) 62%)`;
+  const g=document.getElementById('ping-grid');g.innerHTML='';
+  activeActivities().slice(0,16).forEach(a=>{
+    const b=document.createElement('button');b.className='abt';
     b.innerHTML=`<span class="em">${a.emoji}</span>${a.name}`;
-    b.onclick=()=>logIt(a);
-    g.appendChild(b);
+    b.onclick=()=>logIt(a);g.appendChild(b);
   });
 }
 
 function calcDuration(){
-  // Returns duration in seconds since last log, or interval*60 as fallback
-  const last=lastLogTime();
+  const last=lastAnsweredTime();
   if(last){
     const secs=Math.round((Date.now()-last)/1000);
     return Math.max(1,secs);
@@ -665,12 +653,12 @@ function createLogEntry(activity,durationSec,overrides={}){
     activityId:activity?String(activity.id):null,
     emoji:activity?activity.emoji:'—',
     name:activity?activity.name:'Пропущено',
-    color:activity?activity.color:DEFAULT_ACTIVITY_COLOR,
     ts,
     skipped:!activity,
     durationSec:Math.max(1,parseInt(durationSec)||1),
     createdAt:ts,
     updatedAt:ts,
+    answeredAt:overrides.answeredAt||ts,
     deletedAt:null,
     deviceId:S.deviceId,
   };
@@ -795,43 +783,23 @@ function renderLaps(){
 // ══════════════════════════════════════════════════════
 // SCHEDULE
 // ══════════════════════════════════════════════════════
-function intervalMs(){return (S.intervalMinutes||15)*60*1000;}
-
-function computeDuePingTime(){
-  const last=lastLogTime();
-  if(last)return last+intervalMs();
-  if(S.nextPingTime){
-    const dueAt=new Date(S.nextPingTime).getTime();
-    if(Number.isFinite(dueAt))return dueAt;
-  }
-  return null;
-}
-
-function schedulePing(baseMs=Date.now()){
+function schedulePing(){
   if(pingTimer)clearTimeout(pingTimer);
-  const dueAt=baseMs+intervalMs();
-  S.nextPingTime=new Date(dueAt).toISOString();
+  const ms=(S.intervalMinutes||15)*60*1000;
+  S.nextPingTime=new Date(Date.now()+ms).toISOString();
   save();
-  pingTimer=setTimeout(triggerPing,Math.max(0,dueAt-Date.now()));
-}
-
-function showDuePing(){
-  goScreen('sp');
-  updatePQ();
+  pingTimer=setTimeout(triggerPing,ms);
 }
 
 function restorePingSchedule(){
   if(pingTimer)clearTimeout(pingTimer);
-  const dueAt=computeDuePingTime();
-  if(!dueAt){
+  if(!S.nextPingTime){
     schedulePing();
     return;
   }
-  S.nextPingTime=new Date(dueAt).toISOString();
-  save();
-  const diff=dueAt-Date.now();
+  const diff=new Date(S.nextPingTime).getTime()-Date.now();
   if(diff<=0){
-    showDuePing();
+    triggerPing();
     return;
   }
   pingTimer=setTimeout(triggerPing,diff);
@@ -841,14 +809,12 @@ function triggerPing(){
   if(Notification&&Notification.permission==='granted'){
     try{new Notification('⏱ ЧТО ТЫ ДЕЛАЛ?',{body:'Пора отметить!',tag:'ping'});}catch(e){}
   }
-  showDuePing();
-  schedulePing(Date.now());
+  goScreen('sp');
+  schedulePing();
 }
 
 document.addEventListener('visibilitychange',()=>{
-  if(!document.hidden&&S.nextPingTime&&new Date()>=new Date(S.nextPingTime)){
-    showDuePing();
-  }
+  if(!document.hidden&&S.nextPingTime&&new Date()>=new Date(S.nextPingTime))triggerPing();
 });
 
 function reqNotify(){
@@ -872,7 +838,6 @@ function renderSett(){
     if(a.archived)d.style.opacity='.5';
     d.innerHTML=`<button class="embtn" onclick="openEP(${realIndex})">${a.emoji}</button>
       <input type="text" value="${escapeAttr(a.name)}" placeholder="Название..." oninput="renameAct(${realIndex},this.value)">
-      <button class="colorbtn" style="background:${activityColor(a,realIndex)}" onclick="openColorModal(${realIndex})" title="Цвет"></button>
       ${a.archived?'<span class="arc-badge">архив</span>':''}
       <button class="arcbtn" onclick="toggleArc(${realIndex})">${a.archived?'↩':'📦'}</button>
       <button class="xbtn" onclick="delAct(${realIndex})">×</button>`;
@@ -880,6 +845,7 @@ function renderSett(){
   });
   document.getElementById('ival').value=S.intervalMinutes||15;
   document.getElementById('g-folder').value=S.gFolder||'TimeTracker';
+  document.getElementById('badge-color').value=S.badgeColor||'#e8ff47';
   updateGUI();
 }
 
@@ -918,7 +884,6 @@ function addAct(){
     id:genId(),
     emoji:'❓',
     name:'',
-    color:presetColorByIndex(S.activities.length),
     archived:false,
     createdAt:ts,
     updatedAt:ts,
@@ -944,6 +909,8 @@ function delAct(i){
 function saveSettings(){
   S.intervalMinutes=parseInt(document.getElementById('ival').value)||15;
   S.gFolder=document.getElementById('g-folder').value||'TimeTracker';
+  S.badgeColor=document.getElementById('badge-color').value||'#e8ff47';
+  applyTheme();
   save();
   renderPG();
   schedulePing();
@@ -998,48 +965,6 @@ function openEP(idx){
 }
 function closeEP(evt){if(!evt||evt.target===document.getElementById('epo'))document.getElementById('epo').classList.remove('open');}
 
-function openColorModal(idx){
-  colorActIdx=idx;
-  const activity=S.activities[idx];
-  if(!activity||isDeleted(activity))return;
-  const grid=document.getElementById('color-grid');
-  const selected=activityColor(activity,idx);
-  grid.innerHTML='';
-  ACTIVITY_COLOR_PRESETS.forEach(color=>{
-    const btn=document.createElement('button');
-    btn.className='color-option'+(normalizeHexColor(selected)===normalizeHexColor(color)?' selected':'');
-    btn.style.background=color;
-    btn.onclick=()=>setActColor(idx,color);
-    grid.appendChild(btn);
-  });
-  document.getElementById('custom-color-input').value=selected;
-  document.getElementById('color-modal').classList.add('open');
-}
-
-function setActColor(i,color){
-  const activity=S.activities[i];
-  if(!activity||isDeleted(activity))return;
-  const nextColor=normalizeHexColor(color)||DEFAULT_ACTIVITY_COLOR;
-  activity.color=nextColor;
-  touchItem(activity);
-  S.logs.forEach(l=>{
-    if(!isDeleted(l)&&String(l.activityId)===String(activity.id)){
-      l.color=nextColor;
-      touchItem(l);
-    }
-  });
-  save();
-  rerenderAll();
-  closeModal('color-modal');
-  toast('🎨 Цвет обновлён');
-}
-
-function applyCustomColor(){
-  if(colorActIdx===null)return;
-  const value=document.getElementById('custom-color-input').value;
-  setActColor(colorActIdx,value);
-}
-
 // ══════════════════════════════════════════════════════
 // ANALYTICS
 // ══════════════════════════════════════════════════════
@@ -1081,28 +1006,10 @@ function renderA(){
   else drawHeatmap(body,logs);
 }
 
-function getLogColor(log){
-  const direct=normalizeHexColor(log?.color);
-  if(direct)return direct;
-  const activity=S.activities.find(a=>String(a.id)===String(log?.activityId));
-  return activityColor(activity);
-}
-
 function getCounts(logs){
-  const map=new Map();
-  logs.forEach(log=>{
-    const key=log.activityId?`id:${log.activityId}`:`free:${log.emoji}:${log.name}`;
-    const existing=map.get(key)||{
-      activityId:log.activityId||null,
-      emoji:log.emoji,
-      name:log.name,
-      color:getLogColor(log),
-      sec:0,
-    };
-    existing.sec+=(log.durationSec||0);
-    map.set(key,existing);
-  });
-  return Array.from(map.values()).sort((a,b)=>b.sec-a.sec);
+  const c={};
+  logs.forEach(l=>{const k=l.emoji+'§'+l.name;c[k]=(c[k]||0)+(l.durationSec||0);});
+  return Object.entries(c).sort((a,b)=>b[1]-a[1]);
 }
 
 function totalSecLogs(logs){return logs.reduce((s,l)=>s+(l.durationSec||0),0);}
@@ -1114,13 +1021,14 @@ function drawBars(body,logs){
     <div class="sc"><div class="sv">${logs.length}</div><div class="sl">ОТМЕТОК</div></div>
     <div class="sc"><div class="sv">${fmtDurShort(totalSec)}</div><div class="sl">ВРЕМЕНИ</div></div>
   </div>`;
-  const sorted=getCounts(logs);const max=sorted[0]?.sec||1;
+  const sorted=getCounts(logs);const max=sorted[0]?.[1]||1;
   html+=`<div class="card"><div class="ctitle">ПО АКТИВНОСТЯМ (по времени)</div>`;
-  sorted.forEach(item=>{
-    const pct=Math.round(item.sec/totalSec*100);
-    html+=`<div class="srow"><span class="se">${item.emoji}</span><span class="sn">${item.name}</span>
-      <div class="bw"><div class="bf" style="width:${Math.round(item.sec/max*100)}%;background:${item.color}"></div></div>
-      <span class="sc2">${fmtDurShort(item.sec)}</span><span class="spc">${pct}%</span></div>`;
+  sorted.forEach(([k,sec])=>{
+    const[em,name]=k.split('§');
+    const pct=Math.round(sec/totalSec*100);
+    html+=`<div class="srow"><span class="se">${em}</span><span class="sn">${name}</span>
+      <div class="bw"><div class="bf" style="width:${Math.round(sec/max*100)}%"></div></div>
+      <span class="sc2">${fmtDurShort(sec)}</span><span class="spc">${pct}%</span></div>`;
   });
   html+=`</div>`;
   const hc=Array(24).fill(0);logs.forEach(l=>hc[new Date(l.ts).getHours()]+=(l.durationSec||0));
@@ -1136,17 +1044,18 @@ function drawPie(body,logs){
   const totalSec=totalSecLogs(logs);
   const sorted=getCounts(logs);
   const R=78,cx=88,cy=88;let start=0;let paths='';
-  sorted.forEach(item=>{
-    const frac=item.sec/totalSec;const angle=frac*2*Math.PI;
+  sorted.forEach(([k,sec],i)=>{
+    const frac=sec/totalSec;const angle=frac*2*Math.PI;
     const x1=cx+R*Math.sin(start),y1=cy-R*Math.cos(start);
     const x2=cx+R*Math.sin(start+angle),y2=cy-R*Math.cos(start+angle);
-    if(frac>0.995)paths+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${item.color}"/>`;
-    else paths+=`<path d="M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${angle>Math.PI?1:0},1 ${x2},${y2} Z" fill="${item.color}"/>`;
+    if(frac>0.995)paths+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${PIE_COL[i%PIE_COL.length]}"/>`;
+    else paths+=`<path d="M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${angle>Math.PI?1:0},1 ${x2},${y2} Z" fill="${PIE_COL[i%PIE_COL.length]}"/>`;
     start+=angle;
   });
   let legend='';
-  sorted.forEach(item=>{
-    legend+=`<div class="plr"><div class="pd" style="background:${item.color}"></div><span class="pln">${item.emoji} ${item.name}</span><span class="plp">${Math.round(item.sec/totalSec*100)}%</span></div>`;
+  sorted.forEach(([k,sec],i)=>{
+    const[em,name]=k.split('§');
+    legend+=`<div class="plr"><div class="pd" style="background:${PIE_COL[i%PIE_COL.length]}"></div><span class="pln">${em} ${name}</span><span class="plp">${Math.round(sec/totalSec*100)}%</span></div>`;
   });
   const days=new Set(logs.map(l=>new Date(l.ts).toDateString())).size;
   let html=`<div class="sg">
@@ -1162,30 +1071,134 @@ function drawPie(body,logs){
   body.innerHTML=html;
 }
 
-function drawHeatmap(body,logs){
-  const dc={};logs.forEach(l=>{const k=new Date(l.ts).toDateString();dc[k]=(dc[k]||0)+1;});
-  const mxD=Math.max(...Object.values(dc),1);
-  const today=new Date();today.setHours(23,59,59,999);
-  const start=new Date(today);start.setDate(today.getDate()-69);start.setHours(0,0,0,0);
-  const dn=['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
-  let html=`<div class="card">
-  <div class="ctitle">ТЕПЛОВАЯ КАРТА — каждая клетка = один день. Яркость = количество отметок за день.</div>
-  <div class="hl">${dn.map(d=>`<div style="font-size:7px;color:var(--mut);text-align:center">${d}</div>`).join('')}</div>
-  <div class="hg">`;
-  const dow0=(start.getDay()+6)%7;
-  for(let i=0;i<dow0;i++)html+=`<div class="hc" style="background:transparent"></div>`;
-  for(let i=0;i<70;i++){
-    const d=new Date(start);d.setDate(start.getDate()+i);if(d>today)break;
-    const cnt=dc[d.toDateString()]||0;
-    html+=`<div class="hc" style="background:${cnt>0?`rgba(232,255,71,${Math.max(.18,cnt/mxD)})`:'var(--bor)'}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${cnt} отм."></div>`;
+function getActivityColorById(activityId){
+  if(activityId===null||typeof activityId==='undefined')return 'var(--bor)';
+  const activities=S.activities.filter(a=>!isDeleted(a));
+  const idx=Math.max(0,activities.findIndex(a=>String(a.id)===String(activityId)));
+  return PIE_COL[idx%PIE_COL.length];
+}
+
+function allocateLogAcrossHours(log,buckets){
+  const duration=Math.max(1,parseInt(log.durationSec)||0);
+  if(!duration)return;
+  const end=new Date(log.ts).getTime();
+  const start=end-duration*1000;
+  let cursor=start;
+  while(cursor<end){
+    const cursorDate=new Date(cursor);
+    const hourStart=new Date(cursorDate);
+    hourStart.setMinutes(0,0,0);
+    const hourEnd=hourStart.getTime()+3600000;
+    const sliceEnd=Math.min(end,hourEnd);
+    const overlapSec=Math.max(1,Math.floor((sliceEnd-cursor)/1000));
+    const dayKey=`${cursorDate.getFullYear()}-${pad(cursorDate.getMonth()+1)}-${pad(cursorDate.getDate())}`;
+    if(!buckets[dayKey])buckets[dayKey]=Array.from({length:24},()=>({}));
+    const hour=cursorDate.getHours();
+    const bucket=buckets[dayKey][hour];
+    const key=String(log.activityId);
+    bucket[key]=(bucket[key]||0)+overlapSec;
+    cursor=sliceEnd;
   }
-  html+=`</div>
-  <div class="legr"><span>0</span><div class="legc">${[.18,.4,.6,.8,1].map(o=>`<div class="lc" style="background:rgba(232,255,71,${o})"></div>`).join('')}</div><span>много</span></div>
-  <div style="font-size:9px;color:var(--mut);margin-top:8px">Строки = дни недели (Пн–Вс). Столбцы = недели. Последние 10 недель.</div>
+}
+
+function buildHourlyBuckets(logs){
+  const buckets={};
+  logs.forEach(log=>allocateLogAcrossHours(log,buckets));
+  return buckets;
+}
+
+function buildHourlyDayCells(logs,start,today){
+  const buckets=buildHourlyBuckets(logs);
+  const cells=[];
+  for(let i=0;i<70;i++){
+    const day=new Date(start);
+    day.setDate(start.getDate()+i);
+    if(day>today)break;
+    const dayKey=`${day.getFullYear()}-${pad(day.getMonth()+1)}-${pad(day.getDate())}`;
+    const dateLabel=`${pad(day.getDate())}.${pad(day.getMonth()+1)}.${day.getFullYear()}`;
+    const hours=(buckets[dayKey]||Array.from({length:24},()=>({}))).map((hourMap,hour)=>{
+      const entries=Object.entries(hourMap).sort((a,b)=>b[1]-a[1]);
+      if(!entries.length){
+        return {
+          color:'var(--bor)',
+          title:`${dateLabel} · ${pad(hour)}:00 — пусто`,
+          empty:true,
+          future:false,
+        };
+      }
+      const [activityId,sec]=entries[0];
+      const activity=S.activities.find(a=>String(a.id)===String(activityId));
+      const label=activity?`${activity.emoji} ${activity.name}`:'—';
+      return {
+        color:getActivityColorById(activityId),
+        title:`${dateLabel} · ${pad(hour)}:00 — ${label} (${fmtDurShort(sec)})`,
+        empty:false,
+        future:false,
+      };
+    });
+    cells.push({
+      title:dateLabel,
+      hours,
+    });
+  }
+  return cells;
+}
+
+function getHeatmapLegend(logs){
+  const totals=new Map();
+  logs.forEach(log=>{
+    const key=String(log.activityId);
+    totals.set(key,(totals.get(key)||0)+(log.durationSec||0));
+  });
+  return [...totals.entries()]
+    .sort((a,b)=>b[1]-a[1])
+    .map(([activityId])=>{
+      const activity=S.activities.find(a=>String(a.id)===String(activityId));
+      if(!activity)return null;
+      return {
+        color:getActivityColorById(activityId),
+        label:`${activity.emoji} ${activity.name}`,
+      };
+    })
+    .filter(Boolean);
+}
+
+
+function drawHeatmap(body,logs){
+  const today=new Date();
+  today.setHours(23,59,59,999);
+  const start=new Date(today);
+  start.setDate(today.getDate()-69);
+  start.setHours(0,0,0,0);
+  const dn=['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
+  const dayCells=buildHourlyDayCells(logs,start,today);
+  let html=`<div class="card">
+  <div class="ctitle">ТЕПЛОВАЯ КАРТА — каждый день разбит на 24 квадрата. Цвет часа = активность, которая заняла в этот час больше всего времени.</div>
+  <div class="hl">${dn.map(d=>`<div style="font-size:7px;color:var(--mut);text-align:center">${d}</div>`).join('')}</div>
+  <div class="hm-wrap">`;
+  const dow0=(start.getDay()+6)%7;
+  for(let i=0;i<dow0;i++)html+=`<div class="hday" style="background:transparent;border-color:transparent"></div>`;
+  dayCells.forEach(day=>{
+    html+=`<div class="hday" title="${day.title}">`;
+    day.hours.forEach(hour=>{
+      const cls=['hslot','border'];
+      if(hour.future)cls.push('future');
+      if(hour.empty)cls.push('empty');
+      html+=`<div class="${cls.join(' ')}" style="background:${hour.color}" title="${hour.title}"></div>`;
+    });
+    html+=`</div>`;
+  });
+  html+=`</div>`;
+  const legendItems=getHeatmapLegend(logs).slice(0,8);
+  if(legendItems.length){
+    html+=`<div class="hm-legend">${legendItems.map(item=>`<div class="hm-legend-item"><span class="hm-legend-dot" style="background:${item.color}"></span><span>${item.label}</span></div>`).join('')}</div>`;
+  }
+  html+=`<div style="font-size:9px;color:var(--mut);margin-top:8px">Последние 10 недель. Внутри каждого дня: 24 часа слева направо, сверху вниз.</div>
   </div>`;
-  const dowC=Array(7).fill(0);logs.forEach(l=>dowC[(new Date(l.ts).getDay()+6)%7]++);
+  const dowC=Array(7).fill(0);
+  logs.forEach(l=>{dowC[(new Date(l.ts).getDay()+6)%7]+=(l.durationSec||0);});
   const mxDow=Math.max(...dowC,1);
-  html+=`<div class="card"><div class="ctitle">ПО ДНЯМ НЕДЕЛИ</div><div class="bc">`;
+  html+=`<div class="card"><div class="ctitle">ПО ДНЯМ НЕДЕЛИ (по времени)</div><div class="bc">`;
   dowC.forEach((c,i)=>html+=`<div class="bcol"><div class="b" style="height:${Math.round(c/mxDow*44)}px"></div><div class="l">${dn[i]}</div></div>`);
   html+=`</div></div>`;
   body.innerHTML=html;
@@ -1213,8 +1226,7 @@ function renderH(){
     const time=pad(d.getHours())+':'+pad(d.getMinutes());
     const date=pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
     const dur=fmtDurLong(l.durationSec||0);
-    const itemColor=l.skipped?'var(--bor)':getLogColor(l);
-    html+=`<div class="hitem" style="border-color:${itemColor};box-shadow:0 0 0 1px ${l.skipped?'transparent':rgbaFromHex(itemColor,.16)} inset">
+    html+=`<div class="hitem">
       <div class="hitem-main">
         <div class="hem">${l.skipped?'—':l.emoji}</div>
         <div class="hinfo">
@@ -1283,7 +1295,6 @@ function applyEdit(a){
   log.activityId=String(a.id);
   log.emoji=a.emoji;
   log.name=a.name;
-  log.color=a.color;
   log.skipped=false;
   touchItem(log);
   save();
@@ -1346,7 +1357,7 @@ function confirmSplit(){
   log.durationSec=s1;
   touchItem(log);
   const ts2=new Date(new Date(log.ts).getTime()+s1*1000).toISOString();
-  S.logs.push(createLogEntry(act2,s2,{ts:ts2}));
+  S.logs.push(createLogEntry(act2,s2,{ts:ts2,answeredAt:log.answeredAt||log.createdAt||log.ts}));
   S.logs.sort((a,b)=>new Date(a.ts)-new Date(b.ts));
   save();
   closeModal('split-modal');
@@ -1418,7 +1429,7 @@ function gAuth(){
 6. В "Authorised JavaScript origins" добавь адрес этого файла
 7. Скопируй Client ID
 8. В HTML найди строку:
-   const G_CLIENT_ID='365703826756-q69gavqauf43m7m1d2ftvi2163qh76ai.apps.googleusercontent.com';
+   const G_CLIENT_ID='';
    и вставь Client ID
 
 После этого синхронизация заработает.`);
@@ -1538,7 +1549,8 @@ async function runCloudAction(mode,buttonId=null){
       console.error(e);
     }
   }finally{
-    if(btn){btn.textContent=prevLabel;btn.classList.remove('syncing');}
+    btn.textContent=prevLabel;
+    btn.classList.remove('syncing');
     setCloudButtonsDisabled(false);
     updateGUI();
   }
@@ -1553,7 +1565,7 @@ function setCloudButtonsDisabled(disabled){
 
 function buildExportObject(){
   return {
-    schemaVersion:2,
+    schemaVersion:3,
     exportedAt:nowISO(),
     deviceId:S.deviceId,
     rootFolderId:S.gRootFolderId||null,
@@ -1569,13 +1581,14 @@ function buildExport(){return JSON.stringify(buildExportObject(),null,2);}
 function normalizeState(raw){
   const state=raw&&typeof raw==='object'?raw:{};
   return {
-    schemaVersion:2,
+    schemaVersion:3,
     deviceId:S.deviceId||state.deviceId||genId(),
     gFolder:S.gFolder||'TimeTracker',
     gRootFolderId:state.rootFolderId||S.gRootFolderId||null,
     gBackupFolderId:state.backupFolderId||S.gBackupFolderId||null,
     gMainFileId:state.mainFileId||S.gMainFileId||null,
     lastSyncAt:S.lastSyncAt||null,
+    badgeColor:state.badgeColor||S.badgeColor||'#e8ff47',
     intervalMinutes:S.intervalMinutes||15,
     nextPingTime:S.nextPingTime||null,
     customFrom:S.customFrom||null,
@@ -1801,6 +1814,7 @@ function escapeAttr(value){
 }
 
 function rerenderAll(){
+  applyTheme();
   renderPG();
   renderSett();
   if(document.getElementById('sa').classList.contains('active'))renderA();
@@ -1820,6 +1834,7 @@ function toast(msg){
 // BOOT
 // ══════════════════════════════════════════════════════
 load();
+applyTheme();
 renderPG();
 restorePingSchedule();
 updateGUI();
