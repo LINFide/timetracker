@@ -36,6 +36,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .clk-sec{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#7a8a1a;letter-spacing:2px;padding-bottom:4px}
 .clks{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
 .pq{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--txt);margin-bottom:12px;text-align:center}
+.ping-tools{display:flex;justify-content:center;width:100%;margin:-2px 0 10px}
+.main-sync-btn{padding:7px 14px;background:var(--sur2);border:1px solid var(--bor);border-radius:999px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer}
+.main-sync-btn.connected{border-color:var(--acc);color:var(--acc)}
+.main-sync-btn:disabled{opacity:.55;cursor:default}
+.main-sync-btn:active{opacity:.75}
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;overflow-y:auto;flex:1}
 .abt{background:var(--sur);border:1px solid var(--bor);border-radius:11px;padding:10px 9px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--txt);cursor:pointer;text-align:left;line-height:1.4;transition:all .1s}
 .abt .em{font-size:19px;display:block;margin-bottom:3px}
@@ -220,6 +225,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
    </div>
    <div class="clks">СЕЙЧАС</div>
    <div class="pq" id="pq-text">ЧТО ТЫ ДЕЛАЛ?</div>
+   <div class="ping-tools"><button class="main-sync-btn" id="main-sync-btn" onclick="gSyncFromMain()">☁️ SYNC</button></div>
    <div class="pgrid" id="ping-grid"></div>
    <div class="skiprow"><button class="skipbtn" onclick="skip()">ПРОПУСТИТЬ</button></div>
   </div>
@@ -1059,10 +1065,25 @@ function renderH(){
       <div class="hbtns">
         <button class="hbtn" onclick="openEditModal('${l.id}')">✏️ ИЗМЕНИТЬ</button>
         <button class="hbtn split-btn" onclick="openSplitModal('${l.id}')">✂️ ДЕЛИТЬ НА 2</button>
+        <button class="hbtn" onclick="deleteHistoryLog('${l.id}')">🗑 УДАЛИТЬ</button>
       </div>
     </div>`;
   });
   body.innerHTML=html;
+}
+
+function deleteHistoryLog(logId){
+  const log=visibleLogById(logId);
+  if(!log)return;
+  if(!confirm('Удалить эту запись из истории?')){
+    return;
+  }
+  const deletedAt=nowISO();
+  log.deletedAt=deletedAt;
+  log.updatedAt=deletedAt;
+  save();
+  rerenderAll();
+  toast('🗑 Запись удалена');
 }
 
 // ── Edit modal ──
@@ -1188,6 +1209,7 @@ function updateGUI(){
   const st=document.getElementById('g-status');
   const pn=document.getElementById('g-panel');
   const btn=document.getElementById('g-auth-btn');
+  const mainSyncBtn=document.getElementById('main-sync-btn');
   const details=[];
 
   if(S.gRootFolderId)details.push('Папка привязана');
@@ -1198,10 +1220,20 @@ function updateGUI(){
     st.innerHTML=`<span class="ok">✓ Подключён</span>${details.length?'<br>'+details.join('<br>'):''}`;
     pn.style.display='block';
     btn.textContent='ОТКЛЮЧИТЬ';
+    if(mainSyncBtn){
+      mainSyncBtn.textContent='☁️ SYNC';
+      mainSyncBtn.classList.add('connected');
+      mainSyncBtn.disabled=false;
+    }
   }else{
     st.textContent='Не подключён';
     pn.style.display='none';
     btn.textContent='ПОДКЛЮЧИТЬ GOOGLE DRIVE';
+    if(mainSyncBtn){
+      mainSyncBtn.textContent='☁️ DRIVE OFF';
+      mainSyncBtn.classList.remove('connected');
+      mainSyncBtn.disabled=false;
+    }
   }
 }
 
@@ -1259,6 +1291,7 @@ function startGoogleTokenFlow(){
 }
 
 async function gSync(){await runCloudAction('merge');}
+async function gSyncFromMain(){await runCloudAction('merge','main-sync-btn');}
 async function gForceSync(){
   if(!confirm('Force Sync перезапишет облачную историю локальной версией. Перед этим будет сделан backup облака. Продолжить?'))return;
   await runCloudAction('force-sync');
@@ -1268,7 +1301,7 @@ async function gForceRecovery(){
   await runCloudAction('force-recovery');
 }
 
-async function runCloudAction(mode){
+async function runCloudAction(mode,buttonId=null){
   if(!gToken){
     toast('Сначала подключи Drive');
     return;
@@ -1278,11 +1311,14 @@ async function runCloudAction(mode){
     'force-sync':'g-force-sync-btn',
     'force-recovery':'g-recovery-btn',
   };
-  const btn=document.getElementById(btnMap[mode]);
-  const prevLabel=btn.textContent;
+  const activeBtnId=buttonId||btnMap[mode];
+  const btn=document.getElementById(activeBtnId);
+  const prevLabel=btn?btn.textContent:'';
   setCloudButtonsDisabled(true);
-  btn.textContent='⏳ ОБРАБОТКА...';
-  btn.classList.add('syncing');
+  if(btn){
+    btn.textContent='⏳ ОБРАБОТКА...';
+    btn.classList.add('syncing');
+  }
 
   try{
     S.gFolder=document.getElementById('g-folder').value||'TimeTracker';
@@ -1348,7 +1384,7 @@ async function runCloudAction(mode){
 }
 
 function setCloudButtonsDisabled(disabled){
-  ['g-sync-btn','g-force-sync-btn','g-recovery-btn','g-auth-btn'].forEach(id=>{
+  ['g-sync-btn','g-force-sync-btn','g-recovery-btn','g-auth-btn','main-sync-btn'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.disabled=disabled;
   });
