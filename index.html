@@ -35,7 +35,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .clk-hm{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:1;color:var(--acc);letter-spacing:3px}
 .clk-sec{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#7a8a1a;letter-spacing:2px;padding-bottom:4px}
 .clks{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
-.pq{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--txt);margin-bottom:12px;text-align:center}
+.pq{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--txt);margin-bottom:6px;text-align:center}
+.pq-badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:7px 14px;margin:0 auto 10px;background:var(--acc);border:1px solid var(--acc);border-radius:999px;color:#000;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
 .ping-tools{display:flex;justify-content:center;width:100%;margin:-2px 0 10px}
 .main-sync-btn{padding:7px 14px;background:var(--sur2);border:1px solid var(--bor);border-radius:999px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer}
 .main-sync-btn.connected{border-color:var(--acc);color:var(--acc)}
@@ -224,7 +225,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
     <div class="clk-sec" id="clk-sec">00</div>
    </div>
    <div class="clks">СЕЙЧАС</div>
-   <div class="pq" id="pq-text">ЧТО ТЫ ДЕЛАЛ?</div>
+   <div class="pq" id="pq-text">ЧТО ТЫ ДЕЛАЛ</div>
+   <div class="pq-badge" id="pq-badge">СЕЙЧАС</div>
    <div class="ping-tools"><button class="main-sync-btn" id="main-sync-btn" onclick="gSyncFromMain()">☁️ SYNC</button></div>
    <div class="pgrid" id="ping-grid"></div>
    <div class="skiprow"><button class="skipbtn" onclick="skip()">ПРОПУСТИТЬ</button></div>
@@ -528,15 +530,20 @@ function pad3(x){return String(x).padStart(3,'0')}
 setInterval(tick,1000);tick();
 
 function updatePQ(){
-  let txt='ЧТО ТЫ ДЕЛАЛ?';
-  if(S.nextPingTime){
-    const last=lastLogTime();
-    if(last){
-      const mins=Math.floor((Date.now()-last)/60000);
-      if(mins>0)txt=`ЧТО ТЫ ДЕЛАЛ последние ${mins} мин?`;
-    }
+  const title=document.getElementById('pq-text');
+  const badge=document.getElementById('pq-badge');
+  if(title)title.textContent='ЧТО ТЫ ДЕЛАЛ';
+  if(!badge)return;
+  const last=lastLogTime();
+  if(!last){badge.textContent='СЕЙЧАС';return;}
+  const mins=Math.max(0,Math.floor((Date.now()-last)/60000));
+  if(mins<=0){badge.textContent='МЕНЬШЕ МИНУТЫ';return;}
+  const lastLog=new Date(last);
+  if(lastLog.toDateString()!==new Date().toDateString()){
+    badge.textContent='ДАВНО';
+    return;
   }
-  document.getElementById('pq-text').textContent=txt;
+  badge.textContent=`ПОСЛЕДНИЕ ${mins} МИН`;
 }
 
 function lastLogTime(){
