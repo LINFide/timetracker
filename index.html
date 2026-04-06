@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ЧТО ТЫ ДЕЛАЛ">
+<title>ЧТО ТЫ ДЕЛАЛ</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0a;--sur:#141414;--sur2:#1c1c1c;--sur3:#222;
+  --acc:#e8ff47;--red:#ff4747;--blue:#47b8ff;--grn:#47ff9f;
+  --txt:#f0f0f0;--mut:#555;--bor:#252525;--nav:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'IBM Plex Mono',monospace}
+#app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+#content{flex:1;overflow:hidden;position:relative}
+.screen{display:none;flex-direction:column;position:absolute;inset:0;overflow:hidden}
+.screen.active{display:flex}
+
+/* NAV */
+#bnav{height:var(--nav);background:var(--sur);border-top:1px solid var(--bor);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;padding:0}
+.nb .ic{font-size:19px;line-height:1}
+.nb .lb{font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mut)}
+.nb.active .lb{color:var(--acc)}
+.nb:active{opacity:.6}
+
+/* ── PING ── */
+#sp{align-items:center;padding:14px 16px 8px;gap:0}
+.clk-wrap{display:flex;align-items:baseline;gap:6px;margin-bottom:2px}
+.clk-hm{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:1;color:var(--acc);letter-spacing:3px}
+.clk-sec{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#7a8a1a;letter-spacing:2px;padding-bottom:4px}
+.clks{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.pq{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--txt);margin-bottom:12px;text-align:center}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;overflow-y:auto;flex:1}
+.abt{background:var(--sur);border:1px solid var(--bor);border-radius:11px;padding:10px 9px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--txt);cursor:pointer;text-align:left;line-height:1.4;transition:all .1s}
+.abt .em{font-size:19px;display:block;margin-bottom:3px}
+.abt:active{background:var(--acc);color:#000;border-color:var(--acc);transform:scale(.97)}
+.skiprow{padding-top:8px;width:100%;flex-shrink:0}
+.skipbtn{width:100%;padding:10px;background:none;border:1px solid var(--bor);border-radius:10px;color:var(--mut);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;cursor:pointer}
+.skipbtn:active{color:var(--txt)}
+
+/* ── TIMER SCREEN ── */
+#stimer{align-items:center;justify-content:flex-start;padding:20px 20px 10px}
+.timer-mode-row{display:flex;gap:6px;margin-bottom:24px;background:var(--sur2);border-radius:10px;padding:4px}
+.tmbtn{flex:1;padding:8px;border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:none;border:none;color:var(--mut);cursor:pointer}
+.tmbtn.active{background:var(--acc);color:#000}
+.timer-display{font-family:'Bebas Neue',sans-serif;font-size:62px;letter-spacing:3px;color:var(--acc);text-align:center;line-height:1;margin-bottom:4px;width:100%}
+.timer-ms{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#7a8a1a;text-align:center;margin-bottom:28px}
+.timer-set-row{display:flex;gap:8px;margin-bottom:20px;width:100%}
+.timer-field{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.timer-field label{font-size:9px;letter-spacing:2px;color:var(--mut);text-transform:uppercase}
+.timer-field input{width:100%;background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:10px 4px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--txt);outline:none}
+.timer-btns{display:flex;gap:10px;width:100%}
+.tbtn{flex:1;padding:14px;border-radius:12px;border:none;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer}
+.tbtn.start{background:var(--acc);color:#000}
+.tbtn.stop{background:var(--red);color:#fff}
+.tbtn.reset{background:var(--sur2);color:var(--mut);border:1px solid var(--bor)}
+.tbtn:active{opacity:.75}
+.timer-lap-list{width:100%;flex:1;overflow-y:auto;margin-top:16px}
+.lap-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bor);font-size:11px}
+.lap-item .ln{color:var(--mut)}
+.lap-item .lt{color:var(--acc);font-weight:700}
+
+/* ── SHARED HEADER ── */
+.sh{padding:10px 14px 8px;border-bottom:1px solid var(--bor);flex-shrink:0}
+.sh-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;color:var(--acc);margin-bottom:7px}
+.chips{display:flex;gap:5px;overflow-x:auto;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:5px 12px;border-radius:18px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;border:1px solid var(--bor);background:var(--sur2);color:var(--mut);cursor:pointer;flex-shrink:0}
+.chip.active{background:var(--acc);color:#000;border-color:var(--acc)}
+.vrow{display:flex;gap:5px;overflow-x:auto;padding:6px 14px 0;flex-shrink:0}
+.vrow::-webkit-scrollbar{display:none}
+.vc{padding:4px 11px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;border:1px solid var(--bor);background:var(--sur2);color:var(--mut);cursor:pointer;flex-shrink:0}
+.vc.active{color:var(--acc);border-color:var(--acc)}
+
+/* ── ANALYTICS ── */
+#sa{overflow:hidden}
+.ascroll{flex:1;overflow-y:auto;padding:12px 13px 20px}
+.card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:13px;margin-bottom:9px}
+.ctitle{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:9px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.sc{background:var(--sur);border:1px solid var(--bor);border-radius:11px;padding:11px}
+.sv{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--acc);letter-spacing:2px;line-height:1}
+.sl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-top:3px}
+.srow{display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid var(--bor)}
+.srow:last-child{border-bottom:none}
+.se{font-size:16px;min-width:22px}.sn{flex:1;font-size:11px;color:var(--txt)}
+.bw{flex:2;height:5px;background:var(--bor);border-radius:3px;overflow:hidden}
+.bf{height:100%;background:var(--acc);border-radius:3px}
+.sc2{font-size:9px;color:var(--mut);min-width:30px;text-align:right}
+.spc{font-size:9px;color:var(--acc);min-width:30px;text-align:right}
+.pie-wrap{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.pie-legend{flex:1;min-width:110px}
+.plr{display:flex;align-items:center;gap:6px;padding:3px 0}
+.pd{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.pln{font-size:10px;color:var(--txt);flex:1}
+.plp{font-size:10px;color:var(--acc)}
+.hg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.hl{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+.hc{aspect-ratio:1;border-radius:3px;background:var(--bor)}
+.legr{display:flex;align-items:center;gap:5px;margin-top:7px;font-size:9px;color:var(--mut)}
+.legc{display:flex;gap:3px}
+.lc{width:11px;height:11px;border-radius:2px}
+.bc{display:flex;align-items:flex-end;gap:3px;height:48px;margin:6px 0 3px}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center}
+.bcol .b{width:100%;border-radius:3px 3px 0 0;background:var(--acc)}
+.bcol .l{font-size:7px;color:var(--mut);margin-top:2px}
+.date-row{display:flex;gap:7px;align-items:center;margin-top:5px}
+.date-inp{background:var(--sur);border:1px solid var(--bor);border-radius:7px;padding:6px 9px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:10px;outline:none;flex:1}
+.date-apply{background:var(--acc);color:#000;border:none;border-radius:7px;padding:6px 11px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;cursor:pointer;flex-shrink:0}
+
+/* ── HISTORY ── */
+#sh2{overflow:hidden}
+.hscroll{flex:1;overflow-y:auto;padding:9px 13px 20px}
+.hitem{background:var(--sur);border:1px solid var(--bor);border-radius:10px;margin-bottom:6px;overflow:hidden}
+.hitem-main{display:flex;align-items:center;gap:9px;padding:9px 10px}
+.hem{font-size:18px;min-width:26px;text-align:center}
+.hinfo{flex:1;min-width:0}
+.hname{font-size:12px;color:var(--txt)}
+.htime{font-size:9px;color:var(--mut);margin-top:2px}
+.hdur{font-size:9px;color:var(--blue);margin-top:1px}
+.hskip{color:var(--mut);font-style:italic}
+.hbtns{display:flex;gap:5px;padding:0 10px 9px;margin-top:-2px}
+.hbtn{flex:1;padding:5px 0;background:none;border:1px solid var(--bor);border-radius:7px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--mut);cursor:pointer}
+.hbtn:active{color:var(--acc);border-color:var(--acc)}
+.hbtn.split-btn:active{color:var(--grn);border-color:var(--grn)}
+
+/* ── SETTINGS ── */
+#sset{overflow:hidden}
+.sscroll{flex:1;overflow-y:auto;padding:13px}
+.slbl{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--mut);margin-bottom:8px;margin-top:18px}
+.slbl:first-child{margin-top:0}
+.ait{display:flex;align-items:center;gap:7px;padding:9px 10px;background:var(--sur);border:1px solid var(--bor);border-radius:10px;margin-bottom:5px}
+.embtn{font-size:19px;cursor:pointer;min-width:26px;text-align:center;background:none;border:none}
+.ait input{flex:1;background:none;border:none;outline:none;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--txt)}
+.ait input::placeholder{color:var(--mut)}
+.arc-badge{font-size:8px;color:var(--mut);border:1px solid var(--bor);border-radius:4px;padding:2px 5px;flex-shrink:0}
+.xbtn{background:none;border:none;color:var(--mut);font-size:17px;cursor:pointer;padding:2px 3px;line-height:1}
+.xbtn:active{color:var(--red)}
+.arcbtn{background:none;border:1px solid var(--bor);border-radius:6px;padding:3px 7px;font-size:9px;color:var(--mut);cursor:pointer;font-family:'IBM Plex Mono',monospace;flex-shrink:0}
+.arcbtn:active{color:var(--blue);border-color:var(--blue)}
+.dbtn{width:100%;padding:10px;border:1px dashed var(--bor);border-radius:10px;background:none;color:var(--mut);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;margin-top:3px}
+.dbtn:active{color:var(--acc);border-color:var(--acc)}
+.dbtn.danger:active{color:var(--red);border-color:var(--red)}
+.irow{display:flex;align-items:center;gap:10px}
+.ninp{background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:9px 11px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:13px;width:72px;outline:none}
+.mt{color:var(--mut);font-size:11px}
+.bigbtn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--acc);color:#000;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;letter-spacing:1px;cursor:pointer}
+.bigbtn:active{opacity:.75}
+.bigbtn.sec{background:var(--sur2);color:var(--txt);border:1px solid var(--bor)}
+.bigbtn.blue{background:var(--blue);color:#000}
+.ibox{background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:12px;font-size:11px;line-height:1.9;color:var(--mut)}
+.ibox strong{color:var(--txt)}
+.gstat{font-size:10px;color:var(--mut);margin-top:5px;line-height:1.6}
+.gstat .ok{color:var(--grn)}
+
+/* ── MODALS ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;display:none;align-items:flex-end}
+.overlay.open{display:flex}
+.modal{background:var(--sur2);border-top:1px solid var(--bor);width:100%;padding:15px;border-radius:16px 16px 0 0;max-height:82vh;overflow-y:auto}
+.modal-title{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mut);margin-bottom:11px}
+.modal-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;cursor:pointer;margin-bottom:3px}
+.modal-item:active{background:var(--bor)}
+.modal-item.sel{background:var(--sur3)}
+.modal-item.sel .mname{color:var(--acc)}
+.mem2{font-size:19px;min-width:24px}
+.mname{font-size:12px;color:var(--txt)}
+.cancel-btn{width:100%;margin-top:7px;padding:11px;background:none;border:1px solid var(--bor);border-radius:10px;color:var(--mut);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer}
+
+/* Duration picker inside modal */
+.dur-row{display:flex;gap:8px;margin:10px 0;align-items:center}
+.dur-inp{flex:1;background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:9px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--txt);outline:none}
+.dur-lbl{font-size:10px;color:var(--mut)}
+
+/* Split slider */
+.split-area{padding:10px 0}
+.split-slider{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--bor);outline:none;margin:10px 0}
+.split-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--acc);cursor:pointer}
+.split-preview{display:flex;gap:8px;margin-top:12px}
+.split-half{flex:1;background:var(--sur3);border:1px solid var(--bor);border-radius:8px;padding:9px;text-align:center}
+.split-half .st{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin-bottom:4px}
+.split-half .sv2{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--acc)}
+
+/* EMOJI PICKER */
+.epo{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:600;display:none;align-items:flex-end}
+.epo.open{display:flex}
+.epp{background:var(--sur2);border-top:1px solid var(--bor);width:100%;padding:13px 13px 26px;border-radius:16px 16px 0 0}
+.ept{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:9px}
+.epg{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;max-height:200px;overflow-y:auto}
+.epe{font-size:24px;text-align:center;padding:5px;border-radius:7px;cursor:pointer}
+.epe:active{background:var(--bor)}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nav) + 10px);left:50%;transform:translateX(-50%);background:var(--acc);color:#000;padding:7px 18px;border-radius:18px;font-weight:700;font-size:11px;letter-spacing:1px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:700;white-space:nowrap}
+.toast.show{opacity:1}
+
+.empty{text-align:center;padding:40px 16px;color:var(--mut)}
+.empty .big{font-family:'Bebas Neue';font-size:50px;color:var(--bor);letter-spacing:4px}
+.empty p{font-size:11px;margin-top:5px;line-height:1.7}
+
+/* Sync pulse */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.syncing{animation:pulse 1s infinite}
+</style>
+</head>
+<body>
+<div id="app">
+ <div id="content">
+
+  <!-- ══ PING ══ -->
+  <div class="screen active" id="sp">
+   <div class="clk-wrap">
+    <div class="clk-hm" id="clk-hm">00:00</div>
+    <div class="clk-sec" id="clk-sec">00</div>
+   </div>
+   <div class="clks">СЕЙЧАС</div>
+   <div class="pq" id="pq-text">ЧТО ТЫ ДЕЛАЛ?</div>
+   <div class="pgrid" id="ping-grid"></div>
+   <div class="skiprow"><button class="skipbtn" onclick="skip()">ПРОПУСТИТЬ</button></div>
+  </div>
+
+  <!-- ══ TIMER ══ -->
+  <div class="screen" id="stimer">
+   <div class="timer-mode-row">
+    <button class="tmbtn active" id="tbtn-sw" onclick="setTimerMode('sw')">СЕКУНДОМЕР</button>
+    <button class="tmbtn" id="tbtn-tm" onclick="setTimerMode('tm')">ТАЙМЕР</button>
+   </div>
+   <div class="timer-display" id="timer-hms">00:00:00</div>
+   <div class="timer-ms" id="timer-ms-disp">.000</div>
+   <div class="timer-set-row" id="timer-set-row" style="display:none">
+    <div class="timer-field"><label>ЧАС</label><input type="number" id="t-h" value="0" min="0" max="23"></div>
+    <div class="timer-field"><label>МИН</label><input type="number" id="t-m" value="5" min="0" max="59"></div>
+    <div class="timer-field"><label>СЕК</label><input type="number" id="t-s" value="0" min="0" max="59"></div>
+   </div>
+   <div class="timer-btns">
+    <button class="tbtn start" id="tbtn-start" onclick="timerToggle()">СТАРТ</button>
+    <button class="tbtn reset" onclick="timerReset()">СБРОС</button>
+    <button class="tbtn reset" id="tbtn-lap" onclick="timerLap()" style="display:none">КРУ Г</button>
+   </div>
+   <div class="timer-lap-list" id="lap-list"></div>
+  </div>
+
+  <!-- ══ ANALYTICS ══ -->
+  <div class="screen" id="sa">
+   <div class="sh">
+    <div class="sh-title">АНАЛИТИКА</div>
+    <div class="chips">
+     <button class="chip active" data-p="today"  onclick="setPeriod('today')">СЕГОДНЯ</button>
+     <button class="chip" data-p="week"   onclick="setPeriod('week')">НЕДЕЛЯ</button>
+     <button class="chip" data-p="month"  onclick="setPeriod('month')">МЕСЯЦ</button>
+     <button class="chip" data-p="custom" onclick="setPeriod('custom')">ПЕРИОД</button>
+     <button class="chip" data-p="all"    onclick="setPeriod('all')">ВСЁ ВРЕМЯ</button>
+    </div>
+    <div id="custom-row" style="display:none">
+     <div class="date-row">
+      <input class="date-inp" type="date" id="dfrom">
+      <span style="color:var(--mut);font-size:10px">—</span>
+      <input class="date-inp" type="date" id="dto">
+      <button class="date-apply" onclick="applyCustom()">OK</button>
+     </div>
+    </div>
+   </div>
+   <div class="vrow">
+    <button class="vc active" data-v="bars"    onclick="setView('bars')">▬ ПОЛОСКИ</button>
+    <button class="vc" data-v="pie"     onclick="setView('pie')">◉ КРУГОВАЯ</button>
+    <button class="vc" data-v="heatmap" onclick="setView('heatmap')">▦ ТЕПЛОВАЯ</button>
+   </div>
+   <div class="ascroll" id="abody"></div>
+  </div>
+
+  <!-- ══ HISTORY ══ -->
+  <div class="screen" id="sh2">
+   <div class="sh">
+    <div class="sh-title">ИСТОРИЯ</div>
+    <div class="chips">
+     <button class="chip active" data-hf="all"   onclick="setHF('all')">ВСЕ</button>
+     <button class="chip" data-hf="today" onclick="setHF('today')">СЕГОДНЯ</button>
+     <button class="chip" data-hf="week"  onclick="setHF('week')">НЕДЕЛЯ</button>
+    </div>
+   </div>
+   <div class="hscroll" id="hbody"></div>
+  </div>
+
+  <!-- ══ SETTINGS ══ -->
+  <div class="screen" id="sset">
+   <div class="sh"><div class="sh-title">НАСТРОЙКИ</div></div>
+   <div class="sscroll">
+    <div class="slbl">АКТИВНОСТИ (макс. 16 активных)</div>
+    <div id="act-list"></div>
+    <button class="dbtn" onclick="addAct()">+ ДОБАВИТЬ</button>
+
+    <div class="slbl">ИНТЕРВАЛ ОПРОСА</div>
+    <div class="irow">
+     <input class="ninp" type="number" id="ival" min="1" max="120" value="15">
+     <span class="mt">минут</span>
+    </div>
+
+    <div class="slbl">УВЕДОМЛЕНИЯ</div>
+    <button class="bigbtn" onclick="reqNotify()">ВКЛЮЧИТЬ УВЕДОМЛЕНИЯ</button>
+
+    <div class="slbl">GOOGLE DRIVE</div>
+    <button class="bigbtn sec" id="g-auth-btn" onclick="gAuth()" style="margin-bottom:6px">ПОДКЛЮЧИТЬ GOOGLE DRIVE</button>
+    <div id="g-status" class="gstat">Не подключён</div>
+    <div id="g-panel" style="display:none;margin-top:8px">
+     <input class="ninp" type="text" id="g-folder" placeholder="Папка (напр. TimeTracker)" style="width:100%;margin-bottom:6px">
+     <button class="bigbtn blue" onclick="gSync()" style="margin-bottom:5px" id="g-sync-btn">🔄 SYNC</button>
+     <button class="bigbtn sec" onclick="gForceSync()" style="margin-bottom:5px" id="g-force-sync-btn">☁️ FORCE SYNC</button>
+     <button class="bigbtn sec" onclick="gForceRecovery()" style="margin-bottom:5px" id="g-recovery-btn">📥 FORCE RECOVERY</button>
+     <p style="font-size:10px;color:var(--mut);line-height:1.6">Sync объединяет локальные и облачные данные. Force Sync делает backup облачной версии и полностью перезаписывает её локальной. Force Recovery берёт все данные из облака и заменяет локальную историю.</p>
+    </div>
+
+    <div class="slbl">УСТАНОВКА НА IPHONE</div>
+    <div class="ibox">1. Открой в <strong>Safari</strong><br>2. Нажми <strong>Поделиться ↑</strong><br>3. <strong>«На экран «Домой»»</strong><br>4. <strong>«Добавить»</strong></div>
+
+    <div class="slbl">ДАННЫЕ</div>
+    <button class="dbtn" onclick="exportData()" style="margin-bottom:5px">📤 ЭКСПОРТ JSON</button>
+    <button class="dbtn danger" onclick="clearData()">🗑 УДАЛИТЬ ВСЕ ДАННЫЕ</button>
+
+    <div style="height:12px"></div>
+    <button class="bigbtn" onclick="saveSettings()">СОХРАНИТЬ</button>
+    <div style="height:22px"></div>
+   </div>
+  </div>
+
+ </div>
+
+ <nav id="bnav">
+  <button class="nb active" id="nb-sp"     onclick="goScreen('sp')"><span class="ic">⏱</span><span class="lb">ОТМЕТКА</span></button>
+  <button class="nb"        id="nb-stimer" onclick="goScreen('stimer')"><span class="ic">⏲</span><span class="lb">ТАЙМЕР</span></button>
+  <button class="nb"        id="nb-sa"     onclick="goScreen('sa')"><span class="ic">📊</span><span class="lb">АНАЛИТИКА</span></button>
+  <button class="nb"        id="nb-sh2"    onclick="goScreen('sh2')"><span class="ic">📋</span><span class="lb">ИСТОРИЯ</span></button>
+  <button class="nb"        id="nb-sset"   onclick="goScreen('sset')"><span class="ic">⚙️</span><span class="lb">НАСТРОЙКИ</span></button>
+ </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Edit modal -->
+<div class="overlay" id="edit-modal" onclick="closeModal('edit-modal',event)">
+ <div class="modal">
+  <div class="modal-title" id="edit-modal-title">ИЗМЕНИТЬ ЗАПИСЬ</div>
+  <div class="modal-title" style="margin-top:-4px;margin-bottom:8px;color:var(--txt);font-size:11px">ПРОДОЛЖИТЕЛЬНОСТЬ</div>
+  <div class="dur-row">
+   <input class="dur-inp" type="number" id="dur-h" placeholder="0" min="0"><span class="dur-lbl">ч</span>
+   <input class="dur-inp" type="number" id="dur-m" placeholder="0" min="0" max="59"><span class="dur-lbl">мин</span>
+   <input class="dur-inp" type="number" id="dur-s" placeholder="0" min="0" max="59"><span class="dur-lbl">сек</span>
+  </div>
+  <div class="modal-title" style="margin-bottom:8px">КАТЕГОРИЯ</div>
+  <div id="modal-cats"></div>
+  <button class="cancel-btn" onclick="closeModal('edit-modal')">ОТМЕНА</button>
+ </div>
+</div>
+
+<!-- Split modal -->
+<div class="overlay" id="split-modal" onclick="closeModal('split-modal',event)">
+ <div class="modal">
+  <div class="modal-title">ДЕЛИТЬ НА 2</div>
+  <div class="split-area">
+   <div style="font-size:10px;color:var(--mut);margin-bottom:6px" id="split-total-lbl">Общее время: —</div>
+   <input class="split-slider" type="range" id="split-slider" min="1" max="99" value="50" oninput="updateSplitPreview()">
+   <div class="split-preview">
+    <div class="split-half"><div class="st">ПЕРВАЯ ЧАСТЬ</div><div class="sv2" id="sp1">—</div></div>
+    <div class="split-half"><div class="st">ВТОРАЯ ЧАСТЬ</div><div class="sv2" id="sp2">—</div></div>
+   </div>
+   <div style="margin-top:12px;font-size:10px;color:var(--mut)">Выбери категорию для второй части:</div>
+   <div id="split-cats" style="margin-top:8px;max-height:200px;overflow-y:auto"></div>
+   <button class="bigbtn" onclick="confirmSplit()" style="margin-top:12px">ПОДЕЛИТЬ</button>
+  </div>
+  <button class="cancel-btn" onclick="closeModal('split-modal')">ОТМЕНА</button>
+ </div>
+</div>
+
+<!-- Emoji picker -->
+<div class="epo" id="epo" onclick="closeEP(event)">
+ <div class="epp">
+  <div class="ept">ВЫБЕРИ ЭМОДЗИ</div>
+  <div class="epg" id="epg"></div>
+ </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONSTANTS & STATE
+// ══════════════════════════════════════════════════════
+const EMOJIS=['💻','📚','🏃','🍳','😴','🧹','📱','🎮','🎵','🚗','🤝','🧘','✍️','📞','🛒','🎨','🍔','☕','🏋️','🧠','👨‍👩‍👦','🌿','📺','🎯','🎲','🔧','💼','✈️','🛁','🎭','🐶','🌙','🎤','🖥️','📝','🏠','🎪','🎸','🚴','🏊','🌅'];
+const PIE_COL=['#e8ff47','#47b8ff','#ff4747','#ff9f47','#b847ff','#47ff9f','#ff47b8','#47ffff','#ffb847','#47ffb8','#b8ff47','#ff47ff','#6b47ff','#ffff47','#ff6b47','#47ff6b'];
+
+let S={
+  schemaVersion:2,
+  deviceId:null,
+  activities:[
+    {id:'1',emoji:'💻',name:'Работа',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'2',emoji:'📚',name:'Учёба',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'3',emoji:'🍳',name:'Еда',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'4',emoji:'😴',name:'Отдых / сон',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'5',emoji:'🏃',name:'Спорт',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'6',emoji:'📱',name:'Соцсети',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'7',emoji:'🎮',name:'Игры',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'8',emoji:'🤝',name:'Общение',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'9',emoji:'🧹',name:'Дела по дому',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'10',emoji:'🚗',name:'В дороге',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'11',emoji:'🎵',name:'Музыка / хобби',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'12',emoji:'🧘',name:'Медитация',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+  ],
+  logs:[],
+  intervalMinutes:15,
+  nextPingTime:null,
+  gFolder:'TimeTracker',
+  gRootFolderId:null,
+  gBackupFolderId:null,
+  gMainFileId:null,
+  lastSyncAt:null,
+  customFrom:null,customTo:null,
+};
+
+let period='today',aView='bars',histFilter='all';
+let epIdx=null,pingTimer=null;
+let editLogId=null,splitLogId=null,splitSecondCatId=null;
+let gToken=null;
+
+// Timer/Stopwatch
+let timerMode='sw'; // 'sw' stopwatch, 'tm' timer
+let timerRunning=false;
+let timerStart=null;   // ms timestamp when last started
+let timerAccum=0;      // ms accumulated before last start
+let timerTarget=0;     // ms for countdown target
+let timerRAF=null;
+let laps=[];
+
+// ══════════════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════════════
+function save(){try{localStorage.setItem('ttv4',JSON.stringify(S));}catch(e){}}
+
+function load(){
+  try{
+    const d=localStorage.getItem('ttv4');
+    if(d){
+      const p=JSON.parse(d);
+      S={...S,...p};
+    }
+  }catch(e){}
+  try{gToken=localStorage.getItem('gToken')||null;}catch(e){}
+  migrateState();
+}
+
+function migrateState(){
+  const nowIso=nowISO();
+  if(!S.deviceId)S.deviceId=genId();
+  S.schemaVersion=2;
+
+  S.activities=(S.activities||[]).map((a,idx)=>normalizeActivity(a, idx + 1, nowIso));
+  S.logs=(S.logs||[]).map(normalizeLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+
+  if(typeof S.gRootFolderId==='undefined')S.gRootFolderId=null;
+  if(typeof S.gBackupFolderId==='undefined')S.gBackupFolderId=null;
+  if(typeof S.gMainFileId==='undefined')S.gMainFileId=null;
+  if(typeof S.lastSyncAt==='undefined')S.lastSyncAt=null;
+}
+
+function nowISO(){return new Date().toISOString();}
+
+function genId(){
+  try{
+    if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();
+  }catch(e){}
+  return 'id-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);
+}
+
+function normalizeActivity(a,fallbackId,nowIso=nowISO()){
+  const createdAt=a?.createdAt||a?.updatedAt||nowIso;
+  return {
+    id:String(a?.id??fallbackId??genId()),
+    emoji:a?.emoji||'❓',
+    name:a?.name||'',
+    archived:!!a?.archived,
+    createdAt,
+    updatedAt:a?.updatedAt||createdAt,
+    deletedAt:a?.deletedAt||null,
+  };
+}
+
+function normalizeLog(l){
+  const createdAt=l?.createdAt||l?.updatedAt||l?.ts||nowISO();
+  return {
+    id:String(l?.id??genId()),
+    activityId:l?.activityId===null||typeof l?.activityId==='undefined'?null:String(l.activityId),
+    emoji:l?.emoji||'—',
+    name:l?.name||'',
+    ts:l?.ts||createdAt,
+    skipped:!!l?.skipped,
+    durationSec:Math.max(1,parseInt(l?.durationSec)||1),
+    createdAt,
+    updatedAt:l?.updatedAt||createdAt,
+    deletedAt:l?.deletedAt||null,
+    deviceId:l?.deviceId||S.deviceId||null,
+  };
+}
+
+function isDeleted(item){return !!item?.deletedAt;}
+function activeActivities(){return S.activities.filter(a=>!a.archived&&!isDeleted(a));}
+function visibleLogs(){return S.logs.filter(l=>!isDeleted(l));}
+function visibleLogById(logId){return S.logs.find(l=>String(l.id)===String(logId)&&!isDeleted(l));}
+function touchItem(item){item.updatedAt=nowISO();return item;}
+
+// ══════════════════════════════════════════════════════
+// CLOCK (main screen)
+// ══════════════════════════════════════════════════════
+function tick(){
+  const n=new Date();
+  document.getElementById('clk-hm').textContent=pad(n.getHours())+':'+pad(n.getMinutes());
+  document.getElementById('clk-sec').textContent=pad(n.getSeconds());
+  updatePQ();
+}
+function pad(x){return String(x).padStart(2,'0')}
+function pad3(x){return String(x).padStart(3,'0')}
+setInterval(tick,1000);tick();
+
+function updatePQ(){
+  let txt='ЧТО ТЫ ДЕЛАЛ?';
+  if(S.nextPingTime){
+    const last=lastLogTime();
+    if(last){
+      const mins=Math.floor((Date.now()-last)/60000);
+      if(mins>0)txt=`ЧТО ТЫ ДЕЛАЛ последние ${mins} мин?`;
+    }
+  }
+  document.getElementById('pq-text').textContent=txt;
+}
+
+function lastLogTime(){
+  const logs=visibleLogs();
+  if(!logs.length)return null;
+  return new Date(logs[logs.length-1].ts).getTime();
+}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('nb-'+id).classList.add('active');
+  if(id==='sa')renderA();
+  if(id==='sh2')renderH();
+  if(id==='sset')renderSett();
+  if(id==='sp'){renderPG();updatePQ();}
+}
+
+// ══════════════════════════════════════════════════════
+// PING
+// ══════════════════════════════════════════════════════
+function renderPG(){
+  const g=document.getElementById('ping-grid');g.innerHTML='';
+  activeActivities().slice(0,16).forEach(a=>{
+    const b=document.createElement('button');b.className='abt';
+    b.innerHTML=`<span class="em">${a.emoji}</span>${a.name}`;
+    b.onclick=()=>logIt(a);g.appendChild(b);
+  });
+}
+
+function calcDuration(){
+  // Returns duration in seconds since last log, or interval*60 as fallback
+  const last=lastLogTime();
+  if(last){
+    const secs=Math.round((Date.now()-last)/1000);
+    return Math.max(1,secs);
+  }
+  return (S.intervalMinutes||15)*60;
+}
+
+function createLogEntry(activity,durationSec,overrides={}){
+  const ts=overrides.ts||nowISO();
+  const base={
+    id:genId(),
+    activityId:activity?String(activity.id):null,
+    emoji:activity?activity.emoji:'—',
+    name:activity?activity.name:'Пропущено',
+    ts,
+    skipped:!activity,
+    durationSec:Math.max(1,parseInt(durationSec)||1),
+    createdAt:ts,
+    updatedAt:ts,
+    deletedAt:null,
+    deviceId:S.deviceId,
+  };
+  return normalizeLog({...base,...overrides});
+}
+
+function logIt(a){
+  const dur=calcDuration();
+  S.logs.push(createLogEntry(a,dur));
+  save();
+  toast('✓ '+a.emoji+' '+a.name+' ('+fmtDurShort(dur)+')');
+  schedulePing();
+}
+
+function skip(){
+  const dur=calcDuration();
+  S.logs.push(createLogEntry(null,dur,{emoji:'—',name:'Пропущено',skipped:true}));
+  save();
+  toast('ПРОПУЩЕНО');
+  schedulePing();
+}
+
+// ══════════════════════════════════════════════════════
+// TIMER / STOPWATCH
+// ══════════════════════════════════════════════════════
+function setTimerMode(m){
+  timerMode=m;
+  timerReset();
+  document.getElementById('tbtn-sw').classList.toggle('active',m==='sw');
+  document.getElementById('tbtn-tm').classList.toggle('active',m==='tm');
+  document.getElementById('timer-set-row').style.display=m==='tm'?'flex':'none';
+  document.getElementById('tbtn-lap').style.display=m==='sw'?'inline-block':'none';
+}
+
+function timerToggle(){
+  if(!timerRunning){
+    if(timerMode==='tm'&&timerAccum===0){
+      const h=parseInt(document.getElementById('t-h').value)||0;
+      const mm=parseInt(document.getElementById('t-m').value)||0;
+      const ss=parseInt(document.getElementById('t-s').value)||0;
+      timerTarget=(h*3600+mm*60+ss)*1000;
+      if(timerTarget===0){toast('Укажи время');return;}
+    }
+    timerStart=performance.now();
+    timerRunning=true;
+    document.getElementById('tbtn-start').textContent='СТОП';
+    document.getElementById('tbtn-start').classList.replace('start','stop');
+    rafTimer();
+  } else {
+    const elapsed=performance.now()-timerStart;
+    timerAccum+=elapsed;
+    timerRunning=false;
+    timerStart=null;
+    cancelAnimationFrame(timerRAF);
+    document.getElementById('tbtn-start').textContent='СТАРТ';
+    document.getElementById('tbtn-start').classList.replace('stop','start');
+  }
+}
+
+function timerReset(){
+  const was=timerRunning;
+  timerRunning=false;timerStart=null;timerAccum=0;timerTarget=0;
+  cancelAnimationFrame(timerRAF);
+  laps=[];renderLaps();
+  document.getElementById('tbtn-start').textContent='СТАРТ';
+  document.getElementById('tbtn-start').className='tbtn start';
+  renderTimerDisplay(0);
+}
+
+function timerLap(){
+  if(!timerRunning&&timerAccum===0)return;
+  const ms=timerAccum+(timerRunning?performance.now()-timerStart:0);
+  laps.push(ms);renderLaps();
+}
+
+function rafTimer(){
+  timerRAF=requestAnimationFrame(()=>{
+    if(!timerRunning)return;
+    const ms=timerAccum+(performance.now()-timerStart);
+    if(timerMode==='tm'){
+      const rem=Math.max(0,timerTarget-ms);
+      renderTimerDisplay(rem);
+      if(rem<=0){
+        timerToggle();
+        if(Notification&&Notification.permission==='granted')
+          try{new Notification('⏲ ТАЙМЕР',{body:'Время вышло!',tag:'timer'});}catch(e){}
+        toast('⏲ ВРЕМЯ ВЫШЛО!');
+        return;
+      }
+    } else {
+      renderTimerDisplay(ms);
+    }
+    rafTimer();
+  });
+}
+
+function renderTimerDisplay(ms){
+  const totalSec=Math.floor(ms/1000);
+  const h=Math.floor(totalSec/3600);
+  const m=Math.floor((totalSec%3600)/60);
+  const s=totalSec%60;
+  const mss=Math.floor(ms%1000);
+  document.getElementById('timer-hms').textContent=pad(h)+':'+pad(m)+':'+pad(s);
+  document.getElementById('timer-ms-disp').textContent='.'+pad3(mss);
+}
+
+function renderLaps(){
+  const el=document.getElementById('lap-list');
+  if(!laps.length){el.innerHTML='';return;}
+  let html='';
+  laps.forEach((ms,i)=>{
+    const totalSec=Math.floor(ms/1000);
+    const h=Math.floor(totalSec/3600);
+    const m=Math.floor((totalSec%3600)/60);
+    const s=totalSec%60;
+    const mss=Math.floor(ms%1000);
+    html+=`<div class="lap-item"><span class="ln">Круг ${i+1}</span><span class="lt">${pad(h)}:${pad(m)}:${pad(s)}.${pad3(mss)}</span></div>`;
+  });
+  el.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════
+// SCHEDULE
+// ══════════════════════════════════════════════════════
+function schedulePing(){
+  if(pingTimer)clearTimeout(pingTimer);
+  const ms=(S.intervalMinutes||15)*60*1000;
+  S.nextPingTime=new Date(Date.now()+ms).toISOString();
+  save();
+  pingTimer=setTimeout(triggerPing,ms);
+}
+
+function restorePingSchedule(){
+  if(pingTimer)clearTimeout(pingTimer);
+  if(!S.nextPingTime){
+    schedulePing();
+    return;
+  }
+  const diff=new Date(S.nextPingTime).getTime()-Date.now();
+  if(diff<=0){
+    triggerPing();
+    return;
+  }
+  pingTimer=setTimeout(triggerPing,diff);
+}
+
+function triggerPing(){
+  if(Notification&&Notification.permission==='granted'){
+    try{new Notification('⏱ ЧТО ТЫ ДЕЛАЛ?',{body:'Пора отметить!',tag:'ping'});}catch(e){}
+  }
+  goScreen('sp');
+  schedulePing();
+}
+
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&S.nextPingTime&&new Date()>=new Date(S.nextPingTime))triggerPing();
+});
+
+function reqNotify(){
+  if(!('Notification' in window)){
+    toast('Не поддерживается');
+    return;
+  }
+  Notification.requestPermission().then(p=>toast(p==='granted'?'✓ УВЕДОМЛЕНИЯ ВКЛЮЧЕНЫ':'ОТКЛОНЕНО'));
+}
+
+// ══════════════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════════════
+function renderSett(){
+  const list=document.getElementById('act-list');
+  list.innerHTML='';
+  S.activities.filter(a=>!isDeleted(a)).forEach((a,i)=>{
+    const realIndex=S.activities.findIndex(x=>String(x.id)===String(a.id));
+    const d=document.createElement('div');
+    d.className='ait';
+    if(a.archived)d.style.opacity='.5';
+    d.innerHTML=`<button class="embtn" onclick="openEP(${realIndex})">${a.emoji}</button>
+      <input type="text" value="${escapeAttr(a.name)}" placeholder="Название..." oninput="renameAct(${realIndex},this.value)">
+      ${a.archived?'<span class="arc-badge">архив</span>':''}
+      <button class="arcbtn" onclick="toggleArc(${realIndex})">${a.archived?'↩':'📦'}</button>
+      <button class="xbtn" onclick="delAct(${realIndex})">×</button>`;
+    list.appendChild(d);
+  });
+  document.getElementById('ival').value=S.intervalMinutes||15;
+  document.getElementById('g-folder').value=S.gFolder||'TimeTracker';
+  updateGUI();
+}
+
+function renameAct(i,val){
+  const activity=S.activities[i];
+  if(!activity||isDeleted(activity))return;
+  activity.name=val;
+  touchItem(activity);
+  S.logs.forEach(l=>{
+    if(!isDeleted(l)&&String(l.activityId)===String(activity.id)){
+      l.name=val;
+      touchItem(l);
+    }
+  });
+  save();
+}
+
+function toggleArc(i){
+  const activity=S.activities[i];
+  if(!activity||isDeleted(activity))return;
+  activity.archived=!activity.archived;
+  touchItem(activity);
+  save();
+  renderSett();
+  renderPG();
+  toast(activity.archived?'📦 Заархивировано':'↩ Разархивировано');
+}
+
+function addAct(){
+  if(activeActivities().length>=16){
+    toast('Макс. 16 активных');
+    return;
+  }
+  const ts=nowISO();
+  S.activities.push(normalizeActivity({
+    id:genId(),
+    emoji:'❓',
+    name:'',
+    archived:false,
+    createdAt:ts,
+    updatedAt:ts,
+    deletedAt:null,
+  }));
+  save();
+  renderSett();
+}
+
+function delAct(i){
+  const activity=S.activities[i];
+  if(!activity||isDeleted(activity))return;
+  if(confirm('Удалить активность?')){
+    activity.deletedAt=nowISO();
+    touchItem(activity);
+    save();
+    renderSett();
+    renderPG();
+    toast('Активность скрыта');
+  }
+}
+
+function saveSettings(){
+  S.intervalMinutes=parseInt(document.getElementById('ival').value)||15;
+  S.gFolder=document.getElementById('g-folder').value||'TimeTracker';
+  save();
+  renderPG();
+  schedulePing();
+  updateGUI();
+  toast('✓ СОХРАНЕНО');
+}
+
+function exportData(){
+  const b=new Blob([buildExport()],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download='tt_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+}
+
+function clearData(){
+  if(confirm('Скрыть все записи? Их можно будет вернуть через Force Recovery.')){
+    const deletedAt=nowISO();
+    S.logs=S.logs.map(l=>isDeleted(l)?l:{...l,deletedAt,updatedAt:deletedAt});
+    save();
+    renderA();
+    renderH();
+    toast('Локальные записи скрыты');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// EMOJI PICKER
+// ══════════════════════════════════════════════════════
+function openEP(idx){
+  epIdx=idx;
+  const g=document.getElementById('epg');g.innerHTML='';
+  EMOJIS.forEach(e=>{const s=document.createElement('span');s.className='epe';s.textContent=e;
+    s.onclick=()=>{
+      const activity=S.activities[epIdx];
+      if(!activity||isDeleted(activity))return;
+      activity.emoji=e;
+      touchItem(activity);
+      S.logs.forEach(l=>{
+        if(!isDeleted(l)&&String(l.activityId)===String(activity.id)){
+          l.emoji=e;
+          touchItem(l);
+        }
+      });
+      save();
+      renderSett();
+      closeEP();
+    };
+    g.appendChild(s);
+  });
+  document.getElementById('epo').classList.add('open');
+}
+function closeEP(evt){if(!evt||evt.target===document.getElementById('epo'))document.getElementById('epo').classList.remove('open');}
+
+// ══════════════════════════════════════════════════════
+// ANALYTICS
+// ══════════════════════════════════════════════════════
+function setPeriod(p){
+  period=p;
+  document.querySelectorAll('.chip[data-p]').forEach(c=>c.classList.toggle('active',c.dataset.p===p));
+  document.getElementById('custom-row').style.display=p==='custom'?'block':'none';
+  if(p!=='custom')renderA();
+}
+function setView(v){
+  aView=v;
+  document.querySelectorAll('.vc[data-v]').forEach(c=>c.classList.toggle('active',c.dataset.v===v));
+  renderA();
+}
+function applyCustom(){S.customFrom=document.getElementById('dfrom').value;S.customTo=document.getElementById('dto').value;save();renderA();}
+
+function filtLogs(){
+  const now=new Date();
+  return visibleLogs().filter(l=>{
+    if(l.skipped)return false;
+    const d=new Date(l.ts);
+    if(period==='today')return d.toDateString()===now.toDateString();
+    if(period==='week'){const w=new Date(now);w.setDate(now.getDate()-7);return d>=w;}
+    if(period==='month'){const m=new Date(now);m.setDate(now.getDate()-30);return d>=m;}
+    if(period==='custom'&&S.customFrom&&S.customTo){
+      const f=new Date(S.customFrom);f.setHours(0,0,0,0);
+      const t=new Date(S.customTo);t.setHours(23,59,59,999);
+      return d>=f&&d<=t;
+    }
+    return true;
+  });
+}
+
+function renderA(){
+  const body=document.getElementById('abody'),logs=filtLogs();
+  if(!logs.length){body.innerHTML=`<div class="empty"><div class="big">ПУСТО</div><p>Нет данных за период</p></div>`;return;}
+  if(aView==='bars')drawBars(body,logs);
+  else if(aView==='pie')drawPie(body,logs);
+  else drawHeatmap(body,logs);
+}
+
+function getCounts(logs){
+  const c={};
+  logs.forEach(l=>{const k=l.emoji+'§'+l.name;c[k]=(c[k]||0)+(l.durationSec||0);});
+  return Object.entries(c).sort((a,b)=>b[1]-a[1]);
+}
+
+function totalSecLogs(logs){return logs.reduce((s,l)=>s+(l.durationSec||0),0);}
+
+function drawBars(body,logs){
+  const totalSec=totalSecLogs(logs);
+  const days=new Set(logs.map(l=>new Date(l.ts).toDateString())).size;
+  let html=`<div class="sg">
+    <div class="sc"><div class="sv">${logs.length}</div><div class="sl">ОТМЕТОК</div></div>
+    <div class="sc"><div class="sv">${fmtDurShort(totalSec)}</div><div class="sl">ВРЕМЕНИ</div></div>
+  </div>`;
+  const sorted=getCounts(logs);const max=sorted[0]?.[1]||1;
+  html+=`<div class="card"><div class="ctitle">ПО АКТИВНОСТЯМ (по времени)</div>`;
+  sorted.forEach(([k,sec])=>{
+    const[em,name]=k.split('§');
+    const pct=Math.round(sec/totalSec*100);
+    html+=`<div class="srow"><span class="se">${em}</span><span class="sn">${name}</span>
+      <div class="bw"><div class="bf" style="width:${Math.round(sec/max*100)}%"></div></div>
+      <span class="sc2">${fmtDurShort(sec)}</span><span class="spc">${pct}%</span></div>`;
+  });
+  html+=`</div>`;
+  const hc=Array(24).fill(0);logs.forEach(l=>hc[new Date(l.ts).getHours()]+=(l.durationSec||0));
+  const peak=hc.indexOf(Math.max(...hc));const mxH=Math.max(...hc,1);
+  html+=`<div class="card"><div class="ctitle">АКТИВНОСТЬ ПО ЧАСАМ</div><div class="bc">`;
+  hc.forEach((c,h)=>html+=`<div class="bcol"><div class="b" style="height:${Math.round(c/mxH*44)}px;background:${h===peak?'var(--acc)':'var(--bor)'}"></div></div>`);
+  html+=`</div><div style="display:flex;justify-content:space-between;font-size:7px;color:var(--mut)"><span>0</span><span>6</span><span>12</span><span>18</span><span>23</span></div>
+  <div style="font-size:10px;color:var(--mut);margin-top:6px">Пик: <span style="color:var(--acc)">${pad(peak)}:00</span></div></div>`;
+  body.innerHTML=html;
+}
+
+function drawPie(body,logs){
+  const totalSec=totalSecLogs(logs);
+  const sorted=getCounts(logs);
+  const R=78,cx=88,cy=88;let start=0;let paths='';
+  sorted.forEach(([k,sec],i)=>{
+    const frac=sec/totalSec;const angle=frac*2*Math.PI;
+    const x1=cx+R*Math.sin(start),y1=cy-R*Math.cos(start);
+    const x2=cx+R*Math.sin(start+angle),y2=cy-R*Math.cos(start+angle);
+    if(frac>0.995)paths+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${PIE_COL[i%PIE_COL.length]}"/>`;
+    else paths+=`<path d="M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${angle>Math.PI?1:0},1 ${x2},${y2} Z" fill="${PIE_COL[i%PIE_COL.length]}"/>`;
+    start+=angle;
+  });
+  let legend='';
+  sorted.forEach(([k,sec],i)=>{
+    const[em,name]=k.split('§');
+    legend+=`<div class="plr"><div class="pd" style="background:${PIE_COL[i%PIE_COL.length]}"></div><span class="pln">${em} ${name}</span><span class="plp">${Math.round(sec/totalSec*100)}%</span></div>`;
+  });
+  const days=new Set(logs.map(l=>new Date(l.ts).toDateString())).size;
+  let html=`<div class="sg">
+    <div class="sc"><div class="sv">${logs.length}</div><div class="sl">ОТМЕТОК</div></div>
+    <div class="sc"><div class="sv">${fmtDurShort(totalSec)}</div><div class="sl">ВРЕМЕНИ</div></div>
+  </div>
+  <div class="card"><div class="ctitle">РАСПРЕДЕЛЕНИЕ ВРЕМЕНИ</div>
+   <div class="pie-wrap">
+    <svg width="176" height="176" viewBox="0 0 176 176">${paths}</svg>
+    <div class="pie-legend">${legend}</div>
+   </div>
+  </div>`;
+  body.innerHTML=html;
+}
+
+function drawHeatmap(body,logs){
+  const dc={};logs.forEach(l=>{const k=new Date(l.ts).toDateString();dc[k]=(dc[k]||0)+1;});
+  const mxD=Math.max(...Object.values(dc),1);
+  const today=new Date();today.setHours(23,59,59,999);
+  const start=new Date(today);start.setDate(today.getDate()-69);start.setHours(0,0,0,0);
+  const dn=['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
+  let html=`<div class="card">
+  <div class="ctitle">ТЕПЛОВАЯ КАРТА — каждая клетка = один день. Яркость = количество отметок за день.</div>
+  <div class="hl">${dn.map(d=>`<div style="font-size:7px;color:var(--mut);text-align:center">${d}</div>`).join('')}</div>
+  <div class="hg">`;
+  const dow0=(start.getDay()+6)%7;
+  for(let i=0;i<dow0;i++)html+=`<div class="hc" style="background:transparent"></div>`;
+  for(let i=0;i<70;i++){
+    const d=new Date(start);d.setDate(start.getDate()+i);if(d>today)break;
+    const cnt=dc[d.toDateString()]||0;
+    html+=`<div class="hc" style="background:${cnt>0?`rgba(232,255,71,${Math.max(.18,cnt/mxD)})`:'var(--bor)'}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${cnt} отм."></div>`;
+  }
+  html+=`</div>
+  <div class="legr"><span>0</span><div class="legc">${[.18,.4,.6,.8,1].map(o=>`<div class="lc" style="background:rgba(232,255,71,${o})"></div>`).join('')}</div><span>много</span></div>
+  <div style="font-size:9px;color:var(--mut);margin-top:8px">Строки = дни недели (Пн–Вс). Столбцы = недели. Последние 10 недель.</div>
+  </div>`;
+  const dowC=Array(7).fill(0);logs.forEach(l=>dowC[(new Date(l.ts).getDay()+6)%7]++);
+  const mxDow=Math.max(...dowC,1);
+  html+=`<div class="card"><div class="ctitle">ПО ДНЯМ НЕДЕЛИ</div><div class="bc">`;
+  dowC.forEach((c,i)=>html+=`<div class="bcol"><div class="b" style="height:${Math.round(c/mxDow*44)}px"></div><div class="l">${dn[i]}</div></div>`);
+  html+=`</div></div>`;
+  body.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════
+// HISTORY
+// ══════════════════════════════════════════════════════
+function setHF(f){histFilter=f;document.querySelectorAll('.chip[data-hf]').forEach(c=>c.classList.toggle('active',c.dataset.hf===f));renderH();}
+
+function histLogs(){
+  const now=new Date();
+  let logs=[...visibleLogs()];
+  if(histFilter==='today')logs=logs.filter(l=>new Date(l.ts).toDateString()===now.toDateString());
+  if(histFilter==='week'){const w=new Date(now);w.setDate(now.getDate()-7);logs=logs.filter(l=>new Date(l.ts)>=w);}
+  return logs.sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+}
+
+function renderH(){
+  const body=document.getElementById('hbody'),logs=histLogs();
+  if(!logs.length){body.innerHTML=`<div class="empty"><div class="big">ПУСТО</div><p>Нет записей</p></div>`;return;}
+  let html='';
+  logs.forEach(l=>{
+    const d=new Date(l.ts);
+    const time=pad(d.getHours())+':'+pad(d.getMinutes());
+    const date=pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
+    const dur=fmtDurLong(l.durationSec||0);
+    html+=`<div class="hitem">
+      <div class="hitem-main">
+        <div class="hem">${l.skipped?'—':l.emoji}</div>
+        <div class="hinfo">
+          <div class="hname ${l.skipped?'hskip':''}">${l.name}</div>
+          <div class="htime">${time} · ${date}</div>
+          <div class="hdur">⏱ ${dur}</div>
+        </div>
+      </div>
+      <div class="hbtns">
+        <button class="hbtn" onclick="openEditModal('${l.id}')">✏️ ИЗМЕНИТЬ</button>
+        <button class="hbtn split-btn" onclick="openSplitModal('${l.id}')">✂️ ДЕЛИТЬ НА 2</button>
+      </div>
+    </div>`;
+  });
+  body.innerHTML=html;
+}
+
+// ── Edit modal ──
+function openEditModal(logId){
+  editLogId=logId;
+  const log=visibleLogById(logId);
+  if(!log)return;
+  // Fill duration
+  const sec=log.durationSec||0;
+  document.getElementById('dur-h').value=Math.floor(sec/3600)||'';
+  document.getElementById('dur-m').value=Math.floor((sec%3600)/60)||'';
+  document.getElementById('dur-s').value=sec%60||'';
+  // Fill categories
+  const cats=document.getElementById('modal-cats');cats.innerHTML='';
+  activeActivities().forEach(a=>{
+    const d=document.createElement('div');d.className='modal-item'+(log.activityId===a.id?' sel':'');
+    d.innerHTML=`<span class="mem2">${a.emoji}</span><span class="mname">${a.name}</span>`;
+    d.onclick=()=>{
+      document.querySelectorAll('#modal-cats .modal-item').forEach(x=>x.classList.remove('sel'));
+      d.classList.add('sel');
+      applyEdit(a);
+    };
+    cats.appendChild(d);
+  });
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function applyEdit(a){
+  const log=visibleLogById(editLogId);
+  if(!log)return;
+  const h=parseInt(document.getElementById('dur-h').value)||0;
+  const m=parseInt(document.getElementById('dur-m').value)||0;
+  const s=parseInt(document.getElementById('dur-s').value)||0;
+  const newDur=h*3600+m*60+s;
+  if(newDur>0)log.durationSec=newDur;
+  log.activityId=String(a.id);
+  log.emoji=a.emoji;
+  log.name=a.name;
+  log.skipped=false;
+  touchItem(log);
+  save();
+  closeModal('edit-modal');
+  renderH();
+  renderA();
+  toast('✓ Изменено');
+}
+
+// ── Split modal ──
+function openSplitModal(logId){
+  splitLogId=logId;splitSecondCatId=null;
+  const log=visibleLogById(logId);
+  if(!log)return;
+  const totalSec=log.durationSec||60;
+  document.getElementById('split-total-lbl').textContent='Общее время: '+fmtDurLong(totalSec);
+  document.getElementById('split-slider').value=50;
+  // Render cat picker for second half
+  const cats=document.getElementById('split-cats');cats.innerHTML='';
+  activeActivities().forEach(a=>{
+    const d=document.createElement('div');d.className='modal-item';
+    d.innerHTML=`<span class="mem2">${a.emoji}</span><span class="mname">${a.name}</span>`;
+    d.onclick=()=>{
+      document.querySelectorAll('#split-cats .modal-item').forEach(x=>x.classList.remove('sel'));
+      d.classList.add('sel');splitSecondCatId=a.id;
+    };
+    cats.appendChild(d);
+  });
+  updateSplitPreview();
+  document.getElementById('split-modal').classList.add('open');
+}
+
+function updateSplitPreview(){
+  const log=visibleLogById(splitLogId);
+  if(!log)return;
+  const pct=parseInt(document.getElementById('split-slider').value);
+  const totalSec=log.durationSec||60;
+  const s1=Math.round(totalSec*pct/100);
+  const s2=totalSec-s1;
+  document.getElementById('sp1').textContent=fmtDurShort(s1);
+  document.getElementById('sp2').textContent=fmtDurShort(s2);
+}
+
+function confirmSplit(){
+  if(!splitSecondCatId){
+    toast('Выбери категорию для второй части');
+    return;
+  }
+  const log=visibleLogById(splitLogId);
+  if(!log)return;
+  const pct=parseInt(document.getElementById('split-slider').value);
+  const totalSec=log.durationSec||60;
+  const s1=Math.max(1,Math.round(totalSec*pct/100));
+  const s2=Math.max(1,totalSec-s1);
+  const act2=S.activities.find(a=>String(a.id)===String(splitSecondCatId)&&!isDeleted(a));
+  if(!act2){
+    toast('Категория не найдена');
+    return;
+  }
+  log.durationSec=s1;
+  touchItem(log);
+  const ts2=new Date(new Date(log.ts).getTime()+s1*1000).toISOString();
+  S.logs.push(createLogEntry(act2,s2,{ts:ts2}));
+  S.logs.sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  save();
+  closeModal('split-modal');
+  renderH();
+  renderA();
+  toast('✓ Поделено на 2');
+}
+
+function closeModal(id,evt){
+  const el=document.getElementById(id);
+  if(!evt||evt.target===el)el.classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════════
+// GOOGLE DRIVE
+// ══════════════════════════════════════════════════════
+const G_CLIENT_ID=''; // Вставь сюда свой OAuth Client ID
+const G_MAIN_FILE='timetracker_state.json';
+const G_BACKUP_DIR='backups';
+
+function updateGUI(){
+  const st=document.getElementById('g-status');
+  const pn=document.getElementById('g-panel');
+  const btn=document.getElementById('g-auth-btn');
+  const details=[];
+
+  if(S.gRootFolderId)details.push('Папка привязана');
+  if(S.gMainFileId)details.push('Файл привязан');
+  if(S.lastSyncAt)details.push('Последний sync: '+fmtDateTime(S.lastSyncAt));
+
+  if(gToken){
+    st.innerHTML=`<span class="ok">✓ Подключён</span>${details.length?'<br>'+details.join('<br>'):''}`;
+    pn.style.display='block';
+    btn.textContent='ОТКЛЮЧИТЬ';
+  }else{
+    st.textContent='Не подключён';
+    pn.style.display='none';
+    btn.textContent='ПОДКЛЮЧИТЬ GOOGLE DRIVE';
+  }
+}
+
+function gAuth(){
+  if(gToken){
+    gToken=null;
+    try{localStorage.removeItem('gToken');}catch(e){}
+    updateGUI();
+    toast('Отключено');
+    return;
+  }
+  if(!G_CLIENT_ID){
+    alert(`КАК НАСТРОИТЬ GOOGLE DRIVE:
+
+1. Открой console.cloud.google.com
+2. Создай проект
+3. APIs & Services → Library → включи "Google Drive API"
+4. APIs & Services → Credentials → Create Credentials → OAuth 2.0 Client ID
+5. Тип: Web Application
+6. В "Authorised JavaScript origins" добавь адрес этого файла
+7. Скопируй Client ID
+8. В HTML найди строку:
+   const G_CLIENT_ID='';
+   и вставь Client ID
+
+После этого синхронизация заработает.`);
+    return;
+  }
+  if(window.google?.accounts?.oauth2){
+    startGoogleTokenFlow();
+    return;
+  }
+  const script=document.createElement('script');
+  script.src='https://accounts.google.com/gsi/client';
+  script.onload=()=>startGoogleTokenFlow();
+  document.head.appendChild(script);
+}
+
+function startGoogleTokenFlow(){
+  const client=google.accounts.oauth2.initTokenClient({
+    client_id:G_CLIENT_ID,
+    scope:'https://www.googleapis.com/auth/drive.file',
+    callback:(r)=>{
+      if(r.access_token){
+        gToken=r.access_token;
+        try{localStorage.setItem('gToken',gToken);}catch(e){}
+        updateGUI();
+        toast('✓ Подключено к Google Drive');
+      }else{
+        toast('Ошибка авторизации');
+      }
+    }
+  });
+  client.requestAccessToken();
+}
+
+async function gSync(){await runCloudAction('merge');}
+async function gForceSync(){
+  if(!confirm('Force Sync перезапишет облачную историю локальной версией. Перед этим будет сделан backup облака. Продолжить?'))return;
+  await runCloudAction('force-sync');
+}
+async function gForceRecovery(){
+  if(!confirm('Force Recovery заменит локальную историю данными из облака. Перед этим текущая локальная версия будет отправлена в backup. Продолжить?'))return;
+  await runCloudAction('force-recovery');
+}
+
+async function runCloudAction(mode){
+  if(!gToken){
+    toast('Сначала подключи Drive');
+    return;
+  }
+  const btnMap={
+    'merge':'g-sync-btn',
+    'force-sync':'g-force-sync-btn',
+    'force-recovery':'g-recovery-btn',
+  };
+  const btn=document.getElementById(btnMap[mode]);
+  const prevLabel=btn.textContent;
+  setCloudButtonsDisabled(true);
+  btn.textContent='⏳ ОБРАБОТКА...';
+  btn.classList.add('syncing');
+
+  try{
+    S.gFolder=document.getElementById('g-folder').value||'TimeTracker';
+    save();
+
+    const cloud=await gEnsureCloudState();
+    if(mode==='merge'){
+      const remote=await gReadRemoteState(cloud.mainFileId);
+      if(remote){
+        const merged=buildMergedState(remote);
+        applyState(merged);
+        await gUpdateFile(cloud.mainFileId,buildExport());
+      }else{
+        await gUpdateFile(cloud.mainFileId,buildExport());
+      }
+      S.lastSyncAt=nowISO();
+      save();
+      rerenderAll();
+      toast('✓ Sync завершён');
+    }
+
+    if(mode==='force-sync'){
+      await gBackupRemoteMainFile(cloud,'remote-before-force-sync');
+      await gUpdateFile(cloud.mainFileId,buildExport());
+      S.lastSyncAt=nowISO();
+      save();
+      updateGUI();
+      toast('☁️ Force Sync завершён');
+    }
+
+    if(mode==='force-recovery'){
+      await gBackupJson(cloud.backupFolderId,backupName('local-before-force-recovery'),buildExport());
+      const remote=await gReadRemoteState(cloud.mainFileId);
+      if(!remote){
+        throw new Error('В облаке нет данных для восстановления');
+      }
+      applyState(normalizeState(remote));
+      S.gFolder=document.getElementById('g-folder').value||S.gFolder||'TimeTracker';
+      S.gRootFolderId=cloud.rootFolderId;
+      S.gBackupFolderId=cloud.backupFolderId;
+      S.gMainFileId=cloud.mainFileId;
+      S.lastSyncAt=nowISO();
+      save();
+      rerenderAll();
+      toast('📥 Восстановлено из облака');
+    }
+  }catch(e){
+    if(e.message==='401'){
+      gToken=null;
+      try{localStorage.removeItem('gToken');}catch(er){}
+      updateGUI();
+      toast('Сессия истекла');
+    }else{
+      toast('Ошибка: '+e.message);
+      console.error(e);
+    }
+  }finally{
+    btn.textContent=prevLabel;
+    btn.classList.remove('syncing');
+    setCloudButtonsDisabled(false);
+    updateGUI();
+  }
+}
+
+function setCloudButtonsDisabled(disabled){
+  ['g-sync-btn','g-force-sync-btn','g-recovery-btn','g-auth-btn'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.disabled=disabled;
+  });
+}
+
+function buildExportObject(){
+  return {
+    schemaVersion:2,
+    exportedAt:nowISO(),
+    deviceId:S.deviceId,
+    rootFolderId:S.gRootFolderId||null,
+    backupFolderId:S.gBackupFolderId||null,
+    mainFileId:S.gMainFileId||null,
+    activities:S.activities.map(a=>normalizeActivity(a)),
+    logs:S.logs.map(l=>normalizeLog(l)),
+  };
+}
+
+function buildExport(){return JSON.stringify(buildExportObject(),null,2);}
+
+function normalizeState(raw){
+  const state=raw&&typeof raw==='object'?raw:{};
+  return {
+    schemaVersion:2,
+    deviceId:S.deviceId||state.deviceId||genId(),
+    gFolder:S.gFolder||'TimeTracker',
+    gRootFolderId:state.rootFolderId||S.gRootFolderId||null,
+    gBackupFolderId:state.backupFolderId||S.gBackupFolderId||null,
+    gMainFileId:state.mainFileId||S.gMainFileId||null,
+    lastSyncAt:S.lastSyncAt||null,
+    intervalMinutes:S.intervalMinutes||15,
+    nextPingTime:S.nextPingTime||null,
+    customFrom:S.customFrom||null,
+    customTo:S.customTo||null,
+    activities:(state.activities||[]).map((a,idx)=>normalizeActivity(a,idx+1)),
+    logs:(state.logs||[]).map(normalizeLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+  };
+}
+
+function applyState(state){
+  S={
+    ...S,
+    ...normalizeState(state),
+  };
+  migrateState();
+  save();
+}
+
+function buildMergedState(remoteState){
+  const remote=normalizeState(remoteState);
+  return {
+    ...normalizeState({...S}),
+    gRootFolderId:remote.gRootFolderId||S.gRootFolderId||null,
+    gBackupFolderId:remote.gBackupFolderId||S.gBackupFolderId||null,
+    gMainFileId:remote.gMainFileId||S.gMainFileId||null,
+    activities:mergeEntities(S.activities,remote.activities),
+    logs:mergeEntities(S.logs,remote.logs).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+  };
+}
+
+function mergeEntities(localItems,remoteItems){
+  const map=new Map();
+  [...(localItems||[]),...(remoteItems||[])].forEach(item=>{
+    const normalized='durationSec' in item?normalizeLog(item):normalizeActivity(item);
+    const key=String(normalized.id);
+    const existing=map.get(key);
+    if(!existing){
+      map.set(key,normalized);
+      return;
+    }
+    const existingTs=new Date(existing.updatedAt||existing.createdAt||existing.ts||0).getTime();
+    const currentTs=new Date(normalized.updatedAt||normalized.createdAt||normalized.ts||0).getTime();
+    if(currentTs>=existingTs){
+      map.set(key,{...existing,...normalized});
+    }
+  });
+  return Array.from(map.values());
+}
+
+async function gEnsureCloudState(){
+  const folderName=S.gFolder||'TimeTracker';
+  const rootFolderId=await gEnsureFolder(folderName,'gRootFolderId');
+  const backupFolderId=await gEnsureFolder(G_BACKUP_DIR,'gBackupFolderId',rootFolderId);
+  const mainFileId=await gEnsureMainFile(rootFolderId);
+
+  S.gRootFolderId=rootFolderId;
+  S.gBackupFolderId=backupFolderId;
+  S.gMainFileId=mainFileId;
+  save();
+
+  return {rootFolderId,backupFolderId,mainFileId};
+}
+
+async function gEnsureFolder(name,stateKey,parentId=null){
+  const existingId=S[stateKey];
+  if(existingId){
+    try{
+      const meta=await gGetFileMeta(existingId);
+      if(meta?.id)return meta.id;
+    }catch(e){}
+    S[stateKey]=null;
+  }
+
+  const found=await gFindFolder(name,parentId);
+  if(found){
+    S[stateKey]=found.id;
+    save();
+    return found.id;
+  }
+
+  const created=await gCreateFolder(name,parentId);
+  S[stateKey]=created.id;
+  save();
+  return created.id;
+}
+
+async function gEnsureMainFile(parentId){
+  if(S.gMainFileId){
+    try{
+      const meta=await gGetFileMeta(S.gMainFileId);
+      if(meta?.id)return meta.id;
+    }catch(e){}
+    S.gMainFileId=null;
+  }
+
+  const found=await gFindFile(G_MAIN_FILE,parentId);
+  if(found){
+    S.gMainFileId=found.id;
+    save();
+    return found.id;
+  }
+
+  const created=await gCreateFile(G_MAIN_FILE,parentId,buildExport());
+  S.gMainFileId=created.id;
+  save();
+  return created.id;
+}
+
+async function gReadRemoteState(fileId){
+  const raw=await gDownloadFile(fileId);
+  if(!raw)return null;
+  try{
+    return JSON.parse(raw);
+  }catch(e){
+    throw new Error('Облачный JSON повреждён');
+  }
+}
+
+async function gBackupRemoteMainFile(cloud,reason){
+  const remoteRaw=await gDownloadFile(cloud.mainFileId);
+  if(!remoteRaw)return null;
+  return gBackupJson(cloud.backupFolderId,backupName(reason),remoteRaw);
+}
+
+function backupName(reason){
+  const stamp=new Date().toISOString().replace(/[:.]/g,'-');
+  return `${reason}-${stamp}.json`;
+}
+
+async function gBackupJson(parentId,name,content){
+  return gCreateFile(name,parentId,content);
+}
+
+async function gReq(url,opts={}){
+  const r=await fetch(url,{...opts,headers:{...opts.headers,'Authorization':'Bearer '+gToken}});
+  if(r.status===401)throw new Error('401');
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r;
+}
+
+async function gGetFileMeta(fileId){
+  const r=await(await gReq(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,name,parents,mimeType`)).json();
+  return r;
+}
+
+async function gFindFolder(name,parentId=null){
+  const parentClause=parentId?` and '${parentId}' in parents`:'';
+  const q=encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false${parentClause}`);
+  const r=await(await gReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,createdTime)&orderBy=createdTime`)).json();
+  return r.files&&r.files.length?r.files[0]:null;
+}
+
+async function gCreateFolder(name,parentId=null){
+  const body={name,mimeType:'application/vnd.google-apps.folder'};
+  if(parentId)body.parents=[parentId];
+  return await(await gReq('https://www.googleapis.com/drive/v3/files',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  })).json();
+}
+
+async function gFindFile(name,parentId){
+  const q=encodeURIComponent(`name='${name}' and '${parentId}' in parents and trashed=false`);
+  const r=await(await gReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,createdTime)&orderBy=createdTime`)).json();
+  return r.files&&r.files.length?r.files[0]:null;
+}
+
+async function gDownloadFile(fileId){
+  const r=await gReq(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+  return r.text();
+}
+
+async function gCreateFile(name,parentId,content){
+  const form=new FormData();
+  form.append('metadata',new Blob([JSON.stringify({name,parents:[parentId],mimeType:'application/json'})],{type:'application/json'}));
+  form.append('file',new Blob([content],{type:'application/json'}));
+  const r=await(await gReq('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',body:form})).json();
+  return r;
+}
+
+async function gUpdateFile(fileId,content){
+  await gReq(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,{
+    method:'PATCH',
+    headers:{'Content-Type':'application/json'},
+    body:content
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+function fmtDurShort(sec){
+  if(!sec||sec<0)return '0 мин';
+  const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;
+  if(h>0)return `${h}ч ${m}м`;
+  if(m>0)return `${m}м ${s}с`;
+  return `${s}с`;
+}
+
+function fmtDurLong(sec){
+  if(!sec||sec<0)return '0 секунд';
+  const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;
+  let out='';
+  if(h)out+=h+'ч ';
+  if(m)out+=m+'м ';
+  if(s||!out)out+=s+'с';
+  return out.trim();
+}
+
+function fmtDateTime(iso){
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime()))return '—';
+  return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function escapeAttr(value){
+  return String(value??'')
+    .replace(/&/g,'&amp;')
+    .replace(/"/g,'&quot;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+function rerenderAll(){
+  renderPG();
+  renderSett();
+  if(document.getElementById('sa').classList.contains('active'))renderA();
+  if(document.getElementById('sh2').classList.contains('active'))renderH();
+  updatePQ();
+  updateGUI();
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+// ══════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════
+load();
+renderPG();
+restorePingSchedule();
+updateGUI();
+</script>
+</body>
+</html>
