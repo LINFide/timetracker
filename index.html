@@ -150,6 +150,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .xbtn:active{color:var(--red)}
 .arcbtn{background:none;border:1px solid var(--bor);border-radius:6px;padding:3px 7px;font-size:9px;color:var(--mut);cursor:pointer;font-family:'IBM Plex Mono',monospace;flex-shrink:0}
 .arcbtn:active{color:var(--blue);border-color:var(--blue)}
+.colorbtn{width:20px;height:20px;border-radius:50%;border:1px solid var(--bor);cursor:pointer;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,.06) inset}
+.colorbtn:active{transform:scale(.94)}
+.color-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+.color-option{height:44px;border-radius:12px;border:1px solid var(--bor);cursor:pointer;position:relative;overflow:hidden}
+.color-option.selected::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#000;font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;text-shadow:0 1px 0 rgba(255,255,255,.25)}
+.custom-color-wrap{margin-top:14px;padding-top:14px;border-top:1px solid var(--bor)}
+.custom-color-row{display:flex;gap:10px;align-items:center}
+.custom-color-input{width:58px;height:42px;border:none;background:none;padding:0;cursor:pointer}
+.custom-color-input::-webkit-color-swatch-wrapper{padding:0}
+.custom-color-input::-webkit-color-swatch{border:none;border-radius:10px}
+.custom-color-label{font-size:10px;color:var(--mut);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase}
 .dbtn{width:100%;padding:10px;border:1px dashed var(--bor);border-radius:10px;background:none;color:var(--mut);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;margin-top:3px}
 .dbtn:active{color:var(--acc);border-color:var(--acc)}
 .dbtn.danger:active{color:var(--red);border-color:var(--red)}
@@ -383,6 +394,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
  </div>
 </div>
 
+<!-- Color picker -->
+<div class="overlay" id="color-modal" onclick="closeModal('color-modal',event)">
+ <div class="modal">
+  <div class="modal-title">ЦВЕТ АКТИВНОСТИ</div>
+  <div id="color-grid" class="color-grid"></div>
+  <div class="custom-color-wrap">
+   <div class="custom-color-label">СВОЙ ЦВЕТ</div>
+   <div class="custom-color-row">
+    <input type="color" id="custom-color-input" class="custom-color-input" value="#e8ff47">
+    <button class="bigbtn" onclick="applyCustomColor()">ПРИМЕНИТЬ СВОЙ ЦВЕТ</button>
+   </div>
+  </div>
+  <button class="cancel-btn" onclick="closeModal('color-modal')">ОТМЕНА</button>
+ </div>
+</div>
+
 <!-- Emoji picker -->
 <div class="epo" id="epo" onclick="closeEP(event)">
  <div class="epp">
@@ -396,24 +423,25 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 // CONSTANTS & STATE
 // ══════════════════════════════════════════════════════
 const EMOJIS=['💻','📚','🏃','🍳','😴','🧹','📱','🎮','🎵','🚗','🤝','🧘','✍️','📞','🛒','🎨','🍔','☕','🏋️','🧠','👨‍👩‍👦','🌿','📺','🎯','🎲','🔧','💼','✈️','🛁','🎭','🐶','🌙','🎤','🖥️','📝','🏠','🎪','🎸','🚴','🏊','🌅'];
-const PIE_COL=['#e8ff47','#47b8ff','#ff4747','#ff9f47','#b847ff','#47ff9f','#ff47b8','#47ffff','#ffb847','#47ffb8','#b8ff47','#ff47ff','#6b47ff','#ffff47','#ff6b47','#47ff6b'];
+const ACTIVITY_COLOR_PRESETS=['#e8ff47','#47b8ff','#47ff9f','#ff9f47','#ff6b6b','#b47dff','#47fff2','#ff6bd6','#b8ff47'];
+const DEFAULT_ACTIVITY_COLOR=ACTIVITY_COLOR_PRESETS[0];
 
 let S={
   schemaVersion:2,
   deviceId:null,
   activities:[
-    {id:'1',emoji:'💻',name:'Работа',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'2',emoji:'📚',name:'Учёба',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'3',emoji:'🍳',name:'Еда',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'4',emoji:'😴',name:'Отдых / сон',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'5',emoji:'🏃',name:'Спорт',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'6',emoji:'📱',name:'Соцсети',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'7',emoji:'🎮',name:'Игры',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'8',emoji:'🤝',name:'Общение',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'9',emoji:'🧹',name:'Дела по дому',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'10',emoji:'🚗',name:'В дороге',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'11',emoji:'🎵',name:'Музыка / хобби',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
-    {id:'12',emoji:'🧘',name:'Медитация',archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'1',emoji:'💻',name:'Работа',color:ACTIVITY_COLOR_PRESETS[0],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'2',emoji:'📚',name:'Учёба',color:ACTIVITY_COLOR_PRESETS[1],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'3',emoji:'🍳',name:'Еда',color:ACTIVITY_COLOR_PRESETS[2],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'4',emoji:'😴',name:'Отдых / сон',color:ACTIVITY_COLOR_PRESETS[3],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'5',emoji:'🏃',name:'Спорт',color:ACTIVITY_COLOR_PRESETS[4],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'6',emoji:'📱',name:'Соцсети',color:ACTIVITY_COLOR_PRESETS[5],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'7',emoji:'🎮',name:'Игры',color:ACTIVITY_COLOR_PRESETS[6],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'8',emoji:'🤝',name:'Общение',color:ACTIVITY_COLOR_PRESETS[7],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'9',emoji:'🧹',name:'Дела по дому',color:ACTIVITY_COLOR_PRESETS[8],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'10',emoji:'🚗',name:'В дороге',color:ACTIVITY_COLOR_PRESETS[0],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'11',emoji:'🎵',name:'Музыка / хобби',color:ACTIVITY_COLOR_PRESETS[1],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
+    {id:'12',emoji:'🧘',name:'Медитация',color:ACTIVITY_COLOR_PRESETS[2],archived:false,createdAt:null,updatedAt:null,deletedAt:null},
   ],
   logs:[],
   intervalMinutes:15,
@@ -428,7 +456,7 @@ let S={
 
 let period='today',aView='bars',histFilter='all';
 let epIdx=null,pingTimer=null;
-let editLogId=null,splitLogId=null,splitSecondCatId=null;
+let editLogId=null,splitLogId=null,splitSecondCatId=null,colorActIdx=null;
 let gToken=null;
 
 // Timer/Stopwatch
@@ -486,6 +514,7 @@ function normalizeActivity(a,fallbackId,nowIso=nowISO()){
     id:String(a?.id??fallbackId??genId()),
     emoji:a?.emoji||'❓',
     name:a?.name||'',
+    color:normalizeHexColor(a?.color)||presetColorByIndex((parseInt(fallbackId,10)||1)-1),
     archived:!!a?.archived,
     createdAt,
     updatedAt:a?.updatedAt||createdAt,
@@ -500,6 +529,7 @@ function normalizeLog(l){
     activityId:l?.activityId===null||typeof l?.activityId==='undefined'?null:String(l.activityId),
     emoji:l?.emoji||'—',
     name:l?.name||'',
+    color:normalizeHexColor(l?.color)||DEFAULT_ACTIVITY_COLOR,
     ts:l?.ts||createdAt,
     skipped:!!l?.skipped,
     durationSec:Math.max(1,parseInt(l?.durationSec)||1),
@@ -511,9 +541,35 @@ function normalizeLog(l){
 }
 
 function isDeleted(item){return !!item?.deletedAt;}
+function presetColorByIndex(index){return ACTIVITY_COLOR_PRESETS[((index%ACTIVITY_COLOR_PRESETS.length)+ACTIVITY_COLOR_PRESETS.length)%ACTIVITY_COLOR_PRESETS.length];}
+function normalizeHexColor(color){
+  const value=String(color||'').trim();
+  if(/^#[0-9a-fA-F]{6}$/.test(value))return value.toLowerCase();
+  if(/^#[0-9a-fA-F]{3}$/.test(value)){
+    return '#'+value.slice(1).split('').map(ch=>ch+ch).join('').toLowerCase();
+  }
+  return '';
+}
+function rgbaFromHex(color,alpha=.18){
+  const hex=normalizeHexColor(color)||DEFAULT_ACTIVITY_COLOR;
+  const raw=hex.slice(1);
+  const bigint=parseInt(raw,16);
+  const r=(bigint>>16)&255;
+  const g=(bigint>>8)&255;
+  const b=bigint&255;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+function activityColor(activity,index=0){return normalizeHexColor(activity?.color)||presetColorByIndex(index);}
 function activeActivities(){return S.activities.filter(a=>!a.archived&&!isDeleted(a));}
 function visibleLogs(){return S.logs.filter(l=>!isDeleted(l));}
 function visibleLogById(logId){return S.logs.find(l=>String(l.id)===String(logId)&&!isDeleted(l));}
+function latestVisibleLog(){
+  let latest=null;
+  visibleLogs().forEach(log=>{
+    if(!latest||new Date(log.ts).getTime()>new Date(latest.ts).getTime())latest=log;
+  });
+  return latest;
+}
 function touchItem(item){item.updatedAt=nowISO();return item;}
 
 // ══════════════════════════════════════════════════════
@@ -535,21 +591,28 @@ function updatePQ(){
   if(title)title.textContent='ЧТО ТЫ ДЕЛАЛ';
   if(!badge)return;
   const last=lastLogTime();
-  if(!last){badge.textContent='СЕЙЧАС';return;}
-  const mins=Math.max(0,Math.floor((Date.now()-last)/60000));
-  if(mins<=0){badge.textContent='МЕНЬШЕ МИНУТЫ';return;}
-  const lastLog=new Date(last);
-  if(lastLog.toDateString()!==new Date().toDateString()){
-    badge.textContent='ДАВНО';
+  if(!last){
+    badge.textContent='СЕЙЧАС';
     return;
   }
-  badge.textContent=`ПОСЛЕДНИЕ ${mins} МИН`;
+  const elapsedSec=Math.max(0,Math.floor((Date.now()-last)/1000));
+  if(elapsedSec<60){
+    badge.textContent=elapsedSec<=1?'1 СЕК':'%SEC% СЕК'.replace('%SEC%',elapsedSec);
+    return;
+  }
+  const mins=Math.floor(elapsedSec/60);
+  if(mins<60){
+    badge.textContent=`ПОСЛЕДНИЕ ${mins} МИН`;
+    return;
+  }
+  const hours=Math.floor(mins/60);
+  const remMins=mins%60;
+  badge.textContent=remMins?`${hours}Ч ${remMins}М`:`${hours}Ч`;
 }
 
 function lastLogTime(){
-  const logs=visibleLogs();
-  if(!logs.length)return null;
-  return new Date(logs[logs.length-1].ts).getTime();
+  const last=latestVisibleLog();
+  return last?new Date(last.ts).getTime():null;
 }
 
 // ══════════════════════════════════════════════════════
@@ -570,11 +633,18 @@ function goScreen(id){
 // PING
 // ══════════════════════════════════════════════════════
 function renderPG(){
-  const g=document.getElementById('ping-grid');g.innerHTML='';
-  activeActivities().slice(0,16).forEach(a=>{
-    const b=document.createElement('button');b.className='abt';
+  const g=document.getElementById('ping-grid');
+  g.innerHTML='';
+  activeActivities().slice(0,16).forEach((a,idx)=>{
+    const b=document.createElement('button');
+    b.className='abt';
+    const color=activityColor(a,idx);
+    b.style.borderColor=color;
+    b.style.boxShadow=`0 0 0 1px ${rgbaFromHex(color,.22)} inset`;
+    b.style.background=`linear-gradient(180deg, ${rgbaFromHex(color,.12)} 0%, var(--sur) 62%)`;
     b.innerHTML=`<span class="em">${a.emoji}</span>${a.name}`;
-    b.onclick=()=>logIt(a);g.appendChild(b);
+    b.onclick=()=>logIt(a);
+    g.appendChild(b);
   });
 }
 
@@ -595,6 +665,7 @@ function createLogEntry(activity,durationSec,overrides={}){
     activityId:activity?String(activity.id):null,
     emoji:activity?activity.emoji:'—',
     name:activity?activity.name:'Пропущено',
+    color:activity?activity.color:DEFAULT_ACTIVITY_COLOR,
     ts,
     skipped:!activity,
     durationSec:Math.max(1,parseInt(durationSec)||1),
@@ -724,23 +795,43 @@ function renderLaps(){
 // ══════════════════════════════════════════════════════
 // SCHEDULE
 // ══════════════════════════════════════════════════════
-function schedulePing(){
+function intervalMs(){return (S.intervalMinutes||15)*60*1000;}
+
+function computeDuePingTime(){
+  const last=lastLogTime();
+  if(last)return last+intervalMs();
+  if(S.nextPingTime){
+    const dueAt=new Date(S.nextPingTime).getTime();
+    if(Number.isFinite(dueAt))return dueAt;
+  }
+  return null;
+}
+
+function schedulePing(baseMs=Date.now()){
   if(pingTimer)clearTimeout(pingTimer);
-  const ms=(S.intervalMinutes||15)*60*1000;
-  S.nextPingTime=new Date(Date.now()+ms).toISOString();
+  const dueAt=baseMs+intervalMs();
+  S.nextPingTime=new Date(dueAt).toISOString();
   save();
-  pingTimer=setTimeout(triggerPing,ms);
+  pingTimer=setTimeout(triggerPing,Math.max(0,dueAt-Date.now()));
+}
+
+function showDuePing(){
+  goScreen('sp');
+  updatePQ();
 }
 
 function restorePingSchedule(){
   if(pingTimer)clearTimeout(pingTimer);
-  if(!S.nextPingTime){
+  const dueAt=computeDuePingTime();
+  if(!dueAt){
     schedulePing();
     return;
   }
-  const diff=new Date(S.nextPingTime).getTime()-Date.now();
+  S.nextPingTime=new Date(dueAt).toISOString();
+  save();
+  const diff=dueAt-Date.now();
   if(diff<=0){
-    triggerPing();
+    showDuePing();
     return;
   }
   pingTimer=setTimeout(triggerPing,diff);
@@ -750,12 +841,14 @@ function triggerPing(){
   if(Notification&&Notification.permission==='granted'){
     try{new Notification('⏱ ЧТО ТЫ ДЕЛАЛ?',{body:'Пора отметить!',tag:'ping'});}catch(e){}
   }
-  goScreen('sp');
-  schedulePing();
+  showDuePing();
+  schedulePing(Date.now());
 }
 
 document.addEventListener('visibilitychange',()=>{
-  if(!document.hidden&&S.nextPingTime&&new Date()>=new Date(S.nextPingTime))triggerPing();
+  if(!document.hidden&&S.nextPingTime&&new Date()>=new Date(S.nextPingTime)){
+    showDuePing();
+  }
 });
 
 function reqNotify(){
@@ -779,6 +872,7 @@ function renderSett(){
     if(a.archived)d.style.opacity='.5';
     d.innerHTML=`<button class="embtn" onclick="openEP(${realIndex})">${a.emoji}</button>
       <input type="text" value="${escapeAttr(a.name)}" placeholder="Название..." oninput="renameAct(${realIndex},this.value)">
+      <button class="colorbtn" style="background:${activityColor(a,realIndex)}" onclick="openColorModal(${realIndex})" title="Цвет"></button>
       ${a.archived?'<span class="arc-badge">архив</span>':''}
       <button class="arcbtn" onclick="toggleArc(${realIndex})">${a.archived?'↩':'📦'}</button>
       <button class="xbtn" onclick="delAct(${realIndex})">×</button>`;
@@ -824,6 +918,7 @@ function addAct(){
     id:genId(),
     emoji:'❓',
     name:'',
+    color:presetColorByIndex(S.activities.length),
     archived:false,
     createdAt:ts,
     updatedAt:ts,
@@ -903,6 +998,48 @@ function openEP(idx){
 }
 function closeEP(evt){if(!evt||evt.target===document.getElementById('epo'))document.getElementById('epo').classList.remove('open');}
 
+function openColorModal(idx){
+  colorActIdx=idx;
+  const activity=S.activities[idx];
+  if(!activity||isDeleted(activity))return;
+  const grid=document.getElementById('color-grid');
+  const selected=activityColor(activity,idx);
+  grid.innerHTML='';
+  ACTIVITY_COLOR_PRESETS.forEach(color=>{
+    const btn=document.createElement('button');
+    btn.className='color-option'+(normalizeHexColor(selected)===normalizeHexColor(color)?' selected':'');
+    btn.style.background=color;
+    btn.onclick=()=>setActColor(idx,color);
+    grid.appendChild(btn);
+  });
+  document.getElementById('custom-color-input').value=selected;
+  document.getElementById('color-modal').classList.add('open');
+}
+
+function setActColor(i,color){
+  const activity=S.activities[i];
+  if(!activity||isDeleted(activity))return;
+  const nextColor=normalizeHexColor(color)||DEFAULT_ACTIVITY_COLOR;
+  activity.color=nextColor;
+  touchItem(activity);
+  S.logs.forEach(l=>{
+    if(!isDeleted(l)&&String(l.activityId)===String(activity.id)){
+      l.color=nextColor;
+      touchItem(l);
+    }
+  });
+  save();
+  rerenderAll();
+  closeModal('color-modal');
+  toast('🎨 Цвет обновлён');
+}
+
+function applyCustomColor(){
+  if(colorActIdx===null)return;
+  const value=document.getElementById('custom-color-input').value;
+  setActColor(colorActIdx,value);
+}
+
 // ══════════════════════════════════════════════════════
 // ANALYTICS
 // ══════════════════════════════════════════════════════
@@ -944,10 +1081,28 @@ function renderA(){
   else drawHeatmap(body,logs);
 }
 
+function getLogColor(log){
+  const direct=normalizeHexColor(log?.color);
+  if(direct)return direct;
+  const activity=S.activities.find(a=>String(a.id)===String(log?.activityId));
+  return activityColor(activity);
+}
+
 function getCounts(logs){
-  const c={};
-  logs.forEach(l=>{const k=l.emoji+'§'+l.name;c[k]=(c[k]||0)+(l.durationSec||0);});
-  return Object.entries(c).sort((a,b)=>b[1]-a[1]);
+  const map=new Map();
+  logs.forEach(log=>{
+    const key=log.activityId?`id:${log.activityId}`:`free:${log.emoji}:${log.name}`;
+    const existing=map.get(key)||{
+      activityId:log.activityId||null,
+      emoji:log.emoji,
+      name:log.name,
+      color:getLogColor(log),
+      sec:0,
+    };
+    existing.sec+=(log.durationSec||0);
+    map.set(key,existing);
+  });
+  return Array.from(map.values()).sort((a,b)=>b.sec-a.sec);
 }
 
 function totalSecLogs(logs){return logs.reduce((s,l)=>s+(l.durationSec||0),0);}
@@ -959,14 +1114,13 @@ function drawBars(body,logs){
     <div class="sc"><div class="sv">${logs.length}</div><div class="sl">ОТМЕТОК</div></div>
     <div class="sc"><div class="sv">${fmtDurShort(totalSec)}</div><div class="sl">ВРЕМЕНИ</div></div>
   </div>`;
-  const sorted=getCounts(logs);const max=sorted[0]?.[1]||1;
+  const sorted=getCounts(logs);const max=sorted[0]?.sec||1;
   html+=`<div class="card"><div class="ctitle">ПО АКТИВНОСТЯМ (по времени)</div>`;
-  sorted.forEach(([k,sec])=>{
-    const[em,name]=k.split('§');
-    const pct=Math.round(sec/totalSec*100);
-    html+=`<div class="srow"><span class="se">${em}</span><span class="sn">${name}</span>
-      <div class="bw"><div class="bf" style="width:${Math.round(sec/max*100)}%"></div></div>
-      <span class="sc2">${fmtDurShort(sec)}</span><span class="spc">${pct}%</span></div>`;
+  sorted.forEach(item=>{
+    const pct=Math.round(item.sec/totalSec*100);
+    html+=`<div class="srow"><span class="se">${item.emoji}</span><span class="sn">${item.name}</span>
+      <div class="bw"><div class="bf" style="width:${Math.round(item.sec/max*100)}%;background:${item.color}"></div></div>
+      <span class="sc2">${fmtDurShort(item.sec)}</span><span class="spc">${pct}%</span></div>`;
   });
   html+=`</div>`;
   const hc=Array(24).fill(0);logs.forEach(l=>hc[new Date(l.ts).getHours()]+=(l.durationSec||0));
@@ -982,18 +1136,17 @@ function drawPie(body,logs){
   const totalSec=totalSecLogs(logs);
   const sorted=getCounts(logs);
   const R=78,cx=88,cy=88;let start=0;let paths='';
-  sorted.forEach(([k,sec],i)=>{
-    const frac=sec/totalSec;const angle=frac*2*Math.PI;
+  sorted.forEach(item=>{
+    const frac=item.sec/totalSec;const angle=frac*2*Math.PI;
     const x1=cx+R*Math.sin(start),y1=cy-R*Math.cos(start);
     const x2=cx+R*Math.sin(start+angle),y2=cy-R*Math.cos(start+angle);
-    if(frac>0.995)paths+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${PIE_COL[i%PIE_COL.length]}"/>`;
-    else paths+=`<path d="M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${angle>Math.PI?1:0},1 ${x2},${y2} Z" fill="${PIE_COL[i%PIE_COL.length]}"/>`;
+    if(frac>0.995)paths+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${item.color}"/>`;
+    else paths+=`<path d="M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${angle>Math.PI?1:0},1 ${x2},${y2} Z" fill="${item.color}"/>`;
     start+=angle;
   });
   let legend='';
-  sorted.forEach(([k,sec],i)=>{
-    const[em,name]=k.split('§');
-    legend+=`<div class="plr"><div class="pd" style="background:${PIE_COL[i%PIE_COL.length]}"></div><span class="pln">${em} ${name}</span><span class="plp">${Math.round(sec/totalSec*100)}%</span></div>`;
+  sorted.forEach(item=>{
+    legend+=`<div class="plr"><div class="pd" style="background:${item.color}"></div><span class="pln">${item.emoji} ${item.name}</span><span class="plp">${Math.round(item.sec/totalSec*100)}%</span></div>`;
   });
   const days=new Set(logs.map(l=>new Date(l.ts).toDateString())).size;
   let html=`<div class="sg">
@@ -1060,7 +1213,8 @@ function renderH(){
     const time=pad(d.getHours())+':'+pad(d.getMinutes());
     const date=pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
     const dur=fmtDurLong(l.durationSec||0);
-    html+=`<div class="hitem">
+    const itemColor=l.skipped?'var(--bor)':getLogColor(l);
+    html+=`<div class="hitem" style="border-color:${itemColor};box-shadow:0 0 0 1px ${l.skipped?'transparent':rgbaFromHex(itemColor,.16)} inset">
       <div class="hitem-main">
         <div class="hem">${l.skipped?'—':l.emoji}</div>
         <div class="hinfo">
@@ -1129,6 +1283,7 @@ function applyEdit(a){
   log.activityId=String(a.id);
   log.emoji=a.emoji;
   log.name=a.name;
+  log.color=a.color;
   log.skipped=false;
   touchItem(log);
   save();
@@ -1208,7 +1363,7 @@ function closeModal(id,evt){
 // ══════════════════════════════════════════════════════
 // GOOGLE DRIVE
 // ══════════════════════════════════════════════════════
-const G_CLIENT_ID='365703826756-q69gavqauf43m7mld2ftvi2163qh76ai.apps.googleusercontent.com'; // Вставь сюда свой OAuth Client ID
+const G_CLIENT_ID='365703826756-q69gavqauf43m7m1d2ftvi2163qh76ai.apps.googleusercontent.com'; // OAuth Client ID
 const G_MAIN_FILE='timetracker_state.json';
 const G_BACKUP_DIR='backups';
 
@@ -1263,7 +1418,7 @@ function gAuth(){
 6. В "Authorised JavaScript origins" добавь адрес этого файла
 7. Скопируй Client ID
 8. В HTML найди строку:
-   const G_CLIENT_ID='365703826756-q69gavqauf43m7mld2ftvi2163qh76ai.apps.googleusercontent.com';
+   const G_CLIENT_ID='365703826756-q69gavqauf43m7m1d2ftvi2163qh76ai.apps.googleusercontent.com';
    и вставь Client ID
 
 После этого синхронизация заработает.`);
@@ -1383,8 +1538,7 @@ async function runCloudAction(mode,buttonId=null){
       console.error(e);
     }
   }finally{
-    btn.textContent=prevLabel;
-    btn.classList.remove('syncing');
+    if(btn){btn.textContent=prevLabel;btn.classList.remove('syncing');}
     setCloudButtonsDisabled(false);
     updateGUI();
   }
