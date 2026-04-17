@@ -228,25 +228,48 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .syncing{animation:pulse 1s infinite}
 
 /* ── MAIN LIFE BAR ── */
-.life-top{width:100%;margin:0 0 10px}
-.life-meta-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:5px}
-.life-age,.life-percent{font-size:10px;color:#a5a5a5;letter-spacing:.4px}
-.life-age{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.life-percent{text-align:right;min-width:54px}
-.life-progress{width:100%;height:4px;background:var(--bor);border-radius:999px;overflow:hidden}
-.life-progress-fill{height:100%;width:0%;background:var(--acc);border-radius:999px;transition:width .15s linear}
-#sp .clk-wrap{margin-top:4px}
+.life-top,.day-top{width:100%;margin:0 0 10px}
+.life-top.hidden,.day-top.hidden{display:none}
+.life-meta-row,.day-meta-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:5px}
+.life-age,.life-percent,.day-time,.day-percent{font-size:10px;color:#a5a5a5;letter-spacing:.4px}
+.life-age,.day-time{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.life-percent,.day-percent{text-align:right;min-width:54px}
+.life-progress,.day-progress{width:100%;height:4px;background:var(--bor);border-radius:999px;overflow:hidden}
+.life-progress-fill,.day-progress-fill{height:100%;width:0%;background:var(--acc);border-radius:999px;transition:width .15s linear}
+.life-age.clickable{cursor:pointer}
+.life-dec-wrap{display:inline-flex;align-items:flex-end;gap:2px;font-family:'Bebas Neue',sans-serif;letter-spacing:.5px}
+.life-dec-main{font-size:18px;line-height:1;color:#d2d2d2}
+.life-dec-tail{font-size:11px;line-height:1;color:#6f6f6f;transform:translateY(3px)}
+#sp .clk-wrap{margin-top:4px;display:flex;align-items:flex-end;justify-content:center;gap:8px}
 #sp .clk-hm{font-size:114px;line-height:.95}
-#sp .clk-sec{font-size:38px;padding-top:18px}
+#sp .clk-side{display:flex;align-items:flex-end;gap:4px;padding-bottom:10px}
+#sp .clk-sec{font-size:38px}
+#sp .clk-ms{font-family:'Bebas Neue',sans-serif;font-size:18px;line-height:1;color:#666;letter-spacing:1px;padding-bottom:4px}
+#sp .clk-ms.hidden{display:none}
 #sp .pq{margin-bottom:6px}
-
-/* ── SETTINGS REWORK ── */
+.fullscreen-life{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:800;display:none;align-items:center;justify-content:center;padding:24px}
+.fullscreen-life.open{display:flex}
+.fullscreen-life-inner{width:100%;max-width:760px;text-align:center}
+.fullscreen-life-value{display:inline-flex;align-items:flex-end;gap:6px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px}
+.fullscreen-life-main{font-size:min(26vw,180px);line-height:.85;color:#e8e8e8}
+.fullscreen-life-tail{font-size:min(13vw,84px);line-height:.85;color:#707070;transform:translateY(14px)}
+.fullscreen-life-hint{margin-top:16px;font-size:11px;color:var(--mut);letter-spacing:1px;text-transform:uppercase}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:var(--sur);border:1px solid var(--bor);border-radius:10px;margin-bottom:6px}
+.toggle-row input[type="checkbox"]{width:18px;height:18px}
+.toggle-label{font-size:11px;color:var(--txt);line-height:1.5}
+.select-inp{width:100%;background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:10px 11px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none}
 .settings-home-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px}
 .settings-home-btn{width:100%;padding:12px;border-radius:10px;border:1px solid var(--bor);background:var(--sur);color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;text-align:left}
 .settings-home-btn.active{border-color:var(--acc);color:var(--acc)}
 .settings-section{display:none}
 .settings-section.active{display:block}
 .birth-grid{display:grid;grid-template-columns:1fr 120px;gap:8px}
+.symbol-hint{font-size:9px;color:var(--mut);margin:-1px 0 8px}
+.order-col{display:flex;flex-direction:column;gap:4px}
+.movebtn{background:none;border:1px solid var(--bor);border-radius:6px;padding:2px 6px;font-size:10px;color:var(--mut);cursor:pointer;font-family:'IBM Plex Mono',monospace;line-height:1.2}
+.movebtn:active{color:var(--acc);border-color:var(--acc)}
+.ait .name-inp{flex:1;background:none;border:none;outline:none;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--txt)}
+.ait .name-inp::placeholder{color:var(--mut)}
 
 /* ── RECOVERY PICKER ── */
 .recovery-list{display:flex;flex-direction:column;gap:6px;max-height:48vh;overflow-y:auto}
@@ -275,7 +298,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 
   <!-- ══ PING ══ -->
   <div class="screen active" id="sp">
-   <div class="life-top">
+   <div class="life-top" id="life-top">
     <div class="life-meta-row">
       <div class="life-age" id="life-age-text">УКАЖИ ДАТУ РОЖДЕНИЯ</div>
       <div class="life-percent" id="life-percent-text">—</div>
@@ -284,7 +307,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
    </div>
    <div class="clk-wrap">
     <div class="clk-hm" id="clk-hm">00:00</div>
-    <div class="clk-sec" id="clk-sec">00</div>
+    <div class="clk-side">
+      <div class="clk-sec" id="clk-sec">00</div>
+      <div class="clk-ms" id="clk-ms">000</div>
+    </div>
+   </div>
+   <div class="day-top" id="day-top">
+    <div class="day-meta-row">
+      <div class="day-time" id="day-remaining-text">ОСТАЛОСЬ В СУТКАХ —</div>
+      <div class="day-percent" id="day-percent-text">—</div>
+    </div>
+    <div class="day-progress"><div class="day-progress-fill" id="day-bar-fill"></div></div>
    </div>
    <div class="pq" id="pq-text">TIME</div>
    <div class="ping-tools-row">
@@ -365,6 +398,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
       <button class="settings-home-btn" data-ss="data" onclick="setSettingsSection('data')">☁️ НАСТРОЙКИ ДАННЫХ</button>
       <button class="settings-home-btn" data-ss="activities" onclick="setSettingsSection('activities')">🧩 НАСТРОЙКА АКТИВНОСТЕЙ</button>
       <button class="settings-home-btn" data-ss="time" onclick="setSettingsSection('time')">⏳ НАСТРОЙКИ ВРЕМЕНИ</button>
+      <button class="settings-home-btn" data-ss="appearance" onclick="setSettingsSection('appearance')">🎨 ВНЕШНИЙ ВИД</button>
     </div>
 
     <div class="settings-section" id="settings-section-data">
@@ -396,6 +430,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 
     <div class="settings-section" id="settings-section-activities">
       <div class="slbl">АКТИВНОСТИ (макс. 16 активных)</div>
+      <div class="symbol-hint">Нажми на символ активности, чтобы ввести любой символ или короткий текст.</div>
       <div id="act-list"></div>
       <button class="dbtn" onclick="addAct()">+ ДОБАВИТЬ</button>
     </div>
@@ -413,14 +448,27 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
        <span class="mt">лет</span>
       </div>
 
+      <div class="slbl">УСТАНОВКА НА IPHONE</div>
+      <div class="ibox">1. Открой в <strong>Safari</strong><br>2. Нажми <strong>Поделиться ↑</strong><br>3. <strong>«На экран «Домой»»</strong><br>4. <strong>«Добавить»</strong></div>
+    </div>
+
+    <div class="settings-section" id="settings-section-appearance">
+      <div class="slbl">ГЛАВНЫЙ ЭКРАН</div>
+      <label class="toggle-row"><span class="toggle-label">Показывать верхний блок жизни</span><input type="checkbox" id="show-life-top"></label>
+      <label class="toggle-row"><span class="toggle-label">Показывать блок оставшегося времени дня</span><input type="checkbox" id="show-day-remaining"></label>
+      <label class="toggle-row"><span class="toggle-label">Показывать миллисекунды у часов</span><input type="checkbox" id="show-main-ms"></label>
+
+      <div class="slbl">ВИД ВЕРХНЕГО БЛОКА</div>
+      <select class="select-inp" id="life-display-mode">
+        <option value="precise">ТОЧНЫЙ ВИД</option>
+        <option value="decimal">ДЕСЯТИЧНЫЙ ВИД</option>
+      </select>
+
       <div class="slbl">ЦВЕТ ПЛАШКИ ВРЕМЕНИ</div>
       <div class="irow">
        <input class="color-inp" type="color" id="badge-color" value="#e8ff47">
        <span class="mt">меняет только плашку на главной</span>
       </div>
-
-      <div class="slbl">УСТАНОВКА НА IPHONE</div>
-      <div class="ibox">1. Открой в <strong>Safari</strong><br>2. Нажми <strong>Поделиться ↑</strong><br>3. <strong>«На экран «Домой»»</strong><br>4. <strong>«Добавить»</strong></div>
     </div>
 
     <div style="height:12px"></div>
@@ -438,6 +486,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
   <button class="nb"        id="nb-sh2"    onclick="goScreen('sh2')"><span class="ic">📋</span><span class="lb">ИСТОРИЯ</span></button>
   <button class="nb"        id="nb-sset"   onclick="goScreen('sset')"><span class="ic">⚙️</span><span class="lb">НАСТРОЙКИ</span></button>
  </nav>
+</div>
+
+<div class="fullscreen-life" id="life-fullscreen" onclick="closeLifeFullscreen(event)">
+  <div class="fullscreen-life-inner">
+    <div class="fullscreen-life-value" id="life-fullscreen-value">
+      <span class="fullscreen-life-main">0.0000</span><span class="fullscreen-life-tail">00000000</span>
+    </div>
+    <div class="fullscreen-life-hint">тапни вне числа, чтобы закрыть</div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -529,6 +586,10 @@ let S={
   gMainFileId:null,
   lastSyncAt:null,
   badgeColor:'#e8ff47',
+  showLifeTop:true,
+  showDayRemaining:true,
+  showMainMilliseconds:true,
+  lifeDisplayMode:'precise',
   customFrom:null,customTo:null,
 };
 
@@ -1934,6 +1995,10 @@ function migrateState(){
   if(typeof S.gMainFileId==='undefined')S.gMainFileId=null;
   if(typeof S.lastSyncAt==='undefined')S.lastSyncAt=null;
   if(typeof S.badgeColor==='undefined')S.badgeColor='#e8ff47';
+  if(typeof S.showLifeTop==='undefined')S.showLifeTop=true;
+  if(typeof S.showDayRemaining==='undefined')S.showDayRemaining=true;
+  if(typeof S.showMainMilliseconds==='undefined')S.showMainMilliseconds=true;
+  if(typeof S.lifeDisplayMode==='undefined')S.lifeDisplayMode='precise';
   if(typeof S.birthAt==='undefined')S.birthAt=null;
   if(typeof S.lifeExpectancyYears==='undefined')S.lifeExpectancyYears=75;
   if(typeof S.settingsSection==='undefined')S.settingsSection='data';
@@ -1950,6 +2015,10 @@ function buildExportObject(){
     backupFolderId:S.gBackupFolderId||null,
     mainFileId:S.gMainFileId||null,
     badgeColor:S.badgeColor||'#e8ff47',
+    showLifeTop:S.showLifeTop!==false,
+    showDayRemaining:S.showDayRemaining!==false,
+    showMainMilliseconds:S.showMainMilliseconds!==false,
+    lifeDisplayMode:S.lifeDisplayMode||'precise',
     birthAt:S.birthAt||null,
     lifeExpectancyYears:parseFloat(S.lifeExpectancyYears)||75,
     heatmapMode:S.heatmapMode||'fill',
@@ -1970,6 +2039,10 @@ function normalizeState(raw){
     gMainFileId:state.mainFileId||state.gMainFileId||S.gMainFileId||null,
     lastSyncAt:state.lastSyncAt||S.lastSyncAt||null,
     badgeColor:state.badgeColor||S.badgeColor||'#e8ff47',
+    showLifeTop:typeof state.showLifeTop==='boolean'?state.showLifeTop:(S.showLifeTop!==false),
+    showDayRemaining:typeof state.showDayRemaining==='boolean'?state.showDayRemaining:(S.showDayRemaining!==false),
+    showMainMilliseconds:typeof state.showMainMilliseconds==='boolean'?state.showMainMilliseconds:(S.showMainMilliseconds!==false),
+    lifeDisplayMode:state.lifeDisplayMode||S.lifeDisplayMode||'precise',
     intervalMinutes:parseInt(state.intervalMinutes||S.intervalMinutes||15)||15,
     nextPingTime:state.nextPingTime||S.nextPingTime||null,
     customFrom:state.customFrom||S.customFrom||null,
@@ -1994,10 +2067,17 @@ function tick(){
   const n=new Date();
   const hm=document.getElementById('clk-hm');
   const sec=document.getElementById('clk-sec');
+  const ms=document.getElementById('clk-ms');
   if(hm)hm.textContent=pad(n.getHours())+':'+pad(n.getMinutes());
   if(sec)sec.textContent=pad(n.getSeconds());
+  if(ms){
+    ms.textContent=pad3(n.getMilliseconds());
+    ms.classList.toggle('hidden',S.showMainMilliseconds===false);
+  }
   updatePQ();
   renderLifeStats(n);
+  renderDayStats(n);
+  renderLifeFullscreen(n);
 }
 setInterval(()=>tick(),50);
 
@@ -2029,11 +2109,25 @@ function updatePQ(){
   badge.textContent=`ПОСЛЕДНИЕ ${mins} МИН`;
 }
 
+function decimalYearsFromBirth(birth,now){
+  const yearMs=365.2425*24*60*60*1000;
+  return Math.max(0,(now-birth)/yearMs);
+}
+
+function splitDecimalAgeText(decimalYears){
+  const value=decimalYears.toFixed(12);
+  return {main:value.slice(0,-8),tail:value.slice(-8)};
+}
+
 function renderLifeStats(now=new Date()){
+  const wrap=document.getElementById('life-top');
   const ageEl=document.getElementById('life-age-text');
   const pctEl=document.getElementById('life-percent-text');
   const bar=document.getElementById('life-bar-fill');
-  if(!ageEl||!pctEl||!bar)return;
+  if(!ageEl||!pctEl||!bar||!wrap)return;
+  wrap.classList.toggle('hidden',S.showLifeTop===false);
+  ageEl.classList.remove('clickable');
+  ageEl.onclick=null;
   if(!S.birthAt){
     ageEl.textContent='УКАЖИ ДАТУ РОЖДЕНИЯ';
     pctEl.textContent='—';
@@ -2047,14 +2141,47 @@ function renderLifeStats(now=new Date()){
     bar.style.width='0%';
     return;
   }
-  const parts=agePartsFromBirth(birth,now);
-  ageEl.textContent=`${parts.years} л. ${parts.months} м. ${parts.days} д. ${pad(parts.hours)}:${pad(parts.minutes)}:${pad(parts.seconds)}.${pad3(parts.milliseconds)}`;
   const expectancyYears=parseFloat(S.lifeExpectancyYears)||75;
   const totalMs=Math.max(1,expectancyYears*365.2425*24*60*60*1000);
   const livedMs=Math.max(0,now-birth);
   const pct=Math.min(100,Math.max(0,livedMs/totalMs*100));
+  if((S.lifeDisplayMode||'precise')==='decimal'){
+    const parts=splitDecimalAgeText(decimalYearsFromBirth(birth,now));
+    ageEl.innerHTML=`<span class="life-dec-wrap"><span class="life-dec-main">${parts.main}</span><span class="life-dec-tail">${parts.tail}</span></span>`;
+    ageEl.classList.add('clickable');
+    ageEl.onclick=()=>openLifeFullscreen();
+  }else{
+    const parts=agePartsFromBirth(birth,now);
+    ageEl.textContent=`${parts.years} л. ${parts.months} м. ${parts.days} д. ${pad(parts.hours)}:${pad(parts.minutes)}:${pad(parts.seconds)}.${pad3(parts.milliseconds)}`;
+  }
   pctEl.textContent=`${pct.toFixed(3)}%`;
   bar.style.width=`${pct}%`;
+}
+
+function renderDayStats(now=new Date()){
+  const wrap=document.getElementById('day-top');
+  const timeEl=document.getElementById('day-remaining-text');
+  const pctEl=document.getElementById('day-percent-text');
+  const fill=document.getElementById('day-bar-fill');
+  if(!wrap||!timeEl||!pctEl||!fill)return;
+  wrap.classList.toggle('hidden',S.showDayRemaining===false);
+  const start=new Date(now);
+  start.setHours(0,0,0,0);
+  const end=new Date(start);
+  end.setDate(end.getDate()+1);
+  const remainingMs=Math.max(0,end-now);
+  const remainingPct=remainingMs/86400000*100;
+  timeEl.textContent=`ДО КОНЦА ДНЯ ${fmtRemainingDay(remainingMs)}`;
+  pctEl.textContent=`${remainingPct.toFixed(3)}%`;
+  fill.style.width=`${remainingPct}%`;
+}
+
+function fmtRemainingDay(ms){
+  let diff=Math.max(0,ms);
+  const h=Math.floor(diff/3600000); diff-=h*3600000;
+  const m=Math.floor(diff/60000); diff-=m*60000;
+  const s=Math.floor(diff/1000); diff-=s*1000;
+  return `${pad(h)}:${pad(m)}:${pad(s)}.${pad3(Math.floor(diff))}`;
 }
 
 function agePartsFromBirth(birth,now){
@@ -2080,6 +2207,28 @@ function agePartsFromBirth(birth,now){
   return {years,months,days,hours,minutes,seconds,milliseconds};
 }
 
+function openLifeFullscreen(){
+  if((S.lifeDisplayMode||'precise')!=='decimal'||!S.birthAt)return;
+  document.getElementById('life-fullscreen').classList.add('open');
+  renderLifeFullscreen(new Date());
+}
+
+function renderLifeFullscreen(now=new Date()){
+  const overlay=document.getElementById('life-fullscreen');
+  const valueEl=document.getElementById('life-fullscreen-value');
+  if(!overlay||!valueEl||!overlay.classList.contains('open')||!S.birthAt)return;
+  const birth=new Date(S.birthAt);
+  if(Number.isNaN(birth.getTime())||now<birth)return;
+  const parts=splitDecimalAgeText(decimalYearsFromBirth(birth,now));
+  valueEl.innerHTML=`<span class="fullscreen-life-main">${parts.main}</span><span class="fullscreen-life-tail">${parts.tail}</span>`;
+}
+
+function closeLifeFullscreen(evt){
+  const overlay=document.getElementById('life-fullscreen');
+  if(!overlay)return;
+  if(!evt||evt.target===overlay)overlay.classList.remove('open');
+}
+
 function setSettingsSection(section){
   S.settingsSection=section;
   document.querySelectorAll('.settings-home-btn').forEach(btn=>{
@@ -2099,8 +2248,12 @@ function renderSett(){
       const d=document.createElement('div');
       d.className='ait';
       if(a.archived)d.style.opacity='.5';
-      d.innerHTML=`<button class="embtn" onclick="openEP(${realIndex})">${a.emoji}</button>
-        <input type="text" value="${escapeAttr(a.name)}" placeholder="Название..." oninput="renameAct(${realIndex},this.value)">
+      d.innerHTML=`<button class="embtn" onclick="promptActSymbol(${realIndex})">${escapeAttr(a.emoji||'❓')}</button>
+        <input class="name-inp" type="text" value="${escapeAttr(a.name)}" placeholder="Название..." oninput="renameAct(${realIndex},this.value)">
+        <div class="order-col">
+          <button class="movebtn" onclick="moveAct(${realIndex},-1)">↑</button>
+          <button class="movebtn" onclick="moveAct(${realIndex},1)">↓</button>
+        </div>
         ${a.archived?'<span class="arc-badge">архив</span>':''}
         <button class="arcbtn" onclick="toggleArc(${realIndex})">${a.archived?'↩':'📦'}</button>
         <button class="xbtn" onclick="delAct(${realIndex})">×</button>`;
@@ -2113,10 +2266,18 @@ function renderSett(){
   const lifeYears=document.getElementById('life-years');
   const birthDate=document.getElementById('birth-date');
   const birthTime=document.getElementById('birth-time');
+  const showLifeTop=document.getElementById('show-life-top');
+  const showDayRemaining=document.getElementById('show-day-remaining');
+  const showMainMs=document.getElementById('show-main-ms');
+  const lifeDisplayMode=document.getElementById('life-display-mode');
   if(ival)ival.value=S.intervalMinutes||15;
   if(gfolder)gfolder.value=S.gFolder||'TimeTracker';
   if(badgeColor)badgeColor.value=S.badgeColor||'#e8ff47';
   if(lifeYears)lifeYears.value=S.lifeExpectancyYears||75;
+  if(showLifeTop)showLifeTop.checked=S.showLifeTop!==false;
+  if(showDayRemaining)showDayRemaining.checked=S.showDayRemaining!==false;
+  if(showMainMs)showMainMs.checked=S.showMainMilliseconds!==false;
+  if(lifeDisplayMode)lifeDisplayMode.value=S.lifeDisplayMode||'precise';
   if(S.birthAt){
     const d=new Date(S.birthAt);
     if(!Number.isNaN(d.getTime())){
@@ -2131,6 +2292,38 @@ function renderSett(){
   updateGUI();
 }
 
+function moveAct(i,dir){
+  if(i<0||i>=S.activities.length)return;
+  let target=i+dir;
+  while(target>=0&&target<S.activities.length&&isDeleted(S.activities[target]))target+=dir;
+  if(target<0||target>=S.activities.length)return;
+  const tmp=S.activities[i];
+  S.activities[i]=S.activities[target];
+  S.activities[target]=tmp;
+  if(S.activities[i])touchItem(S.activities[i]);
+  if(S.activities[target])touchItem(S.activities[target]);
+  save();
+  renderSett();
+  renderPG();
+}
+
+function promptActSymbol(i){
+  const activity=S.activities[i];
+  if(!activity||isDeleted(activity))return;
+  const next=prompt('Введи любой символ или короткий текст',activity.emoji||'');
+  if(next===null)return;
+  activity.emoji=String(next).trim()||'❓';
+  touchItem(activity);
+  S.logs.forEach(l=>{
+    if(!isDeleted(l)&&String(l.activityId)===String(activity.id)){
+      l.emoji=activity.emoji;
+      touchItem(l);
+    }
+  });
+  save();
+  rerenderAll();
+}
+
 function saveSettings(){
   const ival=document.getElementById('ival');
   const gfolder=document.getElementById('g-folder');
@@ -2138,22 +2331,30 @@ function saveSettings(){
   const lifeYears=document.getElementById('life-years');
   const birthDate=document.getElementById('birth-date');
   const birthTime=document.getElementById('birth-time');
+  const showLifeTop=document.getElementById('show-life-top');
+  const showDayRemaining=document.getElementById('show-day-remaining');
+  const showMainMs=document.getElementById('show-main-ms');
+  const lifeDisplayMode=document.getElementById('life-display-mode');
   if(ival)S.intervalMinutes=parseInt(ival.value)||15;
   if(gfolder)S.gFolder=gfolder.value||'TimeTracker';
   if(badgeColor)S.badgeColor=badgeColor.value||'#e8ff47';
   if(lifeYears)S.lifeExpectancyYears=Math.max(1,parseFloat(lifeYears.value)||75);
+  if(showLifeTop)S.showLifeTop=!!showLifeTop.checked;
+  if(showDayRemaining)S.showDayRemaining=!!showDayRemaining.checked;
+  if(showMainMs)S.showMainMilliseconds=!!showMainMs.checked;
+  if(lifeDisplayMode)S.lifeDisplayMode=lifeDisplayMode.value||'precise';
   if(birthDate&&birthDate.value){
     const time=(birthTime&&birthTime.value?birthTime.value:'00:00:00');
-    S.birthAt=new Date(`${birthDate.value}T${time}`).toISOString();
+    const birth=new Date(`${birthDate.value}T${time}`);
+    if(!Number.isNaN(birth.getTime()))S.birthAt=birth.toISOString();
   }else{
     S.birthAt=null;
   }
   applyTheme();
   save();
-  renderPG();
+  rerenderAll();
   schedulePing();
   updateGUI();
-  renderLifeStats();
   toast('✓ СОХРАНЕНО');
 }
 
@@ -2370,6 +2571,7 @@ function rerenderAll(){
   renderPG();
   renderSett();
   renderLifeStats();
+  renderDayStats();
   if(document.getElementById('sa').classList.contains('active'))renderA();
   if(document.getElementById('sh2').classList.contains('active'))renderH();
   updatePQ();
@@ -2387,8 +2589,12 @@ if(appleTitleMeta)appleTitleMeta.setAttribute('content','TIME');
 load();
 applyTheme();
 renderPG();
+renderSett();
+renderLifeStats();
+renderDayStats();
 restorePingSchedule();
 updateGUI();
+tick();
 </script>
 </body>
 </html>
