@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ЧТО ТЫ ДЕЛАЛ">
-<title>ЧТО ТЫ ДЕЛАЛ</title>
+<meta name="apple-mobile-web-app-title" content="TIME">
+<title>TIME</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -226,6 +226,47 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 /* Sync pulse */
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .syncing{animation:pulse 1s infinite}
+
+/* ── MAIN LIFE BAR ── */
+.life-top{width:100%;margin:0 0 10px}
+.life-meta-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:5px}
+.life-age,.life-percent{font-size:10px;color:#a5a5a5;letter-spacing:.4px}
+.life-age{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.life-percent{text-align:right;min-width:54px}
+.life-progress{width:100%;height:4px;background:var(--bor);border-radius:999px;overflow:hidden}
+.life-progress-fill{height:100%;width:0%;background:var(--acc);border-radius:999px;transition:width .15s linear}
+#sp .clk-wrap{margin-top:4px}
+#sp .clk-hm{font-size:114px;line-height:.95}
+#sp .clk-sec{font-size:38px;padding-top:18px}
+#sp .pq{margin-bottom:6px}
+
+/* ── SETTINGS REWORK ── */
+.settings-home-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px}
+.settings-home-btn{width:100%;padding:12px;border-radius:10px;border:1px solid var(--bor);background:var(--sur);color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;text-align:left}
+.settings-home-btn.active{border-color:var(--acc);color:var(--acc)}
+.settings-section{display:none}
+.settings-section.active{display:block}
+.birth-grid{display:grid;grid-template-columns:1fr 120px;gap:8px}
+
+/* ── RECOVERY PICKER ── */
+.recovery-list{display:flex;flex-direction:column;gap:6px;max-height:48vh;overflow-y:auto}
+.recovery-item{background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:10px;cursor:pointer}
+.recovery-item.active{border-color:var(--acc);box-shadow:0 0 0 1px rgba(232,255,71,.15) inset}
+.recovery-item-title{font-size:11px;color:var(--txt);margin-bottom:4px}
+.recovery-item-meta{font-size:9px;color:var(--mut);line-height:1.5}
+.recovery-empty{padding:18px;text-align:center;color:var(--mut);border:1px dashed var(--bor);border-radius:10px}
+
+/* ── HEATMAP ENHANCED ── */
+.hm-mode-row{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px}
+.hm-mode-btn,.hm-act-btn{padding:5px 10px;border-radius:999px;border:1px solid var(--bor);background:var(--sur2);color:var(--mut);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;cursor:pointer}
+.hm-mode-btn.active,.hm-act-btn.active{border-color:var(--acc);color:var(--acc)}
+.hm-acts-row{display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:2px}
+.hm-grid-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.hm-cell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;background:var(--bor);color:#2b2b2b;text-align:center;padding:4px;line-height:.9;font-family:'Bebas Neue',sans-serif;font-weight:700;letter-spacing:.2px;overflow:hidden}
+.hm-cell span{display:block;font-family:'Bebas Neue',sans-serif;font-weight:700;line-height:.9;color:#2b2b2b;transform:none}
+.hm-cell.empty{color:transparent}
+.hm-note{font-size:9px;color:var(--mut);margin-top:8px;line-height:1.5}
+
 </style>
 </head>
 <body>
@@ -234,12 +275,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 
   <!-- ══ PING ══ -->
   <div class="screen active" id="sp">
+   <div class="life-top">
+    <div class="life-meta-row">
+      <div class="life-age" id="life-age-text">УКАЖИ ДАТУ РОЖДЕНИЯ</div>
+      <div class="life-percent" id="life-percent-text">—</div>
+    </div>
+    <div class="life-progress"><div class="life-progress-fill" id="life-bar-fill"></div></div>
+   </div>
    <div class="clk-wrap">
     <div class="clk-hm" id="clk-hm">00:00</div>
     <div class="clk-sec" id="clk-sec">00</div>
    </div>
-   <div class="clks">СЕЙЧАС</div>
-   <div class="pq" id="pq-text">ЧТО ТЫ ДЕЛАЛ</div>
+   <div class="pq" id="pq-text">TIME</div>
    <div class="ping-tools-row">
     <div class="pq-badge" id="pq-badge">СЕЙЧАС</div>
     <button class="main-sync-btn" id="main-sync-btn" onclick="gSyncFromMain()">☁️ SYNC</button>
@@ -314,42 +361,67 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
   <div class="screen" id="sset">
    <div class="sh"><div class="sh-title">НАСТРОЙКИ</div></div>
    <div class="sscroll">
-    <div class="slbl">АКТИВНОСТИ (макс. 16 активных)</div>
-    <div id="act-list"></div>
-    <button class="dbtn" onclick="addAct()">+ ДОБАВИТЬ</button>
-
-    <div class="slbl">ИНТЕРВАЛ ОПРОСА</div>
-    <div class="irow">
-     <input class="ninp" type="number" id="ival" min="1" max="120" value="15">
-     <span class="mt">минут</span>
+    <div class="settings-home-grid">
+      <button class="settings-home-btn" data-ss="data" onclick="setSettingsSection('data')">☁️ НАСТРОЙКИ ДАННЫХ</button>
+      <button class="settings-home-btn" data-ss="activities" onclick="setSettingsSection('activities')">🧩 НАСТРОЙКА АКТИВНОСТЕЙ</button>
+      <button class="settings-home-btn" data-ss="time" onclick="setSettingsSection('time')">⏳ НАСТРОЙКИ ВРЕМЕНИ</button>
     </div>
 
-    <div class="slbl">ЦВЕТ ПЛАШКИ ВРЕМЕНИ</div>
-    <div class="irow">
-     <input class="color-inp" type="color" id="badge-color" value="#e8ff47">
-     <span class="mt">меняет только зелёную плашку на главной</span>
+    <div class="settings-section" id="settings-section-data">
+      <div class="slbl">GOOGLE DRIVE</div>
+      <button class="bigbtn sec" id="g-auth-btn" onclick="gAuth()" style="margin-bottom:6px">ПОДКЛЮЧИТЬ GOOGLE DRIVE</button>
+      <div id="g-status" class="gstat">Не подключён</div>
+      <div id="g-panel" style="display:none;margin-top:8px">
+       <input class="ninp" type="text" id="g-folder" placeholder="Папка (напр. TimeTracker)" style="width:100%;margin-bottom:6px">
+       <button class="bigbtn blue" onclick="gSync()" style="margin-bottom:5px" id="g-sync-btn">🔄 SYNC</button>
+       <button class="bigbtn sec" onclick="gForceSync()" style="margin-bottom:5px" id="g-force-sync-btn">☁️ FORCE SYNC</button>
+       <button class="bigbtn sec" onclick="gForceRecovery()" style="margin-bottom:5px" id="g-recovery-btn">📥 FORCE RECOVERY</button>
+       <button class="bigbtn sec" onclick="gChooseRecovery()" style="margin-bottom:5px" id="g-choose-recovery-btn">🗂 CHOOSE RECOVERY</button>
+       <p style="font-size:10px;color:var(--mut);line-height:1.6">Sync объединяет локальные и облачные данные. Force Sync делает backup облачной версии и полностью перезаписывает её локальной. Force Recovery берёт текущую основную облачную версию. Choose Recovery позволяет выбрать один из последних 10 backup-файлов в облаке.</p>
+      </div>
+
+      <div class="slbl">ИНТЕРВАЛ ОПРОСА</div>
+      <div class="irow">
+       <input class="ninp" type="number" id="ival" min="1" max="120" value="15">
+       <span class="mt">минут</span>
+      </div>
+
+      <div class="slbl">УВЕДОМЛЕНИЯ</div>
+      <button class="bigbtn" onclick="reqNotify()">ВКЛЮЧИТЬ УВЕДОМЛЕНИЯ</button>
+
+      <div class="slbl">ДАННЫЕ</div>
+      <button class="dbtn" onclick="exportData()" style="margin-bottom:5px">📤 ЭКСПОРТ JSON</button>
+      <button class="dbtn danger" onclick="clearData()">🗑 УДАЛИТЬ ВСЕ ДАННЫЕ</button>
     </div>
 
-    <div class="slbl">УВЕДОМЛЕНИЯ</div>
-    <button class="bigbtn" onclick="reqNotify()">ВКЛЮЧИТЬ УВЕДОМЛЕНИЯ</button>
-
-    <div class="slbl">GOOGLE DRIVE</div>
-    <button class="bigbtn sec" id="g-auth-btn" onclick="gAuth()" style="margin-bottom:6px">ПОДКЛЮЧИТЬ GOOGLE DRIVE</button>
-    <div id="g-status" class="gstat">Не подключён</div>
-    <div id="g-panel" style="display:none;margin-top:8px">
-     <input class="ninp" type="text" id="g-folder" placeholder="Папка (напр. TimeTracker)" style="width:100%;margin-bottom:6px">
-     <button class="bigbtn blue" onclick="gSync()" style="margin-bottom:5px" id="g-sync-btn">🔄 SYNC</button>
-     <button class="bigbtn sec" onclick="gForceSync()" style="margin-bottom:5px" id="g-force-sync-btn">☁️ FORCE SYNC</button>
-     <button class="bigbtn sec" onclick="gForceRecovery()" style="margin-bottom:5px" id="g-recovery-btn">📥 FORCE RECOVERY</button>
-     <p style="font-size:10px;color:var(--mut);line-height:1.6">Sync объединяет локальные и облачные данные. Force Sync делает backup облачной версии и полностью перезаписывает её локальной. Force Recovery берёт все данные из облака и заменяет локальную историю.</p>
+    <div class="settings-section" id="settings-section-activities">
+      <div class="slbl">АКТИВНОСТИ (макс. 16 активных)</div>
+      <div id="act-list"></div>
+      <button class="dbtn" onclick="addAct()">+ ДОБАВИТЬ</button>
     </div>
 
-    <div class="slbl">УСТАНОВКА НА IPHONE</div>
-    <div class="ibox">1. Открой в <strong>Safari</strong><br>2. Нажми <strong>Поделиться ↑</strong><br>3. <strong>«На экран «Домой»»</strong><br>4. <strong>«Добавить»</strong></div>
+    <div class="settings-section" id="settings-section-time">
+      <div class="slbl">ДАТА И ВРЕМЯ РОЖДЕНИЯ</div>
+      <div class="birth-grid">
+        <input class="date-inp" type="date" id="birth-date">
+        <input class="date-inp" type="time" id="birth-time" step="1">
+      </div>
 
-    <div class="slbl">ДАННЫЕ</div>
-    <button class="dbtn" onclick="exportData()" style="margin-bottom:5px">📤 ЭКСПОРТ JSON</button>
-    <button class="dbtn danger" onclick="clearData()">🗑 УДАЛИТЬ ВСЕ ДАННЫЕ</button>
+      <div class="slbl">СКОЛЬКО Я ПЛАНИРУЮ ПРОЖИТЬ</div>
+      <div class="irow">
+       <input class="ninp" type="number" id="life-years" min="1" max="200" step="0.1" value="75">
+       <span class="mt">лет</span>
+      </div>
+
+      <div class="slbl">ЦВЕТ ПЛАШКИ ВРЕМЕНИ</div>
+      <div class="irow">
+       <input class="color-inp" type="color" id="badge-color" value="#e8ff47">
+       <span class="mt">меняет только плашку на главной</span>
+      </div>
+
+      <div class="slbl">УСТАНОВКА НА IPHONE</div>
+      <div class="ibox">1. Открой в <strong>Safari</strong><br>2. Нажми <strong>Поделиться ↑</strong><br>3. <strong>«На экран «Домой»»</strong><br>4. <strong>«Добавить»</strong></div>
+    </div>
 
     <div style="height:12px"></div>
     <button class="bigbtn" onclick="saveSettings()">СОХРАНИТЬ</button>
@@ -402,6 +474,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
    <button class="bigbtn" onclick="confirmSplit()" style="margin-top:12px">ПОДЕЛИТЬ</button>
   </div>
   <button class="cancel-btn" onclick="closeModal('split-modal')">ОТМЕНА</button>
+ </div>
+</div>
+
+
+<!-- Recovery picker -->
+<div class="overlay" id="recovery-modal" onclick="closeModal('recovery-modal',event)">
+ <div class="modal">
+  <div class="modal-title">ВЫБЕРИ BACKUP ДЛЯ RECOVERY</div>
+  <div id="recovery-list" class="recovery-list"></div>
+  <button class="bigbtn" id="recovery-apply-btn" onclick="confirmChosenRecovery()" style="margin-top:12px">ВОССТАНОВИТЬ ВЫБРАННЫЙ BACKUP</button>
+  <button class="cancel-btn" onclick="closeModal('recovery-modal')">ОТМЕНА</button>
  </div>
 </div>
 
@@ -585,7 +668,7 @@ setInterval(tick,1000);tick();
 function updatePQ(){
   const title=document.getElementById('pq-text');
   const badge=document.getElementById('pq-badge');
-  if(title)title.textContent='ЧТО ТЫ ДЕЛАЛ';
+  if(title)title.textContent='TIME';
   if(!badge)return;
   const last=lastAnsweredTime();
   if(!last){badge.textContent='СЕЙЧАС';return;}
@@ -807,7 +890,7 @@ function restorePingSchedule(){
 
 function triggerPing(){
   if(Notification&&Notification.permission==='granted'){
-    try{new Notification('⏱ ЧТО ТЫ ДЕЛАЛ?',{body:'Пора отметить!',tag:'ping'});}catch(e){}
+    try{new Notification('⏱ TIME',{body:'Пора отметить!',tag:'ping'});}catch(e){}
   }
   goScreen('sp');
   schedulePing();
@@ -1831,6 +1914,472 @@ function toast(msg){
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2400);
 }
+
+
+// ══════════════════════════════════════════════════════
+// OVERRIDES / NEW FEATURES
+// ══════════════════════════════════════════════════════
+let chosenRecoveryFileId=null;
+let chosenRecoveryFileName='';
+let recoveryFilesCache=[];
+
+function migrateState(){
+  const nowIso=nowISO();
+  if(!S.deviceId)S.deviceId=genId();
+  S.schemaVersion=4;
+  S.activities=(S.activities||[]).map((a,idx)=>normalizeActivity(a, idx + 1, nowIso));
+  S.logs=(S.logs||[]).map(normalizeLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  if(typeof S.gRootFolderId==='undefined')S.gRootFolderId=null;
+  if(typeof S.gBackupFolderId==='undefined')S.gBackupFolderId=null;
+  if(typeof S.gMainFileId==='undefined')S.gMainFileId=null;
+  if(typeof S.lastSyncAt==='undefined')S.lastSyncAt=null;
+  if(typeof S.badgeColor==='undefined')S.badgeColor='#e8ff47';
+  if(typeof S.birthAt==='undefined')S.birthAt=null;
+  if(typeof S.lifeExpectancyYears==='undefined')S.lifeExpectancyYears=75;
+  if(typeof S.settingsSection==='undefined')S.settingsSection='data';
+  if(typeof S.heatmapMode==='undefined')S.heatmapMode='fill';
+  if(!Array.isArray(S.heatmapActivityIds))S.heatmapActivityIds=[];
+}
+
+function buildExportObject(){
+  return {
+    schemaVersion:4,
+    exportedAt:nowISO(),
+    deviceId:S.deviceId,
+    rootFolderId:S.gRootFolderId||null,
+    backupFolderId:S.gBackupFolderId||null,
+    mainFileId:S.gMainFileId||null,
+    badgeColor:S.badgeColor||'#e8ff47',
+    birthAt:S.birthAt||null,
+    lifeExpectancyYears:parseFloat(S.lifeExpectancyYears)||75,
+    heatmapMode:S.heatmapMode||'fill',
+    heatmapActivityIds:S.heatmapActivityIds||[],
+    activities:S.activities.map(a=>normalizeActivity(a)),
+    logs:S.logs.map(l=>normalizeLog(l)),
+  };
+}
+
+function normalizeState(raw){
+  const state=raw&&typeof raw==='object'?raw:{};
+  return {
+    schemaVersion:4,
+    deviceId:state.deviceId||S.deviceId||genId(),
+    gFolder:state.gFolder||S.gFolder||'TimeTracker',
+    gRootFolderId:state.rootFolderId||state.gRootFolderId||S.gRootFolderId||null,
+    gBackupFolderId:state.backupFolderId||state.gBackupFolderId||S.gBackupFolderId||null,
+    gMainFileId:state.mainFileId||state.gMainFileId||S.gMainFileId||null,
+    lastSyncAt:state.lastSyncAt||S.lastSyncAt||null,
+    badgeColor:state.badgeColor||S.badgeColor||'#e8ff47',
+    intervalMinutes:parseInt(state.intervalMinutes||S.intervalMinutes||15)||15,
+    nextPingTime:state.nextPingTime||S.nextPingTime||null,
+    customFrom:state.customFrom||S.customFrom||null,
+    customTo:state.customTo||S.customTo||null,
+    birthAt:state.birthAt||S.birthAt||null,
+    lifeExpectancyYears:parseFloat(state.lifeExpectancyYears||S.lifeExpectancyYears||75)||75,
+    settingsSection:state.settingsSection||S.settingsSection||'data',
+    heatmapMode:state.heatmapMode||S.heatmapMode||'fill',
+    heatmapActivityIds:Array.isArray(state.heatmapActivityIds)?state.heatmapActivityIds.map(String):(S.heatmapActivityIds||[]),
+    activities:(state.activities||S.activities||[]).map((a,idx)=>normalizeActivity(a,idx+1)),
+    logs:(state.logs||S.logs||[]).map(normalizeLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+  };
+}
+
+function applyState(state){
+  S={...S,...normalizeState(state)};
+  migrateState();
+  save();
+}
+
+function tick(){
+  const n=new Date();
+  const hm=document.getElementById('clk-hm');
+  const sec=document.getElementById('clk-sec');
+  if(hm)hm.textContent=pad(n.getHours())+':'+pad(n.getMinutes());
+  if(sec)sec.textContent=pad(n.getSeconds());
+  updatePQ();
+  renderLifeStats(n);
+}
+setInterval(()=>tick(),50);
+
+function updatePQ(){
+  const title=document.getElementById('pq-text');
+  const badge=document.getElementById('pq-badge');
+  if(title)title.textContent='TIME';
+  if(!badge)return;
+  const last=lastAnsweredTime();
+  if(!last){
+    badge.textContent='СЕЙЧАС';
+    return;
+  }
+  const elapsedSec=Math.max(0,Math.floor((Date.now()-last)/1000));
+  if(elapsedSec<60){
+    badge.textContent='МЕНЬШЕ МИНУТЫ';
+    return;
+  }
+  const mins=Math.floor(elapsedSec/60);
+  const hours=Math.floor(mins/60);
+  if(hours>=24){
+    badge.textContent=`ПОСЛЕДНИЕ ${hours}Ч`;
+    return;
+  }
+  if(hours>0){
+    badge.textContent=`ПОСЛЕДНИЕ ${hours}Ч ${mins%60}М`;
+    return;
+  }
+  badge.textContent=`ПОСЛЕДНИЕ ${mins} МИН`;
+}
+
+function renderLifeStats(now=new Date()){
+  const ageEl=document.getElementById('life-age-text');
+  const pctEl=document.getElementById('life-percent-text');
+  const bar=document.getElementById('life-bar-fill');
+  if(!ageEl||!pctEl||!bar)return;
+  if(!S.birthAt){
+    ageEl.textContent='УКАЖИ ДАТУ РОЖДЕНИЯ';
+    pctEl.textContent='—';
+    bar.style.width='0%';
+    return;
+  }
+  const birth=new Date(S.birthAt);
+  if(Number.isNaN(birth.getTime())||now<birth){
+    ageEl.textContent='ПРОВЕРЬ ДАТУ РОЖДЕНИЯ';
+    pctEl.textContent='—';
+    bar.style.width='0%';
+    return;
+  }
+  const parts=agePartsFromBirth(birth,now);
+  ageEl.textContent=`${parts.years} л. ${parts.months} м. ${parts.days} д. ${pad(parts.hours)}:${pad(parts.minutes)}:${pad(parts.seconds)}.${pad3(parts.milliseconds)}`;
+  const expectancyYears=parseFloat(S.lifeExpectancyYears)||75;
+  const totalMs=Math.max(1,expectancyYears*365.2425*24*60*60*1000);
+  const livedMs=Math.max(0,now-birth);
+  const pct=Math.min(100,Math.max(0,livedMs/totalMs*100));
+  pctEl.textContent=`${pct.toFixed(3)}%`;
+  bar.style.width=`${pct}%`;
+}
+
+function agePartsFromBirth(birth,now){
+  const cursor=new Date(birth);
+  let years=0;
+  while(true){
+    const next=new Date(cursor);
+    next.setFullYear(next.getFullYear()+1);
+    if(next<=now){years++;cursor.setTime(next.getTime());}else break;
+  }
+  let months=0;
+  while(true){
+    const next=new Date(cursor);
+    next.setMonth(next.getMonth()+1);
+    if(next<=now){months++;cursor.setTime(next.getTime());}else break;
+  }
+  let diff=now-cursor;
+  const days=Math.floor(diff/86400000); diff-=days*86400000;
+  const hours=Math.floor(diff/3600000); diff-=hours*3600000;
+  const minutes=Math.floor(diff/60000); diff-=minutes*60000;
+  const seconds=Math.floor(diff/1000); diff-=seconds*1000;
+  const milliseconds=Math.floor(diff);
+  return {years,months,days,hours,minutes,seconds,milliseconds};
+}
+
+function setSettingsSection(section){
+  S.settingsSection=section;
+  document.querySelectorAll('.settings-home-btn').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.ss===section);
+  });
+  document.querySelectorAll('.settings-section').forEach(sec=>{
+    sec.classList.toggle('active',sec.id===`settings-section-${section}`);
+  });
+}
+
+function renderSett(){
+  const list=document.getElementById('act-list');
+  if(list){
+    list.innerHTML='';
+    S.activities.filter(a=>!isDeleted(a)).forEach((a)=>{
+      const realIndex=S.activities.findIndex(x=>String(x.id)===String(a.id));
+      const d=document.createElement('div');
+      d.className='ait';
+      if(a.archived)d.style.opacity='.5';
+      d.innerHTML=`<button class="embtn" onclick="openEP(${realIndex})">${a.emoji}</button>
+        <input type="text" value="${escapeAttr(a.name)}" placeholder="Название..." oninput="renameAct(${realIndex},this.value)">
+        ${a.archived?'<span class="arc-badge">архив</span>':''}
+        <button class="arcbtn" onclick="toggleArc(${realIndex})">${a.archived?'↩':'📦'}</button>
+        <button class="xbtn" onclick="delAct(${realIndex})">×</button>`;
+      list.appendChild(d);
+    });
+  }
+  const ival=document.getElementById('ival');
+  const gfolder=document.getElementById('g-folder');
+  const badgeColor=document.getElementById('badge-color');
+  const lifeYears=document.getElementById('life-years');
+  const birthDate=document.getElementById('birth-date');
+  const birthTime=document.getElementById('birth-time');
+  if(ival)ival.value=S.intervalMinutes||15;
+  if(gfolder)gfolder.value=S.gFolder||'TimeTracker';
+  if(badgeColor)badgeColor.value=S.badgeColor||'#e8ff47';
+  if(lifeYears)lifeYears.value=S.lifeExpectancyYears||75;
+  if(S.birthAt){
+    const d=new Date(S.birthAt);
+    if(!Number.isNaN(d.getTime())){
+      if(birthDate)birthDate.value=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      if(birthTime)birthTime.value=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+  }else{
+    if(birthDate)birthDate.value='';
+    if(birthTime)birthTime.value='00:00:00';
+  }
+  setSettingsSection(S.settingsSection||'data');
+  updateGUI();
+}
+
+function saveSettings(){
+  const ival=document.getElementById('ival');
+  const gfolder=document.getElementById('g-folder');
+  const badgeColor=document.getElementById('badge-color');
+  const lifeYears=document.getElementById('life-years');
+  const birthDate=document.getElementById('birth-date');
+  const birthTime=document.getElementById('birth-time');
+  if(ival)S.intervalMinutes=parseInt(ival.value)||15;
+  if(gfolder)S.gFolder=gfolder.value||'TimeTracker';
+  if(badgeColor)S.badgeColor=badgeColor.value||'#e8ff47';
+  if(lifeYears)S.lifeExpectancyYears=Math.max(1,parseFloat(lifeYears.value)||75);
+  if(birthDate&&birthDate.value){
+    const time=(birthTime&&birthTime.value?birthTime.value:'00:00:00');
+    S.birthAt=new Date(`${birthDate.value}T${time}`).toISOString();
+  }else{
+    S.birthAt=null;
+  }
+  applyTheme();
+  save();
+  renderPG();
+  schedulePing();
+  updateGUI();
+  renderLifeStats();
+  toast('✓ СОХРАНЕНО');
+}
+
+function drawHeatmap(body,logs){
+  const activities=activeActivities();
+  const mode=S.heatmapMode||'fill';
+  const selectedIds=(S.heatmapActivityIds||[]).filter(id=>activities.some(a=>String(a.id)===String(id)));
+  const today=new Date();
+  today.setHours(23,59,59,999);
+  const start=new Date(today);
+  start.setDate(today.getDate()-69);
+  start.setHours(0,0,0,0);
+  const dn=['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
+
+  const fillByDay={};
+  const hoursByDay={};
+  logs.forEach(l=>{
+    const d=new Date(l.ts);
+    const key=d.toDateString();
+    fillByDay[key]=(fillByDay[key]||0)+(l.durationSec||0);
+    if(mode==='hours' && selectedIds.includes(String(l.activityId))){
+      hoursByDay[key]=(hoursByDay[key]||0)+(l.durationSec||0);
+    }
+  });
+
+  let html=`<div class="card"><div class="ctitle">ТЕПЛОВАЯ КАРТА</div>
+  <div class="hm-mode-row">
+    <button class="hm-mode-btn ${mode==='fill'?'active':''}" onclick="setHeatmapMode('fill')">ЗАПОЛНЕННОСТЬ</button>
+    <button class="hm-mode-btn ${mode==='hours'?'active':''}" onclick="setHeatmapMode('hours')">ЧАСЫ ПО АКТИВНОСТЯМ</button>
+  </div>
+  <div class="hl">${dn.map(d=>`<div style="font-size:7px;color:var(--mut);text-align:center">${d}</div>`).join('')}</div>
+  <div class="hm-grid-days">`;
+  const dow0=(start.getDay()+6)%7;
+  for(let i=0;i<dow0;i++)html+=`<div class="hc" style="background:transparent"></div>`;
+  const maxHoursSec=Math.max(...Object.values(hoursByDay),1);
+  for(let i=0;i<70;i++){
+    const d=new Date(start);
+    d.setDate(start.getDate()+i);
+    if(d>today)break;
+    const key=d.toDateString();
+    if(mode==='fill'){
+      const sec=Math.min(86400,fillByDay[key]||0);
+      const alpha=sec>0?Math.max(.18,sec/86400):0;
+      const bg=sec>0?`rgba(232,255,71,${alpha})`:'var(--bor)';
+      const pct=Math.round(sec/86400*100);
+      html+=`<div class="hc" style="background:${bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${pct}% заполнено"></div>`;
+    }else{
+      const sec=hoursByDay[key]||0;
+      const alpha=sec>0?Math.max(.18,sec/maxHoursSec):0;
+      const bg=sec>0?`rgba(232,255,71,${alpha})`:'var(--bor)';
+      const label=sec>0?fmtDayHours(sec):'';
+      html+=`<div class="hm-cell ${sec>0?'':'empty'}" style="background:${bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${fmtDurLong(sec)}"><span>${label}</span></div>`;
+    }
+  }
+  html+=`</div>`;
+  if(mode==='fill'){
+    html+=`<div class="hm-note">Каждая клетка = один день. Яркость показывает, насколько день заполнен записями.</div>`;
+  }else{
+    html+=`<div class="hm-note">Каждая клетка = один день. Внутри — сумма часов по выбранным активностям.</div>
+    <div class="hm-acts-row">${activities.map(a=>`<button class="hm-act-btn ${selectedIds.includes(String(a.id))?'active':''}" onclick="toggleHeatmapActivity('${escapeAttr(a.id)}')">${a.emoji} ${escapeAttr(a.name)}</button>`).join('')}</div>`;
+  }
+  html+=`</div>`;
+  body.innerHTML=html;
+  requestAnimationFrame(scaleHeatmapHourLabels);
+}
+
+function scaleHeatmapHourLabels(){
+  document.querySelectorAll('.hm-cell:not(.empty)').forEach(cell=>{
+    const span=cell.querySelector('span');
+    if(!span)return;
+    const side=Math.min(cell.clientWidth,cell.clientHeight);
+    const textLen=Math.max(1,(span.textContent||'').length);
+    const sizeByHeight=side*0.42;
+    const sizeByWidth=(cell.clientWidth-10)/(Math.max(2.2,textLen*0.62));
+    const fontSize=Math.max(12,Math.floor(Math.min(sizeByHeight,sizeByWidth)));
+    span.style.fontSize=fontSize+'px';
+  });
+}
+
+function fmtDayHours(sec){
+  if(!sec)return '';
+  const hours=sec/3600;
+  if(hours>=10)return `${hours.toFixed(0)}ч`;
+  if(hours>=1)return `${hours.toFixed(1)}ч`;
+  const mins=Math.round(sec/60);
+  return `${mins}м`;
+}
+
+function setHeatmapMode(mode){
+  S.heatmapMode=mode;
+  if(mode==='hours'&&(!S.heatmapActivityIds||!S.heatmapActivityIds.length)){
+    S.heatmapActivityIds=activeActivities().slice(0,1).map(a=>String(a.id));
+  }
+  save();
+  renderA();
+}
+
+function toggleHeatmapActivity(activityId){
+  const id=String(activityId);
+  const current=new Set((S.heatmapActivityIds||[]).map(String));
+  if(current.has(id))current.delete(id);else current.add(id);
+  S.heatmapActivityIds=Array.from(current);
+  save();
+  renderA();
+}
+
+window.addEventListener('resize',()=>{if(document.getElementById('sa')?.classList.contains('active')&&aView==='heatmap')requestAnimationFrame(scaleHeatmapHourLabels);});
+
+function setCloudButtonsDisabled(disabled){
+  ['g-sync-btn','g-force-sync-btn','g-recovery-btn','g-choose-recovery-btn','g-auth-btn','main-sync-btn','recovery-apply-btn'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.disabled=disabled;
+  });
+}
+
+async function gChooseRecovery(){
+  if(!gToken){
+    toast('Сначала подключи Drive');
+    return;
+  }
+  chosenRecoveryFileId=null;
+  chosenRecoveryFileName='';
+  document.getElementById('recovery-list').innerHTML='<div class="recovery-empty">ЗАГРУЖАЮ BACKUP-ФАЙЛЫ…</div>';
+  document.getElementById('recovery-modal').classList.add('open');
+  try{
+    const cloud=await gEnsureCloudState();
+    recoveryFilesCache=await gListBackups(cloud.backupFolderId,10);
+    renderRecoveryChoices();
+  }catch(e){
+    document.getElementById('recovery-list').innerHTML=`<div class="recovery-empty">${escapeAttr(e.message||'Не удалось загрузить backup-файлы')}</div>`;
+  }
+}
+
+function renderRecoveryChoices(){
+  const wrap=document.getElementById('recovery-list');
+  if(!recoveryFilesCache.length){
+    wrap.innerHTML='<div class="recovery-empty">BACKUP-ФАЙЛЫ НЕ НАЙДЕНЫ</div>';
+    return;
+  }
+  wrap.innerHTML=recoveryFilesCache.map(file=>`
+    <div class="recovery-item ${chosenRecoveryFileId===file.id?'active':''}" onclick="selectRecoveryFile('${file.id}')">
+      <div class="recovery-item-title">${escapeAttr(recoveryReasonLabel(file.name))}</div>
+      <div class="recovery-item-meta">${fmtDateTime(file.modifiedTime||file.createdTime)}<br>${escapeAttr(file.name)}</div>
+    </div>
+  `).join('');
+}
+
+function recoveryReasonLabel(name){
+  const n=String(name||'');
+  if(n.includes('force-sync'))return 'backup перед FORCE SYNC';
+  if(n.includes('local-before-force-recovery'))return 'локальный backup перед FORCE RECOVERY';
+  if(n.includes('manual'))return 'manual backup';
+  return 'backup';
+}
+
+function selectRecoveryFile(fileId){
+  chosenRecoveryFileId=fileId;
+  const file=recoveryFilesCache.find(f=>f.id===fileId);
+  chosenRecoveryFileName=file?.name||'';
+  renderRecoveryChoices();
+}
+
+async function confirmChosenRecovery(){
+  if(!chosenRecoveryFileId){
+    toast('Сначала выбери backup');
+    return;
+  }
+  if(!confirm(`Восстановить backup "${chosenRecoveryFileName}"? Перед этим текущая локальная версия будет сохранена в backup.`))return;
+  try{
+    setCloudButtonsDisabled(true);
+    const cloud=await gEnsureCloudState();
+    await gBackupJson(cloud.backupFolderId,backupName('local-before-chosen-recovery'),buildExport());
+    const backupState=await gReadRemoteState(chosenRecoveryFileId);
+    if(!backupState){
+      throw new Error('Backup пустой');
+    }
+    applyState(normalizeState(backupState));
+    S.gFolder=document.getElementById('g-folder')?.value||S.gFolder||'TimeTracker';
+    S.gRootFolderId=cloud.rootFolderId;
+    S.gBackupFolderId=cloud.backupFolderId;
+    S.gMainFileId=cloud.mainFileId;
+    S.lastSyncAt=nowISO();
+    save();
+    rerenderAll();
+    closeModal('recovery-modal');
+    toast('📥 Backup восстановлен');
+  }catch(e){
+    toast('Ошибка: '+(e.message||'не удалось восстановить backup'));
+  }finally{
+    setCloudButtonsDisabled(false);
+  }
+}
+
+async function gListBackups(parentId,limit=10){
+  const q=encodeURIComponent(`'${parentId}' in parents and trashed=false`);
+  const url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,createdTime,modifiedTime,size)&orderBy=modifiedTime desc&pageSize=${limit}`;
+  const r=await(await gReq(url)).json();
+  return (r.files||[]).slice(0,limit);
+}
+
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('nb-'+id).classList.add('active');
+  if(id==='sa')renderA();
+  if(id==='sh2')renderH();
+  if(id==='sset')renderSett();
+  if(id==='sp'){renderPG();updatePQ();renderLifeStats();}
+}
+
+function rerenderAll(){
+  applyTheme();
+  renderPG();
+  renderSett();
+  renderLifeStats();
+  if(document.getElementById('sa').classList.contains('active'))renderA();
+  if(document.getElementById('sh2').classList.contains('active'))renderH();
+  updatePQ();
+  updateGUI();
+}
+
+document.title='TIME';
+const appleTitleMeta=document.querySelector('meta[name="apple-mobile-web-app-title"]');
+if(appleTitleMeta)appleTitleMeta.setAttribute('content','TIME');
+
 
 // ══════════════════════════════════════════════════════
 // BOOT
