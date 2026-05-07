@@ -54,6 +54,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .abt.detailed .act-name{position:relative;z-index:3;max-width:58px;font-size:11px;line-height:1.1;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .detail-graph{position:absolute;z-index:1;left:62px;right:10px;top:15px;height:24px;pointer-events:none}
 .detail-graph svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.detail-bars rect{fill:var(--acc);rx:.18;ry:.18}
 .detail-line{fill:none;stroke:var(--acc);stroke-width:1.7;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
 .detail-line.today-segment{stroke-dasharray:4 4}
 .detail-dot{position:absolute;width:5px;height:5px;border:1.7px solid var(--acc);border-radius:50%;background:var(--sur);transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(0,0,0,.18)}
@@ -489,6 +490,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
       <label class="toggle-row"><span class="toggle-label">Показывать миллисекунды у часов</span><input type="checkbox" id="show-main-ms"></label>
       <label class="toggle-row"><span class="toggle-label">Подробный вид активностей</span><input type="checkbox" id="show-detailed-cards"></label>
 
+      <div class="slbl">ПЕРИОД ПОДРОБНОГО ВИДА</div>
+      <select class="select-inp" id="detailed-activity-range">
+        <option value="week">НЕДЕЛЯ</option>
+        <option value="month">МЕСЯЦ</option>
+        <option value="all">ВСЁ ВРЕМЯ</option>
+      </select>
+
       <div class="slbl">ВИД ВЕРХНЕГО БЛОКА</div>
       <select class="select-inp" id="life-display-mode">
         <option value="precise">ТОЧНЫЙ ВИД</option>
@@ -630,6 +638,7 @@ let S={
   showDayRemaining:true,
   showMainMilliseconds:true,
   showDetailedActivityCards:false,
+  detailedActivityRange:'week',
   lifeDisplayMode:'precise',
   customFrom:null,customTo:null,
 };
@@ -835,42 +844,68 @@ function renderPG(){
   });
 }
 
+
 function activityDetailStats(activityId){
   const now=new Date();
-  const days=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date(now);
-    d.setDate(now.getDate()-i);
-    d.setHours(0,0,0,0);
-    days.push(d);
-  }
-  const daySecs=days.map(()=>0);
-  const todayKey=days[6].toDateString();
+  const range=['week','month','all'].includes(S.detailedActivityRange)?S.detailedActivityRange:'week';
+  const activityLogs=visibleLogs().filter(l=>!l.skipped&&String(l.activityId)===String(activityId));
+  const todayStart=startOfLocalDay(now);
+  let start;
 
-  visibleLogs().forEach(l=>{
-    if(l.skipped||String(l.activityId)!==String(activityId))return;
-    const d=new Date(l.ts);
-    const idx=days.findIndex(day=>d.toDateString()===day.toDateString());
-    if(idx>=0)daySecs[idx]+=l.durationSec||0;
+  if(range==='week'){
+    start=new Date(todayStart);
+    start.setDate(start.getDate()-6);
+  }else if(range==='month'){
+    start=new Date(todayStart);
+    start.setDate(start.getDate()-29);
+  }else{
+    const earliest=activityLogs.reduce((min,log)=>{
+      const d=startOfLocalDay(new Date(log.ts));
+      return !min||d<min?d:min;
+    },null);
+    start=earliest||new Date(todayStart);
+  }
+
+  const days=[];
+  for(let d=new Date(start);d<=todayStart;d.setDate(d.getDate()+1)){
+    days.push(new Date(d));
+  }
+  if(!days.length)days.push(new Date(todayStart));
+
+  const daySecs=days.map(()=>0);
+  activityLogs.forEach(l=>{
+    const d=startOfLocalDay(new Date(l.ts));
+    const idx=Math.round((d-start)/86400000);
+    if(idx>=0&&idx<daySecs.length)daySecs[idx]+=l.durationSec||0;
   });
 
-  const weekSec=daySecs.reduce((sum,sec)=>sum+sec,0);
+  const periodSec=daySecs.reduce((sum,sec)=>sum+sec,0);
+  const todaySec=daySecs[daySecs.length-1]||0;
+
   return {
+    range,
     daySecs,
-    todaySec:daySecs[6]||0,
-    weekSec,
-    avgSec:Math.round(weekSec/7),
+    todaySec,
+    periodSec,
+    avgSec:Math.round(periodSec/daySecs.length),
     maxSec:Math.max(...daySecs,1),
   };
 }
 
+function startOfLocalDay(date){
+  const d=new Date(date);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
 function renderDetailedActivityCard(activity,detail){
+  const periodSuffix=detail.range==='week'?'w':(detail.range==='month'?'m':'all');
   return `
     <span class="em">${escapeAttr(activity.emoji)}</span>
     <span class="act-name">${escapeAttr(activity.name)}</span>
-    ${renderActivitySparkline(detail.daySecs,detail.maxSec)}
+    ${detail.range==='week'?renderActivitySparkline(detail.daySecs,detail.maxSec):renderActivityBars(detail.daySecs)}
     <span class="detail-number detail-avg">${fmtCardTime(detail.avgSec)}<span class="detail-suffix">avg</span></span>
-    <span class="detail-number detail-week">${fmtCardTime(detail.weekSec)}<span class="detail-suffix">w</span></span>
+    <span class="detail-number detail-week">${fmtCardTime(detail.periodSec)}<span class="detail-suffix">${periodSuffix}</span></span>
     <span class="detail-number detail-today">${detail.todaySec>0?fmtCardTime(detail.todaySec):'--:--'}</span>
   `;
 }
@@ -893,6 +928,21 @@ function renderActivitySparkline(daySecs,maxSec){
       <path class="detail-line today-segment" d="${todayPath}"></path>
     </svg>
     ${dots}
+  </span>`;
+}
+
+function renderActivityBars(daySecs){
+  const count=Math.max(1,daySecs.length);
+  const maxDaySec=86400;
+  const h=24;
+  const rects=daySecs.map((sec,i)=>{
+    const ratio=Math.max(0,Math.min(1,(sec||0)/maxDaySec));
+    const barH=Math.max(sec>0?1.2:0,ratio*h);
+    const y=h-barH;
+    return `<rect x="${(i+.16).toFixed(2)}" y="${y.toFixed(2)}" width=".68" height="${barH.toFixed(2)}"></rect>`;
+  }).join('');
+  return `<span class="detail-graph detail-bars" aria-hidden="true">
+    <svg viewBox="0 0 ${count} ${h}" preserveAspectRatio="none">${rects}</svg>
   </span>`;
 }
 
@@ -2189,6 +2239,7 @@ function migrateState(){
   if(typeof S.showDayRemaining==='undefined')S.showDayRemaining=true;
   if(typeof S.showMainMilliseconds==='undefined')S.showMainMilliseconds=true;
   if(typeof S.showDetailedActivityCards==='undefined')S.showDetailedActivityCards=false;
+  if(typeof S.detailedActivityRange==='undefined')S.detailedActivityRange='week';
   if(typeof S.lifeDisplayMode==='undefined')S.lifeDisplayMode='precise';
   if(typeof S.birthAt==='undefined')S.birthAt=null;
   if(typeof S.lifeExpectancyYears==='undefined')S.lifeExpectancyYears=75;
@@ -2210,6 +2261,7 @@ function buildExportObject(){
     showDayRemaining:S.showDayRemaining!==false,
     showMainMilliseconds:S.showMainMilliseconds!==false,
     showDetailedActivityCards:S.showDetailedActivityCards===true,
+    detailedActivityRange:S.detailedActivityRange||'week',
     lifeDisplayMode:S.lifeDisplayMode||'precise',
     birthAt:S.birthAt||null,
     lifeExpectancyYears:parseFloat(S.lifeExpectancyYears)||75,
@@ -2235,6 +2287,7 @@ function normalizeState(raw){
     showDayRemaining:typeof state.showDayRemaining==='boolean'?state.showDayRemaining:(S.showDayRemaining!==false),
     showMainMilliseconds:typeof state.showMainMilliseconds==='boolean'?state.showMainMilliseconds:(S.showMainMilliseconds!==false),
     showDetailedActivityCards:typeof state.showDetailedActivityCards==='boolean'?state.showDetailedActivityCards:(S.showDetailedActivityCards===true),
+    detailedActivityRange:['week','month','all'].includes(state.detailedActivityRange||S.detailedActivityRange)?(state.detailedActivityRange||S.detailedActivityRange):'week',
     lifeDisplayMode:state.lifeDisplayMode||S.lifeDisplayMode||'precise',
     intervalMinutes:parseInt(state.intervalMinutes||S.intervalMinutes||15)||15,
     nextPingTime:state.nextPingTime||S.nextPingTime||null,
@@ -2462,6 +2515,7 @@ function renderSett(){
   const showDayRemaining=document.getElementById('show-day-remaining');
   const showMainMs=document.getElementById('show-main-ms');
   const showDetailedCards=document.getElementById('show-detailed-cards');
+  const detailedRange=document.getElementById('detailed-activity-range');
   const lifeDisplayMode=document.getElementById('life-display-mode');
   if(ival)ival.value=S.intervalMinutes||15;
   if(gfolder)gfolder.value=S.gFolder||'TimeTracker';
@@ -2471,6 +2525,7 @@ function renderSett(){
   if(showDayRemaining)showDayRemaining.checked=S.showDayRemaining!==false;
   if(showMainMs)showMainMs.checked=S.showMainMilliseconds!==false;
   if(showDetailedCards)showDetailedCards.checked=S.showDetailedActivityCards===true;
+  if(detailedRange)detailedRange.value=S.detailedActivityRange||'week';
   if(lifeDisplayMode)lifeDisplayMode.value=S.lifeDisplayMode||'precise';
   if(S.birthAt){
     const d=new Date(S.birthAt);
@@ -2529,6 +2584,7 @@ function saveSettings(){
   const showDayRemaining=document.getElementById('show-day-remaining');
   const showMainMs=document.getElementById('show-main-ms');
   const showDetailedCards=document.getElementById('show-detailed-cards');
+  const detailedRange=document.getElementById('detailed-activity-range');
   const lifeDisplayMode=document.getElementById('life-display-mode');
   if(ival)S.intervalMinutes=parseInt(ival.value)||15;
   if(gfolder)S.gFolder=gfolder.value||'TimeTracker';
@@ -2538,6 +2594,7 @@ function saveSettings(){
   if(showDayRemaining)S.showDayRemaining=!!showDayRemaining.checked;
   if(showMainMs)S.showMainMilliseconds=!!showMainMs.checked;
   if(showDetailedCards)S.showDetailedActivityCards=!!showDetailedCards.checked;
+  if(detailedRange)S.detailedActivityRange=['week','month','all'].includes(detailedRange.value)?detailedRange.value:'week';
   if(lifeDisplayMode)S.lifeDisplayMode=lifeDisplayMode.value||'precise';
   if(birthDate&&birthDate.value){
     const time=(birthTime&&birthTime.value?birthTime.value:'00:00:00');
