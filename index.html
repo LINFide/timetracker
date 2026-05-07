@@ -36,7 +36,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .clk-sec{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;color:#7a8a1a;letter-spacing:2px;padding-top:12px}
 .clks{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
 .pq{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--txt);margin-bottom:8px;text-align:center}
-.pq-badge{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 14px;background:var(--badge);border:1px solid var(--badge);border-radius:999px;color:var(--badgeText);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.pq-badge{display:inline-flex;align-items:center;justify-content:center;gap:3px;min-height:34px;padding:7px 14px;background:var(--badge);border:1px solid var(--badge);border-radius:999px;color:var(--badgeText);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.pq-badge .pq-ms{font-size:8px;opacity:.68;letter-spacing:.5px;align-self:flex-end;padding-bottom:1px}
 .ping-tools{display:flex;justify-content:center;width:100%;margin:-2px 0 10px}
 .ping-tools-row{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:0 0 10px;flex-wrap:wrap}
 .main-sync-btn{padding:7px 14px;background:var(--sur2);border:1px solid var(--bor);border-radius:999px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;white-space:nowrap}
@@ -47,6 +48,32 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .abt{background:var(--sur);border:1px solid var(--bor);border-radius:11px;padding:10px 9px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--txt);cursor:pointer;text-align:left;line-height:1.4;transition:all .1s}
 .abt .em{font-size:19px;display:block;margin-bottom:3px}
 .abt:active{background:var(--acc);color:#000;border-color:var(--acc);transform:scale(.97)}
+.abt.detailed{position:relative;min-height:104px;overflow:hidden;padding:13px 14px;border-radius:18px;background:linear-gradient(180deg,var(--sur),#111);display:flex;flex-direction:column;justify-content:flex-start}
+.abt.detailed:active{background:linear-gradient(180deg,var(--sur2),#121212);color:var(--txt);border-color:var(--acc)}
+.abt.detailed .em{position:relative;z-index:3;font-size:22px;line-height:1;margin-bottom:10px;max-width:42px;min-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.abt.detailed .act-name{position:relative;z-index:3;max-width:56px;font-size:12px;line-height:1.1;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.detail-graph{position:absolute;z-index:1;left:72px;right:96px;top:18px;height:39px;pointer-events:none}
+.detail-graph svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.detail-line{fill:none;stroke:var(--acc);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.detail-line.today-segment{stroke-dasharray:5 5}
+.detail-dot{position:absolute;width:8px;height:8px;border:2px solid var(--acc);border-radius:50%;background:var(--sur);transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(0,0,0,.18)}
+.detail-number{position:absolute;z-index:2;font-family:'Bebas Neue',sans-serif;color:var(--acc);font-weight:700;letter-spacing:1px;line-height:.9;text-shadow:0 0 1px rgba(0,0,0,.35);pointer-events:none}
+.detail-avg{right:18px;top:13px;font-size:18px;text-align:right;opacity:.68}
+.detail-week{left:72px;bottom:12px;font-size:21px;opacity:.58}
+.detail-today{right:18px;bottom:10px;font-size:27px;text-align:right;opacity:.95}
+.detail-suffix{font-family:'IBM Plex Mono',monospace;font-size:7px;font-weight:700;letter-spacing:.4px;margin-left:2px;opacity:.72;text-transform:uppercase;vertical-align:baseline}
+.abt.no-today .detail-graph,.abt.no-today .detail-number{opacity:.33}
+.abt.no-today .detail-today{opacity:.24}
+@media (max-width:390px){
+  .abt.detailed{min-height:96px;padding:11px 12px}
+  .abt.detailed .em{font-size:20px;max-width:38px;margin-bottom:9px}
+  .abt.detailed .act-name{max-width:50px;font-size:11px}
+  .detail-graph{left:62px;right:82px;top:17px;height:36px}
+  .detail-dot{width:7px;height:7px;border-width:2px}
+  .detail-avg{right:14px;top:13px;font-size:16px}
+  .detail-week{left:62px;bottom:11px;font-size:19px}
+  .detail-today{right:14px;bottom:9px;font-size:24px}
+}
 .skiprow{padding-top:8px;width:100%;flex-shrink:0}
 .skipbtn{width:100%;padding:10px;background:none;border:1px solid var(--bor);border-radius:10px;color:var(--mut);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;cursor:pointer}
 .skipbtn:active{color:var(--txt)}
@@ -196,6 +223,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .dur-row{display:flex;gap:8px;margin:10px 0;align-items:center}
 .dur-inp{flex:1;background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:9px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--txt);outline:none}
 .dur-lbl{font-size:10px;color:var(--mut)}
+.dt-inp{width:100%;background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:10px 11px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--txt);outline:none;margin-bottom:12px}
+.edit-actions{display:flex;gap:8px;margin-top:10px}.edit-actions .bigbtn{flex:1}.edit-actions .cancel-btn{flex:1;margin-top:0}
 
 /* Split slider */
 .split-area{padding:10px 0}
@@ -385,6 +414,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
      <button class="chip active" data-hf="all"   onclick="setHF('all')">ВСЕ</button>
      <button class="chip" data-hf="today" onclick="setHF('today')">СЕГОДНЯ</button>
      <button class="chip" data-hf="week"  onclick="setHF('week')">НЕДЕЛЯ</button>
+     <button class="chip" onclick="openAddHistoryModal()">+ ЗАПИСЬ</button>
     </div>
    </div>
    <div class="hscroll" id="hbody"></div>
@@ -457,6 +487,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
       <label class="toggle-row"><span class="toggle-label">Показывать верхний блок жизни</span><input type="checkbox" id="show-life-top"></label>
       <label class="toggle-row"><span class="toggle-label">Показывать блок оставшегося времени дня</span><input type="checkbox" id="show-day-remaining"></label>
       <label class="toggle-row"><span class="toggle-label">Показывать миллисекунды у часов</span><input type="checkbox" id="show-main-ms"></label>
+      <label class="toggle-row"><span class="toggle-label">Подробный вид активностей</span><input type="checkbox" id="show-detailed-cards"></label>
 
       <div class="slbl">ВИД ВЕРХНЕГО БЛОКА</div>
       <select class="select-inp" id="life-display-mode">
@@ -503,15 +534,24 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 <div class="overlay" id="edit-modal" onclick="closeModal('edit-modal',event)">
  <div class="modal">
   <div class="modal-title" id="edit-modal-title">ИЗМЕНИТЬ ЗАПИСЬ</div>
-  <div class="modal-title" style="margin-top:-4px;margin-bottom:8px;color:var(--txt);font-size:11px">ПРОДОЛЖИТЕЛЬНОСТЬ</div>
+
+  <div class="modal-title" style="margin-top:-4px;margin-bottom:8px;color:var(--txt);font-size:11px">ВРЕМЯ НАЧАЛА</div>
+  <input class="dt-inp" type="datetime-local" id="start-dt">
+
+  <div class="modal-title" style="margin-bottom:8px;color:var(--txt);font-size:11px">ПРОДОЛЖИТЕЛЬНОСТЬ</div>
   <div class="dur-row">
    <input class="dur-inp" type="number" id="dur-h" placeholder="0" min="0"><span class="dur-lbl">ч</span>
    <input class="dur-inp" type="number" id="dur-m" placeholder="0" min="0" max="59"><span class="dur-lbl">мин</span>
    <input class="dur-inp" type="number" id="dur-s" placeholder="0" min="0" max="59"><span class="dur-lbl">сек</span>
   </div>
+
   <div class="modal-title" style="margin-bottom:8px">КАТЕГОРИЯ</div>
   <div id="modal-cats"></div>
-  <button class="cancel-btn" onclick="closeModal('edit-modal')">ОТМЕНА</button>
+
+  <div class="edit-actions">
+   <button class="bigbtn" onclick="saveEditModal()" id="edit-save-btn">СОХРАНИТЬ</button>
+   <button class="cancel-btn" onclick="closeModal('edit-modal')">ОТМЕНА</button>
+  </div>
  </div>
 </div>
 
@@ -589,13 +629,14 @@ let S={
   showLifeTop:true,
   showDayRemaining:true,
   showMainMilliseconds:true,
+  showDetailedActivityCards:false,
   lifeDisplayMode:'precise',
   customFrom:null,customTo:null,
 };
 
 let period='today',aView='bars',histFilter='all';
 let epIdx=null,pingTimer=null;
-let editLogId=null,splitLogId=null,splitSecondCatId=null;
+let editLogId=null,editMode='edit',editSelectedActId=null,splitLogId=null,splitSecondCatId=null;
 let gToken=null;
 
 // Timer/Stopwatch
@@ -732,23 +773,25 @@ function updatePQ(){
   if(title)title.textContent='TIME';
   if(!badge)return;
   const last=lastAnsweredTime();
-  if(!last){badge.textContent='СЕЙЧАС';return;}
-  const elapsedSec=Math.max(0,Math.floor((Date.now()-last)/1000));
-  if(elapsedSec<60){
-    badge.textContent='МЕНЬШЕ МИНУТЫ';
+  if(!last){
+    badge.innerHTML='СЕЙЧАС';
     return;
   }
-  const mins=Math.floor(elapsedSec/60);
-  const hours=Math.floor(mins/60);
-  if(hours>=24){
-    badge.textContent='ДАВНО';
-    return;
-  }
-  if(hours>0){
-    badge.textContent=`${hours}Ч ${mins%60}М НАЗАД`;
-    return;
-  }
-  badge.textContent=`${mins} МИН НАЗАД`;
+  badge.innerHTML=formatElapsedBadgeHtml(Date.now()-last);
+}
+
+function formatElapsedBadgeHtml(elapsedMs){
+  const safeMs=Math.max(0,Math.floor(elapsedMs));
+  const totalSec=Math.floor(safeMs/1000);
+  const ms=safeMs%1000;
+  const h=Math.floor(totalSec/3600);
+  const m=Math.floor((totalSec%3600)/60);
+  const s=totalSec%60;
+  const parts=[];
+  if(h>0)parts.push(`${h}Ч`);
+  if(m>0)parts.push(`${h>0?pad(m):m}М`);
+  parts.push(`${(h>0||m>0)?pad(s):s}<span class="pq-ms">.${pad3(ms)}</span>`);
+  return `ПОСЛЕДНИЕ ${parts.join(' ')}`;
 }
 
 function lastLogTime(){
@@ -773,12 +816,92 @@ function goScreen(id){
 // PING
 // ══════════════════════════════════════════════════════
 function renderPG(){
-  const g=document.getElementById('ping-grid');g.innerHTML='';
+  const g=document.getElementById('ping-grid');
+  if(!g)return;
+  g.innerHTML='';
   activeActivities().slice(0,16).forEach(a=>{
-    const b=document.createElement('button');b.className='abt';
-    b.innerHTML=`<span class="em">${a.emoji}</span>${a.name}`;
-    b.onclick=()=>logIt(a);g.appendChild(b);
+    const b=document.createElement('button');
+    b.className='abt';
+    if(S.showDetailedActivityCards)b.classList.add('detailed');
+    if(S.showDetailedActivityCards){
+      const detail=activityDetailStats(a.id);
+      if(detail.todaySec<=0)b.classList.add('no-today');
+      b.innerHTML=renderDetailedActivityCard(a,detail);
+    }else{
+      b.innerHTML=`<span class="em">${escapeAttr(a.emoji)}</span>${escapeAttr(a.name)}`;
+    }
+    b.onclick=()=>logIt(a);
+    g.appendChild(b);
   });
+}
+
+function activityDetailStats(activityId){
+  const now=new Date();
+  const days=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(now);
+    d.setDate(now.getDate()-i);
+    d.setHours(0,0,0,0);
+    days.push(d);
+  }
+  const daySecs=days.map(()=>0);
+  const todayKey=days[6].toDateString();
+
+  visibleLogs().forEach(l=>{
+    if(l.skipped||String(l.activityId)!==String(activityId))return;
+    const d=new Date(l.ts);
+    const idx=days.findIndex(day=>d.toDateString()===day.toDateString());
+    if(idx>=0)daySecs[idx]+=l.durationSec||0;
+  });
+
+  const weekSec=daySecs.reduce((sum,sec)=>sum+sec,0);
+  return {
+    daySecs,
+    todaySec:daySecs[6]||0,
+    weekSec,
+    avgSec:Math.round(weekSec/7),
+    maxSec:Math.max(...daySecs,1),
+  };
+}
+
+function renderDetailedActivityCard(activity,detail){
+  return `
+    <span class="em">${escapeAttr(activity.emoji)}</span>
+    <span class="act-name">${escapeAttr(activity.name)}</span>
+    ${renderActivitySparkline(detail.daySecs,detail.maxSec)}
+    <span class="detail-number detail-avg">${fmtCardTime(detail.avgSec)}<span class="detail-suffix">avg</span></span>
+    <span class="detail-number detail-week">${fmtCardTime(detail.weekSec)}<span class="detail-suffix">w</span></span>
+    <span class="detail-number detail-today">${detail.todaySec>0?fmtCardTime(detail.todaySec):'--:--'}</span>
+  `;
+}
+
+function renderActivitySparkline(daySecs,maxSec){
+  const w=100,h=48,padX=4,padY=7;
+  const pts=daySecs.map((sec,i)=>{
+    const x=padX+i*((w-padX*2)/6);
+    const ratio=maxSec>0?sec/maxSec:0;
+    const y=h-padY-ratio*(h-padY*2);
+    return {x,y,sec};
+  });
+  const solidPts=pts.slice(0,6);
+  const solidPath=solidPts.map((p,i)=>`${i?'L':'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const todayPath=`M${pts[5].x.toFixed(1)},${pts[5].y.toFixed(1)} L${pts[6].x.toFixed(1)},${pts[6].y.toFixed(1)}`;
+  const dots=pts.map(p=>`<span class="detail-dot" style="left:${(p.x/w*100).toFixed(2)}%;top:${(p.y/h*100).toFixed(2)}%"></span>`).join('');
+  return `<span class="detail-graph" aria-hidden="true">
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <path class="detail-line" d="${solidPath}"></path>
+      <path class="detail-line today-segment" d="${todayPath}"></path>
+    </svg>
+    ${dots}
+  </span>`;
+}
+
+function fmtCardTime(sec){
+  if(!sec||sec<0)return '0:00';
+  const totalMin=Math.round(sec/60);
+  const h=Math.floor(totalMin/60);
+  const m=totalMin%60;
+  return `${h}:${pad(m)}`;
 }
 
 function calcDuration(){
@@ -1407,47 +1530,114 @@ function deleteHistoryLog(logId){
 
 // ── Edit modal ──
 function openEditModal(logId){
+  editMode='edit';
   editLogId=logId;
   const log=visibleLogById(logId);
   if(!log)return;
-  // Fill duration
+  editSelectedActId=log.activityId;
+  document.getElementById('edit-modal-title').textContent='ИЗМЕНИТЬ ЗАПИСЬ';
+  document.getElementById('edit-save-btn').textContent='СОХРАНИТЬ';
+  fillEditFields(log);
+  renderEditCategories(editSelectedActId);
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function openAddHistoryModal(){
+  editMode='add';
+  editLogId=null;
+  const activities=activeActivities();
+  editSelectedActId=activities[0]?.id||null;
+  const dur=(S.intervalMinutes||15)*60;
+  const start=new Date(Date.now()-dur*1000);
+  document.getElementById('edit-modal-title').textContent='ДОБАВИТЬ ЗАПИСЬ';
+  document.getElementById('edit-save-btn').textContent='ДОБАВИТЬ';
+  fillEditFields({ts:start.toISOString(),durationSec:dur,activityId:editSelectedActId});
+  renderEditCategories(editSelectedActId);
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function fillEditFields(log){
   const sec=log.durationSec||0;
   document.getElementById('dur-h').value=Math.floor(sec/3600)||'';
   document.getElementById('dur-m').value=Math.floor((sec%3600)/60)||'';
   document.getElementById('dur-s').value=sec%60||'';
-  // Fill categories
-  const cats=document.getElementById('modal-cats');cats.innerHTML='';
-  activeActivities().forEach(a=>{
-    const d=document.createElement('div');d.className='modal-item'+(log.activityId===a.id?' sel':'');
-    d.innerHTML=`<span class="mem2">${a.emoji}</span><span class="mname">${a.name}</span>`;
-    d.onclick=()=>{
-      document.querySelectorAll('#modal-cats .modal-item').forEach(x=>x.classList.remove('sel'));
-      d.classList.add('sel');
-      applyEdit(a);
-    };
-    cats.appendChild(d);
-  });
-  document.getElementById('edit-modal').classList.add('open');
+  document.getElementById('start-dt').value=toDatetimeLocalValue(log.ts||nowISO());
 }
 
-function applyEdit(a){
-  const log=visibleLogById(editLogId);
-  if(!log)return;
+function renderEditCategories(selectedId){
+  const cats=document.getElementById('modal-cats');
+  cats.innerHTML='';
+  activeActivities().forEach(a=>{
+    const d=document.createElement('div');
+    d.className='modal-item'+(String(selectedId)===String(a.id)?' sel':'');
+    d.innerHTML=`<span class="mem2">${escapeAttr(a.emoji)}</span><span class="mname">${escapeAttr(a.name)}</span>`;
+    d.onclick=()=>selectEditActivity(a.id);
+    cats.appendChild(d);
+  });
+}
+
+function selectEditActivity(activityId){
+  editSelectedActId=String(activityId);
+  document.querySelectorAll('#modal-cats .modal-item').forEach(x=>x.classList.remove('sel'));
+  const idx=activeActivities().findIndex(a=>String(a.id)===String(activityId));
+  const item=document.querySelectorAll('#modal-cats .modal-item')[idx];
+  if(item)item.classList.add('sel');
+}
+
+function saveEditModal(){
+  const activity=activeActivities().find(a=>String(a.id)===String(editSelectedActId));
+  if(!activity){
+    toast('Выбери категорию');
+    return;
+  }
   const h=parseInt(document.getElementById('dur-h').value)||0;
   const m=parseInt(document.getElementById('dur-m').value)||0;
   const s=parseInt(document.getElementById('dur-s').value)||0;
-  const newDur=h*3600+m*60+s;
-  if(newDur>0)log.durationSec=newDur;
-  log.activityId=String(a.id);
-  log.emoji=a.emoji;
-  log.name=a.name;
-  log.skipped=false;
-  touchItem(log);
+  const durationSec=h*3600+m*60+s;
+  if(durationSec<=0){
+    toast('Укажи длительность');
+    return;
+  }
+  const startIso=fromDatetimeLocalValue(document.getElementById('start-dt').value);
+  if(editMode==='add'){
+    S.logs.push(createLogEntry(activity,durationSec,{ts:startIso,createdAt:startIso,updatedAt:nowISO(),answeredAt:startIso}));
+    S.logs.sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+    toast('✓ Запись добавлена');
+  }else{
+    const log=visibleLogById(editLogId);
+    if(!log)return;
+    log.ts=startIso;
+    log.durationSec=durationSec;
+    log.activityId=String(activity.id);
+    log.emoji=activity.emoji;
+    log.name=activity.name;
+    log.skipped=false;
+    touchItem(log);
+    toast('✓ Изменено');
+  }
   save();
   closeModal('edit-modal');
   renderH();
   renderA();
-  toast('✓ Изменено');
+  renderPG();
+  updatePQ();
+}
+
+function applyEdit(a){
+  selectEditActivity(a.id);
+}
+
+function toDatetimeLocalValue(iso){
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime()))return '';
+  const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);
+  return local.toISOString().slice(0,16);
+}
+
+function fromDatetimeLocalValue(value){
+  if(!value)return nowISO();
+  const d=new Date(value);
+  return Number.isNaN(d.getTime())?nowISO():d.toISOString();
 }
 
 // ── Split modal ──
@@ -1998,6 +2188,7 @@ function migrateState(){
   if(typeof S.showLifeTop==='undefined')S.showLifeTop=true;
   if(typeof S.showDayRemaining==='undefined')S.showDayRemaining=true;
   if(typeof S.showMainMilliseconds==='undefined')S.showMainMilliseconds=true;
+  if(typeof S.showDetailedActivityCards==='undefined')S.showDetailedActivityCards=false;
   if(typeof S.lifeDisplayMode==='undefined')S.lifeDisplayMode='precise';
   if(typeof S.birthAt==='undefined')S.birthAt=null;
   if(typeof S.lifeExpectancyYears==='undefined')S.lifeExpectancyYears=75;
@@ -2018,6 +2209,7 @@ function buildExportObject(){
     showLifeTop:S.showLifeTop!==false,
     showDayRemaining:S.showDayRemaining!==false,
     showMainMilliseconds:S.showMainMilliseconds!==false,
+    showDetailedActivityCards:S.showDetailedActivityCards===true,
     lifeDisplayMode:S.lifeDisplayMode||'precise',
     birthAt:S.birthAt||null,
     lifeExpectancyYears:parseFloat(S.lifeExpectancyYears)||75,
@@ -2042,6 +2234,7 @@ function normalizeState(raw){
     showLifeTop:typeof state.showLifeTop==='boolean'?state.showLifeTop:(S.showLifeTop!==false),
     showDayRemaining:typeof state.showDayRemaining==='boolean'?state.showDayRemaining:(S.showDayRemaining!==false),
     showMainMilliseconds:typeof state.showMainMilliseconds==='boolean'?state.showMainMilliseconds:(S.showMainMilliseconds!==false),
+    showDetailedActivityCards:typeof state.showDetailedActivityCards==='boolean'?state.showDetailedActivityCards:(S.showDetailedActivityCards===true),
     lifeDisplayMode:state.lifeDisplayMode||S.lifeDisplayMode||'precise',
     intervalMinutes:parseInt(state.intervalMinutes||S.intervalMinutes||15)||15,
     nextPingTime:state.nextPingTime||S.nextPingTime||null,
@@ -2088,25 +2281,24 @@ function updatePQ(){
   if(!badge)return;
   const last=lastAnsweredTime();
   if(!last){
-    badge.textContent='СЕЙЧАС';
+    badge.innerHTML='СЕЙЧАС';
     return;
   }
-  const elapsedSec=Math.max(0,Math.floor((Date.now()-last)/1000));
-  if(elapsedSec<60){
-    badge.textContent='МЕНЬШЕ МИНУТЫ';
-    return;
-  }
-  const mins=Math.floor(elapsedSec/60);
-  const hours=Math.floor(mins/60);
-  if(hours>=24){
-    badge.textContent=`ПОСЛЕДНИЕ ${hours}Ч`;
-    return;
-  }
-  if(hours>0){
-    badge.textContent=`ПОСЛЕДНИЕ ${hours}Ч ${mins%60}М`;
-    return;
-  }
-  badge.textContent=`ПОСЛЕДНИЕ ${mins} МИН`;
+  badge.innerHTML=formatElapsedBadgeHtml(Date.now()-last);
+}
+
+function formatElapsedBadgeHtml(elapsedMs){
+  const safeMs=Math.max(0,Math.floor(elapsedMs));
+  const totalSec=Math.floor(safeMs/1000);
+  const ms=safeMs%1000;
+  const h=Math.floor(totalSec/3600);
+  const m=Math.floor((totalSec%3600)/60);
+  const s=totalSec%60;
+  const parts=[];
+  if(h>0)parts.push(`${h}Ч`);
+  if(m>0)parts.push(`${h>0?pad(m):m}М`);
+  parts.push(`${(h>0||m>0)?pad(s):s}<span class="pq-ms">.${pad3(ms)}</span>`);
+  return `ПОСЛЕДНИЕ ${parts.join(' ')}`;
 }
 
 function decimalYearsFromBirth(birth,now){
@@ -2269,6 +2461,7 @@ function renderSett(){
   const showLifeTop=document.getElementById('show-life-top');
   const showDayRemaining=document.getElementById('show-day-remaining');
   const showMainMs=document.getElementById('show-main-ms');
+  const showDetailedCards=document.getElementById('show-detailed-cards');
   const lifeDisplayMode=document.getElementById('life-display-mode');
   if(ival)ival.value=S.intervalMinutes||15;
   if(gfolder)gfolder.value=S.gFolder||'TimeTracker';
@@ -2277,6 +2470,7 @@ function renderSett(){
   if(showLifeTop)showLifeTop.checked=S.showLifeTop!==false;
   if(showDayRemaining)showDayRemaining.checked=S.showDayRemaining!==false;
   if(showMainMs)showMainMs.checked=S.showMainMilliseconds!==false;
+  if(showDetailedCards)showDetailedCards.checked=S.showDetailedActivityCards===true;
   if(lifeDisplayMode)lifeDisplayMode.value=S.lifeDisplayMode||'precise';
   if(S.birthAt){
     const d=new Date(S.birthAt);
@@ -2334,6 +2528,7 @@ function saveSettings(){
   const showLifeTop=document.getElementById('show-life-top');
   const showDayRemaining=document.getElementById('show-day-remaining');
   const showMainMs=document.getElementById('show-main-ms');
+  const showDetailedCards=document.getElementById('show-detailed-cards');
   const lifeDisplayMode=document.getElementById('life-display-mode');
   if(ival)S.intervalMinutes=parseInt(ival.value)||15;
   if(gfolder)S.gFolder=gfolder.value||'TimeTracker';
@@ -2342,6 +2537,7 @@ function saveSettings(){
   if(showLifeTop)S.showLifeTop=!!showLifeTop.checked;
   if(showDayRemaining)S.showDayRemaining=!!showDayRemaining.checked;
   if(showMainMs)S.showMainMilliseconds=!!showMainMs.checked;
+  if(showDetailedCards)S.showDetailedActivityCards=!!showDetailedCards.checked;
   if(lifeDisplayMode)S.lifeDisplayMode=lifeDisplayMode.value||'precise';
   if(birthDate&&birthDate.value){
     const time=(birthTime&&birthTime.value?birthTime.value:'00:00:00');
