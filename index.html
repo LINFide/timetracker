@@ -175,6 +175,98 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .hbtn:active{color:var(--acc);border-color:var(--acc)}
 .hbtn.split-btn:active{color:var(--grn);border-color:var(--grn)}
 
+
+/* ── NUTRITION ── */
+#snut{overflow:hidden}
+.nut-header{padding:10px 14px 8px;border-bottom:1px solid var(--bor);flex-shrink:0}
+.nut-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.nut-title-left{display:flex;align-items:center;gap:7px;min-width:0}
+.nut-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;color:var(--acc);white-space:nowrap}
+.nut-icon-row{display:flex;gap:6px;align-items:center}
+.nut-icon-btn{width:34px;height:30px;border-radius:9px;border:1px solid var(--bor);background:var(--sur2);color:var(--mut);font-size:15px;cursor:pointer}
+.nut-icon-btn.active,.nut-icon-btn:active{border-color:var(--acc);color:var(--acc)}
+.nut-espresso-btn{display:none;align-items:center;gap:5px;height:30px;border-radius:9px;border:1px solid var(--acc);background:var(--sur2);color:var(--acc);font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:0 8px;cursor:pointer;white-space:nowrap}
+.nut-espresso-btn:active{transform:scale(.97)}
+.nut-espresso-count{font-family:'Bebas Neue',sans-serif;font-size:17px;line-height:1;letter-spacing:1px}
+.nut-scroll{flex:1;overflow-y:auto;padding:12px 13px 20px}
+.nut-summary{background:var(--sur);border:1px solid var(--bor);border-radius:14px;padding:14px;margin-bottom:10px;text-align:center}
+.nut-kcal{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;color:var(--acc);letter-spacing:2px;display:inline-flex;align-items:flex-end;justify-content:center;gap:7px}
+.nut-kcal-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.nut-macros{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.nut-macro{background:var(--sur2);border:1px solid var(--bor);border-radius:10px;padding:8px;text-align:center}
+.nut-macro-v{font-family:'Bebas Neue',sans-serif;font-size:23px;color:var(--txt);line-height:1;display:inline-flex;align-items:flex-end;justify-content:center;gap:4px}
+.nut-macro-l{font-size:8px;color:var(--mut);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+.meal-grid{display:flex;flex-direction:column;gap:8px}
+.meal-card{background:var(--sur);border:1px solid var(--bor);border-radius:14px;padding:12px;min-height:92px;text-align:left;cursor:pointer;color:var(--txt);font-family:'IBM Plex Mono',monospace;position:relative;display:grid;grid-template-columns:44px 1fr auto;align-items:center;column-gap:10px}
+.meal-card:active{border-color:var(--acc);transform:scale(.985)}
+.meal-emoji{font-size:26px;margin-bottom:0;text-align:center}
+.meal-name{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.meal-kcal{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--acc);letter-spacing:1px;line-height:1;text-align:right}
+.meal-sub{font-size:9px;color:var(--mut);margin-top:3px;line-height:1.4}
+.product-list{max-height:250px;overflow-y:auto;margin:8px 0}
+.product-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--bor);border-radius:10px;background:var(--sur);margin-bottom:6px;cursor:pointer}
+.product-item:active,.product-item.sel{border-color:var(--acc)}
+.product-emoji{font-size:20px;min-width:24px;text-align:center}
+.product-info{flex:1;min-width:0}
+.product-name{font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-meta{font-size:9px;color:var(--mut);margin-top:2px}
+.nut-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.nut-form-grid .date-inp{width:100%}
+.nut-tabs{display:flex;gap:6px;margin:8px 0}
+.nut-tab{flex:1;padding:8px;border-radius:10px;border:1px solid var(--bor);background:var(--sur);color:var(--mut);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.nut-tab.active{border-color:var(--acc);color:var(--acc)}
+.nut-day-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px;background:var(--sur);border:1px solid var(--bor);border-radius:12px;margin-bottom:7px;cursor:pointer}
+.nut-day-row:active{border-color:var(--acc)}
+.nut-day-date{font-size:12px;color:var(--txt);font-weight:700}
+.nut-day-meta{font-size:9px;color:var(--mut);margin-top:3px}
+.nut-day-kcal{font-family:'Bebas Neue',sans-serif;font-size:29px;color:var(--acc);letter-spacing:1px;white-space:nowrap}
+.nut-entry{background:var(--sur);border:1px solid var(--bor);border-radius:12px;margin-bottom:7px;overflow:hidden}
+.nut-entry-main{display:flex;align-items:center;gap:9px;padding:10px 11px}
+.nut-entry .product-emoji{font-size:20px}
+.nut-entry-info{flex:1;min-width:0}
+.nut-entry-title{font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nut-entry-meta{font-size:9px;color:var(--mut);margin-top:2px}
+.nut-entry-kcal{font-family:'Bebas Neue',sans-serif;font-size:25px;color:var(--acc);letter-spacing:1px}
+.nut-heat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.nut-heat-cell{aspect-ratio:1;border-radius:7px;background:var(--sur);border:1px solid var(--bor);padding:4px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:hidden}
+.nut-heat-date{font-size:7px;color:var(--mut);letter-spacing:.5px;margin-bottom:2px}
+.nut-heat-kcal{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc);line-height:1;letter-spacing:1px}
+.nut-heat-macro{font-size:6px;color:var(--mut);line-height:1.25;margin-top:2px}
+.nut-back-btn{margin-bottom:8px;width:100%;padding:9px;border-radius:10px;border:1px solid var(--bor);background:var(--sur2);color:var(--mut);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700}
+@media(max-width:390px){
+  .nut-kcal{font-size:42px}
+  .meal-card{min-height:102px;padding:10px}
+  .nut-heat-kcal{font-size:15px}
+}
+
+
+.nut-kcal-row{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.nut-kcal-goal{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:rgba(240,240,240,.42);letter-spacing:1px;white-space:nowrap}
+.nut-goal-muted{color:rgba(240,240,240,.35)}
+.nut-macro-goal{font-family:'Bebas Neue',sans-serif;font-size:18px;color:rgba(240,240,240,.38);line-height:1;margin-left:2px;white-space:nowrap}
+.product-meta.changed-meta{color:var(--acc);font-weight:700}
+.nut-heat-espresso{font-family:'IBM Plex Mono',monospace;font-size:7px;font-weight:700;color:#000;background:var(--acc);border-radius:8px;padding:1px 4px;margin-top:2px;line-height:1.2}
+.nut-day-espresso{font-size:9px;color:var(--acc);margin-top:3px;letter-spacing:.5px}
+.nut-settings-card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:12px;margin-bottom:9px}
+.nut-settings-row{display:grid;grid-template-columns:38px 1fr;gap:7px;margin-bottom:7px;align-items:center}
+.nut-settings-row.nut-product-row{grid-template-columns:38px 1.2fr .7fr .7fr .7fr .7fr .7fr 28px}
+.nut-settings-row.nut-meal-row{grid-template-columns:38px 1fr 28px}
+.nut-settings-row input{width:100%;background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:8px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:10px;outline:none}
+.nut-settings-row input:focus{border-color:var(--acc)}
+.nut-settings-row input::placeholder,.nut-goals-grid input::placeholder{color:rgba(240,240,240,.32)}
+.nut-switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--sur2);border:1px solid var(--bor);border-radius:10px;padding:10px;margin-top:8px}
+.nut-switch-row span{font-size:10px;color:var(--txt);font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.nut-switch-row input{width:auto}
+.nut-goals-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.nut-goals-grid label{font-size:8px;color:var(--mut);letter-spacing:1.5px;text-transform:uppercase}
+.nut-goals-grid input{width:100%;margin-top:4px;background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:9px;color:var(--txt);font-family:'IBM Plex Mono',monospace}
+@media(max-width:520px){
+  .nut-settings-row.nut-product-row{grid-template-columns:34px 1fr 1fr 1fr;gap:6px}
+  .nut-settings-row.nut-product-row input:nth-of-type(n+4){grid-column:auto}
+  .nut-settings-row.nut-product-row .xbtn{grid-column:4}
+  .nut-kcal-goal{font-size:24px}
+}
+
 /* ── SETTINGS ── */
 #sset{overflow:hidden}
 .sscroll{flex:1;overflow-y:auto;padding:13px}
@@ -320,6 +412,45 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .hm-cell.empty{color:transparent}
 .hm-note{font-size:9px;color:var(--mut);margin-top:8px;line-height:1.5}
 
+
+/* ── COMPARE GRAPH ── */
+.compare-panel{display:flex;flex-direction:column;gap:10px}
+.compare-periods{display:grid;grid-template-columns:1fr;gap:8px}
+.compare-period-card{background:var(--sur2);border:1px solid var(--bor);border-radius:12px;padding:10px}
+.compare-period-title{font-size:9px;color:var(--mut);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px}
+.compare-date-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.compare-summary{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.compare-metric{background:var(--sur2);border:1px solid var(--bor);border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.compare-value{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--acc);line-height:1;letter-spacing:1px;white-space:nowrap}
+.compare-label{display:flex;align-items:center;justify-content:flex-end;min-width:48px}
+.compare-legend-segment{display:block;width:42px;border-top:2.4px solid var(--acc);border-radius:999px}
+.compare-legend-segment.dashed{border-top-style:dashed;opacity:.58}
+.compare-delta{border:1px solid var(--bor);border-radius:12px;padding:10px 12px;background:var(--sur2);display:flex;align-items:center;justify-content:center;gap:10px}
+.compare-delta-value{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--acc);letter-spacing:1px;line-height:1}
+.compare-delta-arrow{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--acc);line-height:1}
+.compare-delta-arrow.down{opacity:.72}
+.compare-delta-arrow.same{color:var(--mut)}
+.compare-chart{position:relative;width:100%;height:210px;background:var(--sur2);border:1px solid var(--bor);border-radius:12px;padding:0;overflow:hidden}
+.compare-plot{position:absolute;left:42px;right:16px;top:20px;bottom:30px}
+.compare-lines-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;display:block}
+.compare-axis{stroke:var(--bor);stroke-width:1;vector-effect:non-scaling-stroke}
+.compare-grid{stroke:rgba(255,255,255,.07);stroke-width:1;vector-effect:non-scaling-stroke}
+.compare-line-old,.compare-line-new{fill:none;stroke:var(--acc);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.compare-line-old{stroke-dasharray:6 6;opacity:.55}
+.compare-line-new{opacity:1}
+.compare-dot{position:absolute;width:8px;height:8px;border:2px solid var(--acc);border-radius:50%;background:var(--sur2);transform:translate(-50%,-50%);z-index:3;box-sizing:border-box}
+.compare-dot.old{opacity:.55}
+.compare-y-label,.compare-x-label{position:absolute;font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--mut);line-height:1;user-select:none}
+.compare-y-label{left:10px;width:28px;text-align:right;transform:translateY(-50%);white-space:nowrap;overflow:visible}
+.compare-x-label{bottom:12px;transform:translateX(-50%)}
+.compare-x-label.first{left:42px}
+.compare-x-label.last{right:16px;left:auto;transform:translateX(50%)}
+@media(max-width:520px){.compare-chart{height:185px}.compare-plot{left:42px;right:12px;top:18px;bottom:26px}.compare-y-label{left:8px;width:30px}.compare-x-label.first{left:42px}.compare-x-label.last{right:12px}.compare-dot{width:7px;height:7px}}
+.compare-acts{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.compare-act-btn{padding:6px 11px;border-radius:999px;border:1px solid var(--bor);background:var(--sur2);color:var(--mut);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;cursor:pointer}
+.compare-act-btn.active{border-color:var(--acc);color:var(--acc)}
+.debug-note{font-size:10px;line-height:1.6;color:var(--mut);background:var(--sur2);border:1px dashed var(--bor);border-radius:10px;padding:10px;margin-top:6px}
+
 </style>
 </head>
 <body>
@@ -378,6 +509,25 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
    </div>
    <div class="timer-lap-list" id="lap-list"></div>
   </div>
+  <!-- ══ NUTRITION ══ -->
+  <div class="screen" id="snut">
+   <div class="nut-header">
+    <div class="nut-title-row">
+     <div class="nut-title-left">
+      <button class="nut-espresso-btn" id="nut-espresso-btn" onclick="incrementEspresso()">☕ ЭСПРЕССО <span class="nut-espresso-count" id="nut-espresso-count">x0</span></button>
+      <div class="nut-title">КАЛОРИИ</div>
+     </div>
+     <div class="nut-icon-row">
+      <button class="nut-icon-btn active" id="nut-view-main-btn" onclick="setNutritionView('main')" title="Сегодня">🍽</button>
+      <button class="nut-icon-btn" id="nut-view-stats-btn" onclick="setNutritionView('stats')" title="Статистика">▦</button>
+      <button class="nut-icon-btn" id="nut-view-history-btn" onclick="setNutritionView('history')" title="История">📜</button>
+      <button class="nut-icon-btn" id="nut-view-settings-btn" onclick="setNutritionView('settings')" title="Настройки">⚙️</button>
+     </div>
+    </div>
+   </div>
+   <div class="nut-scroll" id="nut-body"></div>
+  </div>
+
 
   <!-- ══ ANALYTICS ══ -->
   <div class="screen" id="sa">
@@ -403,6 +553,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
     <button class="vc active" data-v="bars"    onclick="setView('bars')">▬ ПОЛОСКИ</button>
     <button class="vc" data-v="pie"     onclick="setView('pie')">◉ КРУГОВАЯ</button>
     <button class="vc" data-v="heatmap" onclick="setView('heatmap')">▦ ТЕПЛОВАЯ</button>
+    <button class="vc" data-v="graph"   onclick="setView('graph')">⌁ ГРАФИК</button>
    </div>
    <div class="ascroll" id="abody"></div>
   </div>
@@ -489,6 +640,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
       <label class="toggle-row"><span class="toggle-label">Показывать блок оставшегося времени дня</span><input type="checkbox" id="show-day-remaining"></label>
       <label class="toggle-row"><span class="toggle-label">Показывать миллисекунды у часов</span><input type="checkbox" id="show-main-ms"></label>
       <label class="toggle-row"><span class="toggle-label">Подробный вид активностей</span><input type="checkbox" id="show-detailed-cards"></label>
+      <label class="toggle-row"><span class="toggle-label">Показывать вкладку таймера</span><input type="checkbox" id="show-timer-tab"></label>
+      <label class="toggle-row"><span class="toggle-label">Режим отладки</span><input type="checkbox" id="debug-mode"></label>
+      <div class="debug-note">Режим отладки визуально подставляет случайные данные за последние 2 месяца. Реальная история, sync и backup не меняются.</div>
 
       <div class="slbl">ПЕРИОД ПОДРОБНОГО ВИДА</div>
       <select class="select-inp" id="detailed-activity-range">
@@ -520,7 +674,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 
  <nav id="bnav">
   <button class="nb active" id="nb-sp"     onclick="goScreen('sp')"><span class="ic">⏱</span><span class="lb">ОТМЕТКА</span></button>
-  <button class="nb"        id="nb-stimer" onclick="goScreen('stimer')"><span class="ic">⏲</span><span class="lb">ТАЙМЕР</span></button>
+  <button class="nb"        id="nb-snut"   onclick="goScreen('snut')"><span class="ic">🍽</span><span class="lb">КАЛОРИИ</span></button>
+  <button class="nb"        id="nb-stimer" onclick="goScreen('stimer')" style="display:none"><span class="ic">⏲</span><span class="lb">ТАЙМЕР</span></button>
   <button class="nb"        id="nb-sa"     onclick="goScreen('sa')"><span class="ic">📊</span><span class="lb">АНАЛИТИКА</span></button>
   <button class="nb"        id="nb-sh2"    onclick="goScreen('sh2')"><span class="ic">📋</span><span class="lb">ИСТОРИЯ</span></button>
   <button class="nb"        id="nb-sset"   onclick="goScreen('sset')"><span class="ic">⚙️</span><span class="lb">НАСТРОЙКИ</span></button>
@@ -593,6 +748,41 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
  </div>
 </div>
 
+
+<!-- Nutrition modal -->
+<div class="overlay" id="nutrition-modal" onclick="closeNutritionModal(event)">
+ <div class="modal">
+  <div class="modal-title" id="nutrition-modal-title">ДОБАВИТЬ ПРИЁМ ПИЩИ</div>
+  <div class="nut-tabs">
+   <button class="nut-tab active" id="nut-tab-existing" onclick="setNutritionModalTab('existing')">ИЗ СПИСКА</button>
+   <button class="nut-tab" id="nut-tab-new" onclick="setNutritionModalTab('new')">НОВЫЙ ПРОДУКТ</button>
+  </div>
+  <div id="nutrition-existing-panel">
+   <div class="modal-title" style="margin-top:8px">ПРОДУКТ</div>
+   <div class="product-list" id="nutrition-product-list"></div>
+   <div class="modal-title">ВЕС / КОЛИЧЕСТВО</div>
+   <div class="nut-form-grid">
+    <input class="date-inp" type="number" id="nutrition-grams" placeholder="граммы" min="1" step="1" value="100" oninput="renderNutritionProductList()">
+    <input class="date-inp" type="number" id="nutrition-qty" placeholder="кол-во" min="0.1" step="0.1" value="1" oninput="renderNutritionProductList()">
+   </div>
+  </div>
+  <div id="nutrition-new-panel" style="display:none">
+   <div class="nut-form-grid">
+    <input class="date-inp" type="text" id="product-emoji" placeholder="эмодзи" value="🍽">
+    <input class="date-inp" type="text" id="product-name" placeholder="Название">
+    <input class="date-inp" type="number" id="product-base-grams" placeholder="вес базы, г" min="1" step="1" value="100">
+    <input class="date-inp" type="number" id="product-kcal" placeholder="ккал" min="0" step="0.1">
+    <input class="date-inp" type="number" id="product-protein" placeholder="белки" min="0" step="0.1">
+    <input class="date-inp" type="number" id="product-fat" placeholder="жиры" min="0" step="0.1">
+    <input class="date-inp" type="number" id="product-carbs" placeholder="углеводы" min="0" step="0.1">
+    <input class="date-inp" type="number" id="product-entry-grams" placeholder="съедено, г" min="1" step="1" value="100">
+   </div>
+  </div>
+  <button class="bigbtn" onclick="saveNutritionEntry()" style="margin-top:10px">СОХРАНИТЬ</button>
+  <button class="cancel-btn" onclick="closeModal('nutrition-modal')">ОТМЕНА</button>
+ </div>
+</div>
+
 <!-- Emoji picker -->
 <div class="epo" id="epo" onclick="closeEP(event)">
  <div class="epp">
@@ -607,6 +797,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 // ══════════════════════════════════════════════════════
 const EMOJIS=['💻','📚','🏃','🍳','😴','🧹','📱','🎮','🎵','🚗','🤝','🧘','✍️','📞','🛒','🎨','🍔','☕','🏋️','🧠','👨‍👩‍👦','🌿','📺','🎯','🎲','🔧','💼','✈️','🛁','🎭','🐶','🌙','🎤','🖥️','📝','🏠','🎪','🎸','🚴','🏊','🌅'];
 const PIE_COL=['#e8ff47','#47b8ff','#ff4747','#ff9f47','#b847ff','#47ff9f','#ff47b8','#47ffff','#ffb847','#47ffb8','#b8ff47','#ff47ff','#6b47ff','#ffff47','#ff6b47','#47ff6b'];
+const DEFAULT_NUTRITION_MEAL_TYPES=[
+  {id:'breakfast',emoji:'🌅',name:'Завтрак',deletedAt:null},
+  {id:'lunch',emoji:'☀️',name:'Обед',deletedAt:null},
+  {id:'dinner',emoji:'🌙',name:'Ужин',deletedAt:null},
+  {id:'snack',emoji:'🍪',name:'Перекус',deletedAt:null},
+];
+const DEFAULT_NUTRITION_GOALS={kcal:3400,protein:160,fat:100,carbs:420};
 
 let S={
   schemaVersion:3,
@@ -639,7 +836,14 @@ let S={
   showMainMilliseconds:true,
   showDetailedActivityCards:false,
   detailedActivityRange:'week',
+  debugMode:false,
   lifeDisplayMode:'precise',
+  graphActivityIds:[],
+  graphP1From:null,graphP1To:null,graphP2From:null,graphP2To:null,
+  showTimerTab:false,
+  nutritionView:'main',
+  nutritionHistoryDate:null,
+  nutrition:{products:[],entries:[],mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),goals:{...DEFAULT_NUTRITION_GOALS},espressoLogs:[],settings:{showEspressoMeter:false}},
   customFrom:null,customTo:null,
 };
 
@@ -687,6 +891,22 @@ function migrateState(){
   if(typeof S.gMainFileId==='undefined')S.gMainFileId=null;
   if(typeof S.lastSyncAt==='undefined')S.lastSyncAt=null;
   if(typeof S.badgeColor==='undefined')S.badgeColor='#e8ff47';
+  if(typeof S.debugMode==='undefined')S.debugMode=false;
+  if(typeof S.showTimerTab==='undefined')S.showTimerTab=false;
+  if(typeof S.nutritionView==='undefined')S.nutritionView='main';
+  if(typeof S.nutritionHistoryDate==='undefined')S.nutritionHistoryDate=null;
+  if(!S.nutrition||typeof S.nutrition!=='object')S.nutrition={products:[],entries:[],mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),goals:{...DEFAULT_NUTRITION_GOALS},espressoLogs:[],settings:{showEspressoMeter:false}};
+  S.nutrition.products=(S.nutrition.products||[]).map(normalizeNutritionProduct);
+  S.nutrition.entries=(S.nutrition.entries||[]).map(normalizeNutritionEntry).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  S.nutrition.mealTypes=(S.nutrition.mealTypes&&S.nutrition.mealTypes.length?S.nutrition.mealTypes:DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType);
+  S.nutrition.goals=normalizeNutritionGoals(S.nutrition.goals);
+  S.nutrition.espressoLogs=(S.nutrition.espressoLogs||[]).map(normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  S.nutrition.settings=normalizeNutritionSettings(S.nutrition.settings);
+  if(!Array.isArray(S.graphActivityIds))S.graphActivityIds=[];
+  if(typeof S.graphP1From==='undefined')S.graphP1From=null;
+  if(typeof S.graphP1To==='undefined')S.graphP1To=null;
+  if(typeof S.graphP2From==='undefined')S.graphP2From=null;
+  if(typeof S.graphP2To==='undefined')S.graphP2To=null;
 }
 
 function nowISO(){return new Date().toISOString();}
@@ -730,10 +950,179 @@ function normalizeLog(l){
   };
 }
 
+function normalizeNutritionProduct(p){
+  const createdAt=p?.createdAt||p?.updatedAt||nowISO();
+  return {
+    id:String(p?.id??genId()),
+    emoji:p?.emoji||'🍽',
+    name:p?.name||'',
+    baseGrams:Math.max(1,parseFloat(p?.baseGrams)||100),
+    kcal:Math.max(0,parseFloat(p?.kcal)||0),
+    protein:Math.max(0,parseFloat(p?.protein)||0),
+    fat:Math.max(0,parseFloat(p?.fat)||0),
+    carbs:Math.max(0,parseFloat(p?.carbs)||0),
+    createdAt,
+    updatedAt:p?.updatedAt||createdAt,
+    deletedAt:p?.deletedAt||null,
+    deviceId:p?.deviceId||S.deviceId||null,
+  };
+}
+
+function normalizeNutritionEntry(e){
+  const createdAt=e?.createdAt||e?.updatedAt||e?.ts||nowISO();
+  return {
+    id:String(e?.id??genId()),
+    productId:e?.productId?String(e.productId):null,
+    mealType:e?.mealType||'snack',
+    emoji:e?.emoji||'🍽',
+    name:e?.name||'',
+    grams:Math.max(0,parseFloat(e?.grams)||0),
+    qty:Math.max(0,parseFloat(e?.qty)||1),
+    kcal:Math.max(0,parseFloat(e?.kcal)||0),
+    protein:Math.max(0,parseFloat(e?.protein)||0),
+    fat:Math.max(0,parseFloat(e?.fat)||0),
+    carbs:Math.max(0,parseFloat(e?.carbs)||0),
+    ts:e?.ts||createdAt,
+    createdAt,
+    updatedAt:e?.updatedAt||createdAt,
+    deletedAt:e?.deletedAt||null,
+    deviceId:e?.deviceId||S.deviceId||null,
+  };
+}
+
+function normalizeNutritionMealType(m){
+  const createdAt=m?.createdAt||m?.updatedAt||nowISO();
+  return {
+    id:String(m?.id??genId()),
+    emoji:m?.emoji||'🍽',
+    name:m?.name||'Приём пищи',
+    createdAt,
+    updatedAt:m?.updatedAt||createdAt,
+    deletedAt:m?.deletedAt||null,
+    deviceId:m?.deviceId||S.deviceId||null,
+  };
+}
+
+function normalizeEspressoLog(e){
+  const createdAt=e?.createdAt||e?.updatedAt||e?.ts||nowISO();
+  return {
+    id:String(e?.id??genId()),
+    ts:e?.ts||createdAt,
+    createdAt,
+    updatedAt:e?.updatedAt||createdAt,
+    deletedAt:e?.deletedAt||null,
+    deviceId:e?.deviceId||S.deviceId||null,
+  };
+}
+
+function normalizeNutritionSettings(settings){
+  const s=settings&&typeof settings==='object'?settings:{};
+  return {
+    showEspressoMeter:s.showEspressoMeter===true,
+  };
+}
+
+function normalizeNutritionGoals(goals){
+  const g=goals&&typeof goals==='object'?goals:{};
+  return {
+    kcal:Math.max(0,parseFloat(g.kcal)||DEFAULT_NUTRITION_GOALS.kcal),
+    protein:Math.max(0,parseFloat(g.protein)||DEFAULT_NUTRITION_GOALS.protein),
+    fat:Math.max(0,parseFloat(g.fat)||DEFAULT_NUTRITION_GOALS.fat),
+    carbs:Math.max(0,parseFloat(g.carbs)||DEFAULT_NUTRITION_GOALS.carbs),
+  };
+}
+
+function allNutritionMealTypes(){
+  return S.nutrition?.mealTypes||DEFAULT_NUTRITION_MEAL_TYPES;
+}
+
+function visibleNutritionMealTypes(){
+  return allNutritionMealTypes().filter(m=>!isDeleted(m));
+}
+
+function nutritionGoals(){
+  return normalizeNutritionGoals(S.nutrition?.goals);
+}
+
+function nutritionSettings(){
+  return normalizeNutritionSettings(S.nutrition?.settings);
+}
+
+function visibleNutritionProducts(){return (S.nutrition?.products||[]).filter(p=>!isDeleted(p));}
+function visibleNutritionEntries(){return (S.nutrition?.entries||[]).filter(e=>!isDeleted(e));}
+function visibleEspressoLogs(){return (S.nutrition?.espressoLogs||[]).filter(e=>!isDeleted(e));}
+function displayNutritionEntries(){return S.debugMode?getDebugNutritionEntries():visibleNutritionEntries();}
+
 function isDeleted(item){return !!item?.deletedAt;}
 function activeActivities(){return S.activities.filter(a=>!a.archived&&!isDeleted(a));}
 function visibleLogs(){return S.logs.filter(l=>!isDeleted(l));}
+function displayLogs(){return S.debugMode?getDebugLogs():visibleLogs();}
 function visibleLogById(logId){return S.logs.find(l=>String(l.id)===String(logId)&&!isDeleted(l));}
+
+function getDebugLogs(){
+  const activities=activeActivities();
+  if(!activities.length)return [];
+  const logs=[];
+  const today=startOfLocalDay(new Date());
+  const start=new Date(today);
+  start.setDate(today.getDate()-59);
+  activities.forEach((activity,activityIndex)=>{
+    for(let i=0;i<60;i++){
+      const day=new Date(start);
+      day.setDate(start.getDate()+i);
+      const weekend=[0,6].includes(day.getDay());
+      const seed=debugHash(`${activity.id}-${i}-${activityIndex}`);
+      const baseChance=activityIndex<4?.72:.42;
+      const chance=weekend?baseChance*.78:baseChance;
+      if(debugRand(seed)>chance)continue;
+      const focus=(activityIndex%5)+1;
+      const wave=.55+.45*Math.sin((i+focus)*Math.PI/7);
+      const rawHours=(.25+debugRand(seed+17)*3.2+wave*1.4)*(activityIndex===0?2.2:1);
+      const cappedHours=Math.min(9.5,rawHours*(weekend&&activityIndex===0?.45:1));
+      const chunks=1+Math.floor(debugRand(seed+31)*3);
+      let remaining=Math.max(900,Math.round(cappedHours*3600));
+      for(let part=0;part<chunks;part++){
+        const isLast=part===chunks-1;
+        const duration=isLast?remaining:Math.max(600,Math.round(remaining*(.25+debugRand(seed+part*13)*.35)));
+        remaining-=duration;
+        const minute=Math.floor(debugRand(seed+part*101)*720)+480;
+        const ts=new Date(day);
+        ts.setMinutes(minute+part*70,0,0);
+        logs.push({
+          id:`debug-${activity.id}-${i}-${part}`,
+          activityId:String(activity.id),
+          emoji:activity.emoji,
+          name:activity.name,
+          ts:ts.toISOString(),
+          skipped:false,
+          durationSec:duration,
+          createdAt:ts.toISOString(),
+          updatedAt:ts.toISOString(),
+          answeredAt:ts.toISOString(),
+          deletedAt:null,
+          deviceId:'debug',
+          debug:true,
+        });
+      }
+    }
+  });
+  return logs.sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+}
+
+function debugHash(input){
+  let h=2166136261;
+  for(let i=0;i<String(input).length;i++){
+    h^=String(input).charCodeAt(i);
+    h=Math.imul(h,16777619);
+  }
+  return h>>>0;
+}
+
+function debugRand(seed){
+  const x=Math.sin(seed*12.9898+78.233)*43758.5453;
+  return x-Math.floor(x);
+}
+
 function touchItem(item){item.updatedAt=nowISO();return item;}
 
 function lastAnsweredTime(){
@@ -818,7 +1207,9 @@ function goScreen(id){
   if(id==='sa')renderA();
   if(id==='sh2')renderH();
   if(id==='sset')renderSett();
+  if(id==='snut')renderNutrition();
   if(id==='sp'){renderPG();updatePQ();}
+  updateTimerNavVisibility();
 }
 
 // ══════════════════════════════════════════════════════
@@ -848,7 +1239,7 @@ function renderPG(){
 function activityDetailStats(activityId){
   const now=new Date();
   const range=['week','month','all'].includes(S.detailedActivityRange)?S.detailedActivityRange:'week';
-  const activityLogs=visibleLogs().filter(l=>!l.skipped&&String(l.activityId)===String(activityId));
+  const activityLogs=displayLogs().filter(l=>!l.skipped&&String(l.activityId)===String(activityId));
   const todayStart=startOfLocalDay(now);
   let start;
 
@@ -1163,6 +1554,9 @@ function renderSett(){
   document.getElementById('ival').value=S.intervalMinutes||15;
   document.getElementById('g-folder').value=S.gFolder||'TimeTracker';
   document.getElementById('badge-color').value=S.badgeColor||'#e8ff47';
+  const showTimer=document.getElementById('show-timer-tab');
+  if(showTimer)showTimer.checked=!!S.showTimerTab;
+  updateTimerNavVisibility();
   updateGUI();
 }
 
@@ -1227,7 +1621,10 @@ function saveSettings(){
   S.intervalMinutes=parseInt(document.getElementById('ival').value)||15;
   S.gFolder=document.getElementById('g-folder').value||'TimeTracker';
   S.badgeColor=document.getElementById('badge-color').value||'#e8ff47';
+  const showTimer=document.getElementById('show-timer-tab');
+  if(showTimer)S.showTimerTab=!!showTimer.checked;
   applyTheme();
+  updateTimerNavVisibility();
   save();
   renderPG();
   schedulePing();
@@ -1300,7 +1697,7 @@ function applyCustom(){S.customFrom=document.getElementById('dfrom').value;S.cus
 
 function filtLogs(){
   const now=new Date();
-  return visibleLogs().filter(l=>{
+  return displayLogs().filter(l=>{
     if(l.skipped)return false;
     const d=new Date(l.ts);
     if(period==='today')return d.toDateString()===now.toDateString();
@@ -1316,7 +1713,12 @@ function filtLogs(){
 }
 
 function renderA(){
-  const body=document.getElementById('abody'),logs=filtLogs();
+  const body=document.getElementById('abody');
+  if(aView==='graph'){
+    drawCompareGraph(body);
+    return;
+  }
+  const logs=filtLogs();
   if(!logs.length){body.innerHTML=`<div class="empty"><div class="big">ПУСТО</div><p>Нет данных за период</p></div>`;return;}
   if(aView==='bars')drawBars(body,logs);
   else if(aView==='pie')drawPie(body,logs);
@@ -1757,6 +2159,537 @@ function closeModal(id,evt){
   if(!evt||evt.target===el)el.classList.remove('open');
 }
 
+
+// ══════════════════════════════════════════════════════
+// NUTRITION
+// ══════════════════════════════════════════════════════
+const MEAL_TYPES=DEFAULT_NUTRITION_MEAL_TYPES;
+let nutritionMealType='snack';
+let nutritionSelectedProductId=null;
+let nutritionModalTab='existing';
+let editingNutritionEntryId=null;
+
+function updateTimerNavVisibility(){
+  const btn=document.getElementById('nb-stimer');
+  if(!btn)return;
+  btn.style.display=S.showTimerTab?'flex':'none';
+  if(!S.showTimerTab&&document.getElementById('stimer')?.classList.contains('active')){
+    goScreen('sp');
+  }
+}
+
+function setNutritionView(view){
+  S.nutritionView=view;
+  save();
+  renderNutrition();
+}
+
+function updateNutritionButtons(){
+  ['main','stats','history','settings'].forEach(v=>{
+    const b=document.getElementById('nut-view-'+v+'-btn');
+    if(b)b.classList.toggle('active',(S.nutritionView||'main')===v);
+  });
+  updateEspressoMeterUI();
+}
+
+function nutritionEntriesForDay(date){
+  const start=startOfLocalDay(date);
+  const end=new Date(start);end.setDate(start.getDate()+1);
+  return displayNutritionEntries().filter(e=>{
+    const d=new Date(e.ts);
+    return d>=start&&d<end;
+  });
+}
+
+function sumNutrition(entries){
+  return entries.reduce((s,e)=>{
+    s.kcal+=(+e.kcal)||0;s.protein+=(+e.protein)||0;s.fat+=(+e.fat)||0;s.carbs+=(+e.carbs)||0;
+    return s;
+  },{kcal:0,protein:0,fat:0,carbs:0});
+}
+
+function fmtMacro(v){return Number(v||0).toFixed(v>=10?0:1).replace(/\.0$/,'');}
+function fmtKcal(v){return Math.round(v||0);}
+function todayNutrition(){return sumNutrition(nutritionEntriesForDay(new Date()));}
+
+function renderNutrition(){
+  updateNutritionButtons();
+  const body=document.getElementById('nut-body');
+  if(!body)return;
+  if(S.nutritionView==='history'){renderNutritionHistory(body);return;}
+  if(S.nutritionView==='stats'){renderNutritionStats(body);return;}
+  if(S.nutritionView==='settings'){renderNutritionSettings(body);return;}
+  renderNutritionMain(body);
+}
+
+function renderNutritionMain(body){
+  const total=todayNutrition();
+  const goals=nutritionGoals();
+  body.innerHTML=`<div class="nut-summary">
+    <div class="nut-kcal-row">
+      <div class="nut-kcal">${fmtKcal(total.kcal)}<span class="nut-kcal-goal">/${fmtKcal(goals.kcal)}</span></div>
+      <div class="nut-kcal-label">ККАЛ СЕГОДНЯ</div>
+    </div>
+    <div class="nut-macros">
+      ${macroGoalHtml('БЕЛКИ',total.protein,goals.protein)}
+      ${macroGoalHtml('ЖИРЫ',total.fat,goals.fat)}
+      ${macroGoalHtml('УГЛЕВОДЫ',total.carbs,goals.carbs)}
+    </div>
+  </div>
+  <div class="meal-grid">
+    ${visibleNutritionMealTypes().map(m=>mealCardHtml(m)).join('')}
+  </div>`;
+}
+
+function macroGoalHtml(label,current,goal){
+  return `<div class="nut-macro">
+    <div class="nut-macro-v">${fmtMacro(current)}г<span class="nut-macro-goal">/${fmtMacro(goal)}г</span></div>
+    <div class="nut-macro-l">${label}</div>
+  </div>`;
+}
+
+function mealCardHtml(meal){
+  const entries=nutritionEntriesForDay(new Date()).filter(e=>e.mealType===meal.id);
+  const total=sumNutrition(entries);
+  return `<button class="meal-card" onclick="openMealModal('${escapeAttr(meal.id)}')">
+    <div class="meal-emoji">${escapeAttr(meal.emoji)}</div>
+    <div>
+      <div class="meal-name">${escapeAttr(meal.name)}</div>
+      <div class="meal-sub">${entries.length?entries.length+' поз.':'нет записей'}<br>Б ${fmtMacro(total.protein)} · Ж ${fmtMacro(total.fat)} · У ${fmtMacro(total.carbs)}</div>
+    </div>
+    <div class="meal-kcal">${fmtKcal(total.kcal)}</div>
+  </button>`;
+}
+
+function openMealModal(mealType,entryId=null){
+  nutritionMealType=mealType||visibleNutritionMealTypes()[0]?.id||'snack';
+  editingNutritionEntryId=entryId;
+  nutritionSelectedProductId=null;
+  nutritionModalTab='existing';
+  const entry=entryId?visibleNutritionEntries().find(e=>String(e.id)===String(entryId)):null;
+  if(entry){
+    nutritionMealType=entry.mealType;
+    nutritionSelectedProductId=entry.productId;
+  }
+  document.getElementById('nutrition-modal-title').textContent=entry?'ИЗМЕНИТЬ ПРИЁМ ПИЩИ':'ДОБАВИТЬ · '+mealName(nutritionMealType);
+  setNutritionModalTab('existing');
+  renderNutritionProductList();
+  document.getElementById('nutrition-grams').value=entry?Math.round(entry.grams||100):100;
+  document.getElementById('nutrition-qty').value=entry?entry.qty||1:1;
+  renderNutritionProductList();
+  document.getElementById('nutrition-modal').classList.add('open');
+}
+
+function setNutritionModalTab(tab){
+  nutritionModalTab=tab;
+  document.getElementById('nut-tab-existing')?.classList.toggle('active',tab==='existing');
+  document.getElementById('nut-tab-new')?.classList.toggle('active',tab==='new');
+  document.getElementById('nutrition-existing-panel').style.display=tab==='existing'?'block':'none';
+  document.getElementById('nutrition-new-panel').style.display=tab==='new'?'block':'none';
+}
+
+function currentExistingNutritionScale(product){
+  const gramsEl=document.getElementById('nutrition-grams');
+  const qtyEl=document.getElementById('nutrition-qty');
+  const grams=Math.max(0,parseFloat(gramsEl?.value)||product.baseGrams||100);
+  const qty=Math.max(0,parseFloat(qtyEl?.value)||1);
+  const totalGrams=grams*qty;
+  const ratio=totalGrams/(product.baseGrams||100);
+  const changed=Math.abs(totalGrams-(product.baseGrams||100))>.01||Math.abs(qty-1)>.001;
+  return {grams,qty,totalGrams,ratio,changed};
+}
+
+function sortNutritionProductsByPopularity(a,b){
+  const pa=nutritionProductPopularity(a.id);
+  const pb=nutritionProductPopularity(b.id);
+  if(pb.count!==pa.count)return pb.count-pa.count;
+  if(pb.last!==pa.last)return pb.last-pa.last;
+  return String(a.name||'').localeCompare(String(b.name||''),'ru');
+}
+
+function nutritionProductPopularity(productId){
+  let count=0,last=0;
+  visibleNutritionEntries().forEach(e=>{
+    if(String(e.productId)!==String(productId))return;
+    count++;
+    last=Math.max(last,new Date(e.ts).getTime()||0);
+  });
+  return {count,last};
+}
+
+function renderNutritionProductList(){
+  const list=document.getElementById('nutrition-product-list');
+  if(!list)return;
+  const products=visibleNutritionProducts().sort(sortNutritionProductsByPopularity);
+  if(!products.length){
+    list.innerHTML='<div class="empty" style="padding:18px 8px"><p>Пока нет продуктов. Добавь новый продукт.</p></div>';
+    setNutritionModalTab('new');
+    return;
+  }
+  if(!nutritionSelectedProductId)nutritionSelectedProductId=products[0].id;
+  list.innerHTML=products.map(p=>{
+    const selected=String(p.id)===String(nutritionSelectedProductId);
+    const scale=selected?currentExistingNutritionScale(p):{ratio:1,changed:false,totalGrams:p.baseGrams};
+    const kcal=p.kcal*scale.ratio,protein=p.protein*scale.ratio,fat=p.fat*scale.ratio,carbs=p.carbs*scale.ratio;
+    return `<div class="product-item ${selected?'sel':''}" onclick="selectNutritionProduct('${escapeAttr(p.id)}')">
+      <div class="product-emoji">${escapeAttr(p.emoji)}</div>
+      <div class="product-info">
+        <div class="product-name">${escapeAttr(p.name)}</div>
+        <div class="product-meta ${selected&&scale.changed?'changed-meta':''}">
+          ${fmtKcal(kcal)} ккал · Б ${fmtMacro(protein)} Ж ${fmtMacro(fat)} У ${fmtMacro(carbs)} · ${fmtMacro(scale.totalGrams)}г
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectNutritionProduct(productId){
+  nutritionSelectedProductId=productId;
+  renderNutritionProductList();
+}
+
+function closeNutritionModal(evt){
+  const el=document.getElementById('nutrition-modal');
+  if(!evt||evt.target===el)el.classList.remove('open');
+}
+
+function saveNutritionEntry(){
+  const ts=nowISO();
+  let product,grams,qty;
+  if(nutritionModalTab==='new'){
+    const name=document.getElementById('product-name').value.trim();
+    if(!name){toast('Укажи название продукта');return;}
+    product=normalizeNutritionProduct({
+      id:genId(),
+      emoji:document.getElementById('product-emoji').value.trim()||'🍽',
+      name,
+      baseGrams:parseFloat(document.getElementById('product-base-grams').value)||100,
+      kcal:parseFloat(document.getElementById('product-kcal').value)||0,
+      protein:parseFloat(document.getElementById('product-protein').value)||0,
+      fat:parseFloat(document.getElementById('product-fat').value)||0,
+      carbs:parseFloat(document.getElementById('product-carbs').value)||0,
+      createdAt:ts,updatedAt:ts,deviceId:S.deviceId
+    });
+    S.nutrition.products.push(product);
+    grams=parseFloat(document.getElementById('product-entry-grams').value)||product.baseGrams;
+    qty=1;
+  }else{
+    product=visibleNutritionProducts().find(p=>String(p.id)===String(nutritionSelectedProductId));
+    if(!product){toast('Выбери продукт');return;}
+    grams=parseFloat(document.getElementById('nutrition-grams').value)||product.baseGrams;
+    qty=parseFloat(document.getElementById('nutrition-qty').value)||1;
+    grams*=qty;
+  }
+
+  const ratio=grams/product.baseGrams;
+  const oldEntry=editingNutritionEntryId?visibleNutritionEntries().find(e=>String(e.id)===String(editingNutritionEntryId)):null;
+  const payload=normalizeNutritionEntry({
+    id:editingNutritionEntryId||genId(),
+    productId:product.id,
+    mealType:nutritionMealType,
+    emoji:product.emoji,
+    name:product.name,
+    grams,
+    qty,
+    kcal:product.kcal*ratio,
+    protein:product.protein*ratio,
+    fat:product.fat*ratio,
+    carbs:product.carbs*ratio,
+    ts:oldEntry?.ts||ts,
+    createdAt:oldEntry?.createdAt||ts,
+    updatedAt:ts,
+    deviceId:S.deviceId,
+  });
+
+  if(editingNutritionEntryId){
+    const idx=S.nutrition.entries.findIndex(e=>String(e.id)===String(editingNutritionEntryId));
+    if(idx>=0)S.nutrition.entries[idx]={...S.nutrition.entries[idx],...payload};
+  }else{
+    S.nutrition.entries.push(payload);
+  }
+  save();
+  closeModal('nutrition-modal');
+  renderNutrition();
+  toast('✓ Сохранено');
+}
+
+function renderNutritionSettings(body){
+  const goals=nutritionGoals();
+  const settings=nutritionSettings();
+  body.innerHTML=`<div class="nut-settings-card">
+    <div class="ctitle">ЦЕЛИ КБЖУ НА ДЕНЬ</div>
+    <div class="nut-goals-grid">
+      <label>ККАЛ<input type="number" min="0" placeholder="ккал" value="${fmtKcal(goals.kcal)}" oninput="setNutritionGoal('kcal',this.value)"></label>
+      <label>БЕЛКИ, Г<input type="number" min="0" step="0.1" placeholder="белки" value="${fmtMacro(goals.protein)}" oninput="setNutritionGoal('protein',this.value)"></label>
+      <label>ЖИРЫ, Г<input type="number" min="0" step="0.1" placeholder="жиры" value="${fmtMacro(goals.fat)}" oninput="setNutritionGoal('fat',this.value)"></label>
+      <label>УГЛЕВОДЫ, Г<input type="number" min="0" step="0.1" placeholder="углеводы" value="${fmtMacro(goals.carbs)}" oninput="setNutritionGoal('carbs',this.value)"></label>
+    </div>
+  </div>
+  <div class="nut-settings-card">
+    <div class="ctitle">ВНЕШНИЙ ВИД</div>
+    <label class="nut-switch-row"><span>Эспрессометр</span><input type="checkbox" ${settings.showEspressoMeter?'checked':''} onchange="setNutritionSetting('showEspressoMeter',this.checked)"></label>
+  </div>
+  <div class="nut-settings-card">
+    <div class="ctitle">ПРИЁМЫ ПИЩИ</div>
+    <div id="nutrition-meal-settings">${visibleNutritionMealTypes().map(nutritionMealSettingsRow).join('')}</div>
+    <button class="dbtn" onclick="addNutritionMealType()">+ ДОБАВИТЬ ПРИЁМ</button>
+  </div>
+  <div class="nut-settings-card">
+    <div class="ctitle">БЛЮДА / ПРОДУКТЫ</div>
+    <div id="nutrition-product-settings">${visibleNutritionProducts().map(nutritionProductSettingsRow).join('')}</div>
+    <button class="dbtn" onclick="addNutritionProductSetting()">+ ДОБАВИТЬ БЛЮДО</button>
+  </div>`;
+}
+
+function nutritionMealSettingsRow(m){
+  return `<div class="nut-settings-row nut-meal-row">
+    <input value="${escapeAttr(m.emoji)}" oninput="updateNutritionMealType('${escapeAttr(m.id)}','emoji',this.value)">
+    <input value="${escapeAttr(m.name)}" oninput="updateNutritionMealType('${escapeAttr(m.id)}','name',this.value)">
+    <button class="xbtn" onclick="deleteNutritionMealType('${escapeAttr(m.id)}')">×</button>
+  </div>`;
+}
+
+function nutritionProductSettingsRow(p){
+  return `<div class="nut-settings-row nut-product-row">
+    <input value="${escapeAttr(p.emoji)}" placeholder="эмодзи" oninput="updateNutritionProduct('${escapeAttr(p.id)}','emoji',this.value)">
+    <input value="${escapeAttr(p.name)}" placeholder="название" oninput="updateNutritionProduct('${escapeAttr(p.id)}','name',this.value)">
+    <input type="number" value="${nutritionInputValue(p.baseGrams)}" placeholder="вес, г" oninput="updateNutritionProduct('${escapeAttr(p.id)}','baseGrams',this.value)">
+    <input type="number" value="${nutritionInputValue(p.kcal)}" placeholder="ккал" oninput="updateNutritionProduct('${escapeAttr(p.id)}','kcal',this.value)">
+    <input type="number" value="${nutritionInputValue(p.protein)}" placeholder="белки" oninput="updateNutritionProduct('${escapeAttr(p.id)}','protein',this.value)">
+    <input type="number" value="${nutritionInputValue(p.fat)}" placeholder="жиры" oninput="updateNutritionProduct('${escapeAttr(p.id)}','fat',this.value)">
+    <input type="number" value="${nutritionInputValue(p.carbs)}" placeholder="углеводы" oninput="updateNutritionProduct('${escapeAttr(p.id)}','carbs',this.value)">
+    <button class="xbtn" onclick="deleteNutritionProduct('${escapeAttr(p.id)}')">×</button>
+  </div>`;
+}
+
+function nutritionInputValue(v){
+  const n=parseFloat(v);
+  return n>0?fmtMacro(n):'';
+}
+
+function setNutritionGoal(field,value){
+  if(!S.nutrition.goals)S.nutrition.goals={...DEFAULT_NUTRITION_GOALS};
+  S.nutrition.goals[field]=Math.max(0,parseFloat(value)||0);
+  save();
+}
+
+function setNutritionSetting(field,value){
+  if(!S.nutrition.settings)S.nutrition.settings=normalizeNutritionSettings();
+  S.nutrition.settings[field]=value;
+  save();
+  updateEspressoMeterUI();
+}
+
+function addNutritionProductSetting(){
+  const now=nowISO();
+  if(!S.nutrition.products)S.nutrition.products=[];
+  S.nutrition.products.push(normalizeNutritionProduct({id:genId(),emoji:'🍽',name:'',baseGrams:100,kcal:0,protein:0,fat:0,carbs:0,createdAt:now,updatedAt:now,deviceId:S.deviceId}));
+  save();
+  renderNutrition();
+}
+
+function updateNutritionProduct(id,field,value){
+  const p=S.nutrition.products.find(x=>String(x.id)===String(id));
+  if(!p)return;
+  if(['baseGrams','kcal','protein','fat','carbs'].includes(field))p[field]=Math.max(0,parseFloat(value)||0);
+  else p[field]=value;
+  touchItem(p);
+  save();
+}
+
+function deleteNutritionProduct(id){
+  if(!confirm('Удалить блюдо из списка? История останется.'))return;
+  const p=S.nutrition.products.find(x=>String(x.id)===String(id));
+  if(!p)return;
+  p.deletedAt=nowISO();
+  touchItem(p);
+  save();
+  renderNutrition();
+}
+
+function addNutritionMealType(){
+  const now=nowISO();
+  if(!S.nutrition.mealTypes)S.nutrition.mealTypes=[];
+  S.nutrition.mealTypes.push(normalizeNutritionMealType({id:genId(),emoji:'🍽',name:'Новый приём',createdAt:now,updatedAt:now,deviceId:S.deviceId}));
+  save();
+  renderNutrition();
+}
+
+function updateNutritionMealType(id,field,value){
+  const m=S.nutrition.mealTypes.find(x=>String(x.id)===String(id));
+  if(!m)return;
+  m[field]=value;
+  touchItem(m);
+  save();
+}
+
+function deleteNutritionMealType(id){
+  const active=visibleNutritionMealTypes();
+  if(active.length<=1){toast('Нужен хотя бы один приём');return;}
+  if(!confirm('Удалить приём пищи? Записи останутся в истории.'))return;
+  const m=S.nutrition.mealTypes.find(x=>String(x.id)===String(id));
+  if(!m)return;
+  m.deletedAt=nowISO();
+  touchItem(m);
+  save();
+  renderNutrition();
+}
+
+function renderNutritionHistory(body){
+  if(S.nutritionHistoryDate){
+    renderNutritionDayHistory(body,S.nutritionHistoryDate);
+    return;
+  }
+  const map={};
+  displayNutritionEntries().forEach(e=>{
+    const k=localDateKey(new Date(e.ts));
+    if(!map[k])map[k]=[];
+    map[k].push(e);
+  });
+  const days=Object.keys(map).sort((a,b)=>b.localeCompare(a));
+  if(!days.length){body.innerHTML=`<div class="empty"><div class="big">ПУСТО</div><p>Нет приёмов пищи</p></div>`;return;}
+  body.innerHTML=days.map(k=>{
+    const total=sumNutrition(map[k]);
+    const espresso=espressoCountForDay(new Date(k+'T00:00:00'));
+    return `<div class="nut-day-row" onclick="openNutritionHistoryDay('${k}')">
+      <div><div class="nut-day-date">${formatLocalDateKey(k)}</div><div class="nut-day-meta">${map[k].length} поз. · Б ${fmtMacro(total.protein)} Ж ${fmtMacro(total.fat)} У ${fmtMacro(total.carbs)}</div>${espresso?`<div class="nut-day-espresso">☕ x${espresso}</div>`:''}</div>
+      <div class="nut-day-kcal">${fmtKcal(total.kcal)}</div>
+    </div>`;
+  }).join('');
+}
+
+function openNutritionHistoryDay(key){
+  S.nutritionHistoryDate=key;
+  save();
+  renderNutrition();
+}
+
+function renderNutritionDayHistory(body,key){
+  const entries=displayNutritionEntries().filter(e=>localDateKey(new Date(e.ts))===key).sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+  body.innerHTML=`<button class="nut-back-btn" onclick="S.nutritionHistoryDate=null;save();renderNutrition()">← К ДНЯМ</button>
+    <div class="ctitle">${formatLocalDateKey(key)}</div>
+    ${entries.map(e=>`<div class="nut-entry">
+      <div class="nut-entry-main">
+        <div class="product-emoji">${escapeAttr(e.emoji)}</div>
+        <div class="nut-entry-info">
+          <div class="nut-entry-title">${escapeAttr(e.name)}</div>
+          <div class="nut-entry-meta">${mealName(e.mealType)} · ${fmtMacro(e.grams)}г · Б ${fmtMacro(e.protein)} Ж ${fmtMacro(e.fat)} У ${fmtMacro(e.carbs)}</div>
+        </div>
+        <div class="nut-entry-kcal">${fmtKcal(e.kcal)}</div>
+      </div>
+      <div class="hbtns">
+        <button class="hbtn" onclick="openMealModal('${e.mealType}','${e.id}')">✏️ ИЗМЕНИТЬ</button>
+        <button class="hbtn" onclick="deleteNutritionEntry('${e.id}')">🗑 УДАЛИТЬ</button>
+      </div>
+    </div>`).join('')}`;
+}
+
+function deleteNutritionEntry(id){
+  if(!confirm('Удалить запись о еде?'))return;
+  const e=S.nutrition.entries.find(x=>String(x.id)===String(id));
+  if(!e)return;
+  e.deletedAt=nowISO();
+  touchItem(e);
+  save();
+  renderNutrition();
+  toast('Удалено');
+}
+
+function espressoCountForDay(date){
+  const start=startOfLocalDay(date);
+  const end=new Date(start);
+  end.setDate(start.getDate()+1);
+  return visibleEspressoLogs().filter(e=>{
+    const d=new Date(e.ts);
+    return d>=start&&d<end;
+  }).length;
+}
+
+function todayEspressoCount(){
+  return espressoCountForDay(new Date());
+}
+
+function updateEspressoMeterUI(){
+  const btn=document.getElementById('nut-espresso-btn');
+  const cnt=document.getElementById('nut-espresso-count');
+  if(!btn)return;
+  const show=nutritionSettings().showEspressoMeter===true;
+  btn.style.display=show?'inline-flex':'none';
+  if(cnt)cnt.textContent='x'+todayEspressoCount();
+}
+
+function incrementEspresso(){
+  const ts=nowISO();
+  if(!S.nutrition.espressoLogs)S.nutrition.espressoLogs=[];
+  S.nutrition.espressoLogs.push(normalizeEspressoLog({id:genId(),ts,createdAt:ts,updatedAt:ts,deviceId:S.deviceId}));
+  save();
+  updateEspressoMeterUI();
+  if(S.nutritionView==='stats'||S.nutritionView==='history')renderNutrition();
+  toast('☕ Эспрессо x'+todayEspressoCount());
+}
+
+function renderNutritionStats(body){
+  const days=[];
+  const today=startOfLocalDay(new Date());
+  for(let i=0;i<56;i++){
+    const d=new Date(today);
+    d.setDate(today.getDate()-i);
+    days.push(d);
+  }
+  const goals=nutritionGoals();
+  body.innerHTML=`<div class="card"><div class="ctitle">ТЕПЛОВАЯ КАРТА КАЛОРИЙ · БЛИЖАЙШАЯ ДАТА СЛЕВА СВЕРХУ</div>
+    <div class="nut-heat-grid">
+      ${days.map(d=>{
+        const total=sumNutrition(nutritionEntriesForDay(d));
+        const espresso=espressoCountForDay(d);
+        const ratio=goals.kcal?Math.min(1,total.kcal/goals.kcal):0;
+        const alpha=total.kcal?Math.max(.18,ratio):0;
+        const bg=total.kcal?`rgba(232,255,71,${alpha})`:'var(--sur2)';
+        return `<div class="nut-heat-cell" style="background:${bg}">
+          <div class="nut-heat-date">${pad(d.getDate())}.${pad(d.getMonth()+1)}</div>
+          <div class="nut-heat-kcal">${fmtKcal(total.kcal)}</div>
+          <div class="nut-heat-macro">Б ${fmtMacro(total.protein)}<br>Ж ${fmtMacro(total.fat)} У ${fmtMacro(total.carbs)}</div>
+          ${espresso?`<div class="nut-heat-espresso">☕ x${espresso}</div>`:''}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function mealName(type){return allNutritionMealTypes().find(m=>String(m.id)===String(type))?.name||'Приём';}
+function localDateKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function formatLocalDateKey(k){const [y,m,d]=k.split('-');return `${d}.${m}.${y}`;}
+
+function getDebugNutritionEntries(){
+  const products=visibleNutritionProducts();
+  const fallback=[
+    {id:'dbg-p1',emoji:'🍚',name:'Рис',baseGrams:100,kcal:130,protein:2.7,fat:.3,carbs:28},
+    {id:'dbg-p2',emoji:'🍗',name:'Курица',baseGrams:100,kcal:165,protein:31,fat:3.6,carbs:0},
+    {id:'dbg-p3',emoji:'🍌',name:'Банан',baseGrams:100,kcal:89,protein:1.1,fat:.3,carbs:23},
+  ].map(normalizeNutritionProduct);
+  const source=products.length?products:fallback;
+  const entries=[];
+  const today=startOfLocalDay(new Date());
+  for(let i=0;i<60;i++){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    const daySeed=(i*37)%100;
+    const count=daySeed%5===0?2:3+(daySeed%3);
+    for(let j=0;j<count;j++){
+      const p=source[(i+j)%source.length];
+      const grams=80+((i*13+j*29)%220);
+      const ratio=grams/p.baseGrams;
+      const ts=new Date(d);ts.setHours(8+j*4+(i%2),15,0,0);
+      entries.push(normalizeNutritionEntry({
+        id:'debug-nut-'+i+'-'+j,
+        productId:p.id,mealType:MEAL_TYPES[j%MEAL_TYPES.length].id,emoji:p.emoji,name:p.name,grams,qty:1,
+        kcal:p.kcal*ratio,protein:p.protein*ratio,fat:p.fat*ratio,carbs:p.carbs*ratio,ts:ts.toISOString(),createdAt:ts.toISOString(),updatedAt:ts.toISOString()
+      }));
+    }
+  }
+  return entries;
+}
+
+
 // ══════════════════════════════════════════════════════
 // GOOGLE DRIVE
 // ══════════════════════════════════════════════════════
@@ -1959,6 +2892,14 @@ function buildExportObject(){
     mainFileId:S.gMainFileId||null,
     activities:S.activities.map(a=>normalizeActivity(a)),
     logs:S.logs.map(l=>normalizeLog(l)),
+    nutrition:{
+      products:(S.nutrition?.products||[]).map(normalizeNutritionProduct),
+      entries:(S.nutrition?.entries||[]).map(normalizeNutritionEntry),
+      mealTypes:(S.nutrition?.mealTypes||DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType),
+      goals:normalizeNutritionGoals(S.nutrition?.goals),
+      espressoLogs:(S.nutrition?.espressoLogs||[]).map(normalizeEspressoLog),
+      settings:normalizeNutritionSettings(S.nutrition?.settings),
+    },
   };
 }
 
@@ -1981,6 +2922,14 @@ function normalizeState(raw){
     customTo:S.customTo||null,
     activities:(state.activities||[]).map((a,idx)=>normalizeActivity(a,idx+1)),
     logs:(state.logs||[]).map(normalizeLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+    nutrition:{
+      products:(state.nutrition?.products||[]).map(normalizeNutritionProduct),
+      entries:(state.nutrition?.entries||[]).map(normalizeNutritionEntry).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      mealTypes:(state.nutrition?.mealTypes||DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType),
+      goals:normalizeNutritionGoals(state.nutrition?.goals),
+      espressoLogs:(state.nutrition?.espressoLogs||[]).map(normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      settings:normalizeNutritionSettings(state.nutrition?.settings),
+    },
   };
 }
 
@@ -2002,6 +2951,14 @@ function buildMergedState(remoteState){
     gMainFileId:remote.gMainFileId||S.gMainFileId||null,
     activities:mergeEntities(S.activities,remote.activities),
     logs:mergeEntities(S.logs,remote.logs).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+    nutrition:{
+      products:mergeGenericEntities(S.nutrition?.products||[],remote.nutrition?.products||[],normalizeNutritionProduct),
+      entries:mergeGenericEntities(S.nutrition?.entries||[],remote.nutrition?.entries||[],normalizeNutritionEntry).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      mealTypes:mergeGenericEntities(S.nutrition?.mealTypes||[],remote.nutrition?.mealTypes||[],normalizeNutritionMealType),
+      goals:normalizeNutritionGoals({...remote.nutrition?.goals,...S.nutrition?.goals}),
+      espressoLogs:mergeGenericEntities(S.nutrition?.espressoLogs||[],remote.nutrition?.espressoLogs||[],normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      settings:normalizeNutritionSettings({...remote.nutrition?.settings,...S.nutrition?.settings}),
+    },
   };
 }
 
@@ -2023,6 +2980,24 @@ function mergeEntities(localItems,remoteItems){
   });
   return Array.from(map.values());
 }
+
+function mergeGenericEntities(localItems,remoteItems,normalizer){
+  const map=new Map();
+  [...(localItems||[]),...(remoteItems||[])].forEach(item=>{
+    const normalized=normalizer(item);
+    const key=String(normalized.id);
+    const existing=map.get(key);
+    if(!existing){
+      map.set(key,normalized);
+      return;
+    }
+    const existingTs=new Date(existing.updatedAt||existing.createdAt||existing.ts||0).getTime();
+    const currentTs=new Date(normalized.updatedAt||normalized.createdAt||normalized.ts||0).getTime();
+    if(currentTs>=existingTs)map.set(key,{...existing,...normalized});
+  });
+  return Array.from(map.values());
+}
+
 
 async function gEnsureCloudState(){
   const folderName=S.gFolder||'TimeTracker';
@@ -2205,6 +3180,7 @@ function rerenderAll(){
   renderSett();
   if(document.getElementById('sa').classList.contains('active'))renderA();
   if(document.getElementById('sh2').classList.contains('active'))renderH();
+  if(document.getElementById('snut').classList.contains('active'))renderNutrition();
   updatePQ();
   updateGUI();
 }
@@ -2261,6 +3237,7 @@ function buildExportObject(){
     showDayRemaining:S.showDayRemaining!==false,
     showMainMilliseconds:S.showMainMilliseconds!==false,
     showDetailedActivityCards:S.showDetailedActivityCards===true,
+    showTimerTab:S.showTimerTab===true,
     detailedActivityRange:S.detailedActivityRange||'week',
     lifeDisplayMode:S.lifeDisplayMode||'precise',
     birthAt:S.birthAt||null,
@@ -2269,6 +3246,10 @@ function buildExportObject(){
     heatmapActivityIds:S.heatmapActivityIds||[],
     activities:S.activities.map(a=>normalizeActivity(a)),
     logs:S.logs.map(l=>normalizeLog(l)),
+    nutrition:{
+      products:(S.nutrition?.products||[]).map(normalizeNutritionProduct),
+      entries:(S.nutrition?.entries||[]).map(normalizeNutritionEntry),
+    },
   };
 }
 
@@ -2300,6 +3281,13 @@ function normalizeState(raw){
     heatmapActivityIds:Array.isArray(state.heatmapActivityIds)?state.heatmapActivityIds.map(String):(S.heatmapActivityIds||[]),
     activities:(state.activities||S.activities||[]).map((a,idx)=>normalizeActivity(a,idx+1)),
     logs:(state.logs||S.logs||[]).map(normalizeLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+    showTimerTab:typeof state.showTimerTab==='boolean'?state.showTimerTab:(S.showTimerTab===true),
+    nutritionView:state.nutritionView||S.nutritionView||'main',
+    nutritionHistoryDate:state.nutritionHistoryDate||S.nutritionHistoryDate||null,
+    nutrition:{
+      products:(state.nutrition?.products||S.nutrition?.products||[]).map(normalizeNutritionProduct),
+      entries:(state.nutrition?.entries||S.nutrition?.entries||[]).map(normalizeNutritionEntry).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+    },
   };
 }
 
@@ -2515,6 +3503,8 @@ function renderSett(){
   const showDayRemaining=document.getElementById('show-day-remaining');
   const showMainMs=document.getElementById('show-main-ms');
   const showDetailedCards=document.getElementById('show-detailed-cards');
+  const showTimerTab=document.getElementById('show-timer-tab');
+  const debugMode=document.getElementById('debug-mode');
   const detailedRange=document.getElementById('detailed-activity-range');
   const lifeDisplayMode=document.getElementById('life-display-mode');
   if(ival)ival.value=S.intervalMinutes||15;
@@ -2525,6 +3515,8 @@ function renderSett(){
   if(showDayRemaining)showDayRemaining.checked=S.showDayRemaining!==false;
   if(showMainMs)showMainMs.checked=S.showMainMilliseconds!==false;
   if(showDetailedCards)showDetailedCards.checked=S.showDetailedActivityCards===true;
+  if(showTimerTab)showTimerTab.checked=S.showTimerTab===true;
+  if(debugMode)debugMode.checked=S.debugMode===true;
   if(detailedRange)detailedRange.value=S.detailedActivityRange||'week';
   if(lifeDisplayMode)lifeDisplayMode.value=S.lifeDisplayMode||'precise';
   if(S.birthAt){
@@ -2584,6 +3576,8 @@ function saveSettings(){
   const showDayRemaining=document.getElementById('show-day-remaining');
   const showMainMs=document.getElementById('show-main-ms');
   const showDetailedCards=document.getElementById('show-detailed-cards');
+  const showTimerTab=document.getElementById('show-timer-tab');
+  const debugMode=document.getElementById('debug-mode');
   const detailedRange=document.getElementById('detailed-activity-range');
   const lifeDisplayMode=document.getElementById('life-display-mode');
   if(ival)S.intervalMinutes=parseInt(ival.value)||15;
@@ -2594,6 +3588,8 @@ function saveSettings(){
   if(showDayRemaining)S.showDayRemaining=!!showDayRemaining.checked;
   if(showMainMs)S.showMainMilliseconds=!!showMainMs.checked;
   if(showDetailedCards)S.showDetailedActivityCards=!!showDetailedCards.checked;
+  if(showTimerTab)S.showTimerTab=!!showTimerTab.checked;
+  if(debugMode)S.debugMode=!!debugMode.checked;
   if(detailedRange)S.detailedActivityRange=['week','month','all'].includes(detailedRange.value)?detailedRange.value:'week';
   if(lifeDisplayMode)S.lifeDisplayMode=lifeDisplayMode.value||'precise';
   if(birthDate&&birthDate.value){
@@ -2610,6 +3606,187 @@ function saveSettings(){
   updateGUI();
   toast('✓ СОХРАНЕНО');
 }
+
+
+function ensureCompareDefaults(){
+  const today=startOfLocalDay(new Date());
+  const p2To=new Date(today);
+  const p2From=new Date(today);
+  p2From.setDate(p2From.getDate()-6);
+  const p1To=new Date(p2From);
+  p1To.setDate(p1To.getDate()-1);
+  const p1From=new Date(p1To);
+  p1From.setDate(p1From.getDate()-6);
+  if(!S.graphP1From)S.graphP1From=dateInputValue(p1From);
+  if(!S.graphP1To)S.graphP1To=dateInputValue(p1To);
+  if(!S.graphP2From)S.graphP2From=dateInputValue(p2From);
+  if(!S.graphP2To)S.graphP2To=dateInputValue(p2To);
+  const activeIds=activeActivities().map(a=>String(a.id));
+  if(!Array.isArray(S.graphActivityIds)||!S.graphActivityIds.some(id=>activeIds.includes(String(id)))){
+    S.graphActivityIds=activeIds.slice(0,Math.min(3,activeIds.length));
+  }
+}
+
+function dateInputValue(date){
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+}
+
+function readLocalDate(value,endOfDay=false){
+  const d=new Date(`${value}T${endOfDay?'23:59:59':'00:00:00'}`);
+  return Number.isNaN(d.getTime())?null:d;
+}
+
+function dateSpanDays(from,to){
+  if(!from||!to||to<from)return 0;
+  return Math.round((startOfLocalDay(to)-startOfLocalDay(from))/86400000)+1;
+}
+
+function drawCompareGraph(body){
+  ensureCompareDefaults();
+  const activities=activeActivities();
+  const selectedIds=(S.graphActivityIds||[]).map(String).filter(id=>activities.some(a=>String(a.id)===id));
+  if(!selectedIds.length&&activities.length){
+    selectedIds.push(String(activities[0].id));
+    S.graphActivityIds=[selectedIds[0]];
+  }
+
+  const p1From=readLocalDate(S.graphP1From);
+  const p1To=readLocalDate(S.graphP1To,true);
+  const p2From=readLocalDate(S.graphP2From);
+  const p2To=readLocalDate(S.graphP2To,true);
+  const p1Days=dateSpanDays(p1From,p1To);
+  const p2Days=dateSpanDays(p2From,p2To);
+  const isValid=p1Days>0&&p2Days>0&&p1Days===p2Days;
+  const logs=displayLogs().filter(l=>!l.skipped&&selectedIds.includes(String(l.activityId)));
+
+  let oldSeries=[],newSeries=[],svg='';
+  if(isValid){
+    oldSeries=periodSeries(logs,p1From,p1Days);
+    newSeries=periodSeries(logs,p2From,p2Days);
+    svg=renderCompareSvg(oldSeries,newSeries);
+  }
+
+  const oldTotal=oldSeries.reduce((s,v)=>s+v,0);
+  const newTotal=newSeries.reduce((s,v)=>s+v,0);
+  const delta=newTotal-oldTotal;
+
+  body.innerHTML=`<div class="card compare-panel">
+    <div class="ctitle">ГРАФИК — сравнение двух равных периодов</div>
+
+    <div class="compare-periods">
+      <div class="compare-period-card">
+        <div class="compare-period-title">ПЕРВЫЙ ПЕРИОД · ПУНКТИР</div>
+        <div class="compare-date-row">
+          <input class="date-inp" type="date" id="graph-p1-from" value="${escapeAttr(S.graphP1From||'')}" onchange="applyCompareDates()">
+          <input class="date-inp" type="date" id="graph-p1-to" value="${escapeAttr(S.graphP1To||'')}" onchange="applyCompareDates()">
+        </div>
+      </div>
+      <div class="compare-period-card">
+        <div class="compare-period-title">АКТУАЛЬНЫЙ ПЕРИОД · СПЛОШНАЯ</div>
+        <div class="compare-date-row">
+          <input class="date-inp" type="date" id="graph-p2-from" value="${escapeAttr(S.graphP2From||'')}" onchange="applyCompareDates()">
+          <input class="date-inp" type="date" id="graph-p2-to" value="${escapeAttr(S.graphP2To||'')}" onchange="applyCompareDates()">
+        </div>
+      </div>
+    </div>
+
+    ${S.debugMode?'<div class="debug-note">Режим отладки включён: график использует демонстрационные данные и не меняет твою историю.</div>':''}
+
+    ${isValid?`
+      <div class="compare-summary">
+        <div class="compare-metric">
+          <div class="compare-value">${fmtCardTime(oldTotal)}</div>
+          <div class="compare-label" title="первый период"><span class="compare-legend-segment dashed"></span></div>
+        </div>
+        <div class="compare-metric">
+          <div class="compare-value">${fmtCardTime(newTotal)}</div>
+          <div class="compare-label" title="актуальный период"><span class="compare-legend-segment"></span></div>
+        </div>
+      </div>
+      <div class="compare-delta">${compareDeltaText(delta,oldTotal,newTotal)}</div>
+      <div class="compare-chart">${svg}</div>
+    `:`<div class="empty"><div class="big">!</div><p>Выбери два периода одинаковой продолжительности.</p></div>`}
+
+    <div class="ctitle" style="margin-top:2px">ВИДЫ ДЕЯТЕЛЬНОСТИ</div>
+    <div class="compare-acts">
+      ${activities.map(a=>`<button class="compare-act-btn ${selectedIds.includes(String(a.id))?'active':''}" onclick="toggleCompareActivity('${escapeAttr(a.id)}')">${a.emoji} ${escapeAttr(a.name)}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function periodSeries(logs,start,days){
+  const series=Array(days).fill(0);
+  logs.forEach(l=>{
+    const d=startOfLocalDay(new Date(l.ts));
+    const idx=Math.round((d-startOfLocalDay(start))/86400000);
+    if(idx>=0&&idx<days)series[idx]+=l.durationSec||0;
+  });
+  return series;
+}
+
+function renderCompareSvg(oldSeries,newSeries){
+  const n=Math.max(oldSeries.length,newSeries.length,1);
+  const maxSec=Math.max(...oldSeries,...newSeries,1);
+  const xFor=i=>n===1?50:(i/(n-1))*100;
+  const yFor=sec=>100-(sec/maxSec)*100;
+  const makePath=series=>series.length
+    ? series.map((sec,i)=>`${i?'L':'M'}${xFor(i).toFixed(3)},${yFor(sec).toFixed(3)}`).join(' ')
+    : '';
+  const grid=[0,.25,.5,.75,1].map(r=>{
+    const y=(100-r*100);
+    const label=Math.round(maxSec*r/3600)+'ч';
+    return `<line class="compare-grid" x1="0" y1="${y.toFixed(3)}" x2="100" y2="${y.toFixed(3)}"></line>`;
+  }).join('');
+  const yLabels=[0,.25,.5,.75,1].map(r=>{
+    const y=(100-r*100);
+    const label=Math.round(maxSec*r/3600)+'ч';
+    return `<span class=\"compare-y-label\" style=\"top:calc(20px + (100% - 50px) * ${ (y/100).toFixed(4) })\">${label}</span>`;
+  }).join('');
+  const oldDots=oldSeries.map((sec,i)=>`<span class="compare-dot old" style="left:${xFor(i).toFixed(3)}%;top:${yFor(sec).toFixed(3)}%"></span>`).join('');
+  const newDots=newSeries.map((sec,i)=>`<span class="compare-dot" style="left:${xFor(i).toFixed(3)}%;top:${yFor(sec).toFixed(3)}%"></span>`).join('');
+  return `${yLabels}
+    <div class="compare-plot">
+      <svg class="compare-lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        ${grid}
+        <line class="compare-axis" x1="0" y1="100" x2="100" y2="100"></line>
+        <path class="compare-line-old" d="${makePath(oldSeries)}"></path>
+        <path class="compare-line-new" d="${makePath(newSeries)}"></path>
+      </svg>
+      ${oldDots}${newDots}
+    </div>
+    <span class="compare-x-label first">1</span>
+    <span class="compare-x-label last">${n}</span>`;
+}
+
+function compareDeltaText(delta,oldTotal,newTotal){
+  const abs=Math.abs(delta);
+  if(abs<60)return `<span class="compare-delta-value">0:00</span><span class="compare-delta-arrow same">→</span>`;
+  const more=delta>0;
+  return `<span class="compare-delta-value">${fmtCardTime(abs)}</span><span class="compare-delta-arrow ${more?'up':'down'}">${more?'↑':'↓'}</span>`;
+}
+
+function applyCompareDates(){
+  const p1f=document.getElementById('graph-p1-from');
+  const p1t=document.getElementById('graph-p1-to');
+  const p2f=document.getElementById('graph-p2-from');
+  const p2t=document.getElementById('graph-p2-to');
+  if(p1f)S.graphP1From=p1f.value||null;
+  if(p1t)S.graphP1To=p1t.value||null;
+  if(p2f)S.graphP2From=p2f.value||null;
+  if(p2t)S.graphP2To=p2t.value||null;
+  save();
+  renderA();
+}
+
+function toggleCompareActivity(activityId){
+  const id=String(activityId);
+  const current=new Set((S.graphActivityIds||[]).map(String));
+  if(current.has(id))current.delete(id);else current.add(id);
+  S.graphActivityIds=Array.from(current);
+  save();
+  renderA();
+}
+
 
 function drawHeatmap(body,logs){
   const activities=activeActivities();
@@ -2811,12 +3988,16 @@ async function gListBackups(parentId,limit=10){
 function goScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.getElementById('nb-'+id).classList.add('active');
+  const screen=document.getElementById(id);
+  const nav=document.getElementById('nb-'+id);
+  if(screen)screen.classList.add('active');
+  if(nav)nav.classList.add('active');
   if(id==='sa')renderA();
   if(id==='sh2')renderH();
   if(id==='sset')renderSett();
+  if(id==='snut')renderNutrition();
   if(id==='sp'){renderPG();updatePQ();renderLifeStats();}
+  updateTimerNavVisibility();
 }
 
 function rerenderAll(){
@@ -2827,6 +4008,7 @@ function rerenderAll(){
   renderDayStats();
   if(document.getElementById('sa').classList.contains('active'))renderA();
   if(document.getElementById('sh2').classList.contains('active'))renderH();
+  if(document.getElementById('snut').classList.contains('active'))renderNutrition();
   updatePQ();
   updateGUI();
 }
@@ -2847,6 +4029,7 @@ renderLifeStats();
 renderDayStats();
 restorePingSchedule();
 updateGUI();
+updateTimerNavVisibility();
 tick();
 </script>
 </body>
