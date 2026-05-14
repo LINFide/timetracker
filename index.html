@@ -254,6 +254,50 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .nut-settings-row input{width:100%;background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:8px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:10px;outline:none}
 .nut-settings-row input:focus{border-color:var(--acc)}
 .nut-settings-row input::placeholder,.nut-goals-grid input::placeholder{color:rgba(240,240,240,.32)}
+
+.nut-settings-row.nut-product-row{
+  grid-template-columns:30px minmax(70px,1.15fr) repeat(5,minmax(37px,.58fr)) 24px;
+  gap:4px;
+  overflow:hidden;
+  white-space:nowrap;
+}
+.nut-settings-row.nut-product-row input,
+.nut-settings-row.nut-meal-row input{
+  min-width:0;
+  width:100%;
+  box-sizing:border-box;
+  padding:7px 5px;
+  font-size:9px;
+}
+.nut-settings-row.nut-product-row input::placeholder{color:rgba(240,240,240,.28)}
+.nut-heat-cell{position:relative}
+.nut-heat-cell.today{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.nut-heat-cell.hot .nut-heat-date,
+.nut-heat-cell.hot .nut-heat-kcal,
+.nut-heat-cell.hot .nut-heat-macro{color:#11160a}
+.nut-heat-espresso{
+  position:absolute;
+  top:-5px;
+  right:-4px;
+  z-index:2;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:7px;
+  font-weight:700;
+  color:var(--acc);
+  background:#050505;
+  border:1px solid var(--acc);
+  border-radius:999px;
+  padding:2px 5px;
+  line-height:1;
+  box-shadow:0 0 0 1px rgba(0,0,0,.45);
+}
+.nut-day-row.has-espresso{background:linear-gradient(90deg,rgba(232,255,71,.10),var(--sur) 42%)}
+.nut-day-espresso{display:inline-block;background:rgba(232,255,71,.14);border:1px solid rgba(232,255,71,.5);border-radius:999px;padding:2px 7px}
+
+
+.hc.today,.hm-cell.today{border-color:var(--acc)!important;box-shadow:0 0 0 1px var(--acc) inset}
+.nut-heat-cell.future{opacity:.45}
+
 .nut-switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--sur2);border:1px solid var(--bor);border-radius:10px;padding:10px;margin-top:8px}
 .nut-switch-row span{font-size:10px;color:var(--txt);font-weight:700;letter-spacing:.6px;text-transform:uppercase}
 .nut-switch-row input{width:auto}
@@ -762,8 +806,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
    <div class="product-list" id="nutrition-product-list"></div>
    <div class="modal-title">ВЕС / КОЛИЧЕСТВО</div>
    <div class="nut-form-grid">
-    <input class="date-inp" type="number" id="nutrition-grams" placeholder="граммы" min="1" step="1" value="100" oninput="renderNutritionProductList()">
-    <input class="date-inp" type="number" id="nutrition-qty" placeholder="кол-во" min="0.1" step="0.1" value="1" oninput="renderNutritionProductList()">
+    <input class="date-inp" type="number" id="nutrition-grams" placeholder="0 = вес из настроек" min="0" step="1" value="0" oninput="renderNutritionProductList()">
+    <input class="date-inp" type="number" id="nutrition-qty" placeholder="0 = 1 шт" min="0" step="0.1" value="0" oninput="renderNutritionProductList()">
    </div>
   </div>
   <div id="nutrition-new-panel" style="display:none">
@@ -2261,6 +2305,7 @@ function mealCardHtml(meal){
   </button>`;
 }
 
+
 function openMealModal(mealType,entryId=null){
   nutritionMealType=mealType||visibleNutritionMealTypes()[0]?.id||'snack';
   editingNutritionEntryId=entryId;
@@ -2274,11 +2319,15 @@ function openMealModal(mealType,entryId=null){
   document.getElementById('nutrition-modal-title').textContent=entry?'ИЗМЕНИТЬ ПРИЁМ ПИЩИ':'ДОБАВИТЬ · '+mealName(nutritionMealType);
   setNutritionModalTab('existing');
   renderNutritionProductList();
-  document.getElementById('nutrition-grams').value=entry?Math.round(entry.grams||100):100;
-  document.getElementById('nutrition-qty').value=entry?entry.qty||1:1;
+  const product=entry?visibleNutritionProducts().find(p=>String(p.id)===String(entry.productId)):null;
+  const entryQty=entry?Math.max(1,parseFloat(entry.qty)||1):0;
+  const entryGrams=entry?(product?Math.round((entry.grams||product.baseGrams)/entryQty):Math.round(entry.grams||100)):0;
+  document.getElementById('nutrition-grams').value=entry?entryGrams:0;
+  document.getElementById('nutrition-qty').value=entry?entryQty:0;
   renderNutritionProductList();
   document.getElementById('nutrition-modal').classList.add('open');
 }
+
 
 function setNutritionModalTab(tab){
   nutritionModalTab=tab;
@@ -2288,16 +2337,20 @@ function setNutritionModalTab(tab){
   document.getElementById('nutrition-new-panel').style.display=tab==='new'?'block':'none';
 }
 
+
 function currentExistingNutritionScale(product){
   const gramsEl=document.getElementById('nutrition-grams');
   const qtyEl=document.getElementById('nutrition-qty');
-  const grams=Math.max(0,parseFloat(gramsEl?.value)||product.baseGrams||100);
-  const qty=Math.max(0,parseFloat(qtyEl?.value)||1);
+  const rawGrams=parseFloat(gramsEl?.value);
+  const rawQty=parseFloat(qtyEl?.value);
+  const grams=rawGrams>0?rawGrams:(product.baseGrams||100);
+  const qty=rawQty>0?rawQty:1;
   const totalGrams=grams*qty;
   const ratio=totalGrams/(product.baseGrams||100);
-  const changed=Math.abs(totalGrams-(product.baseGrams||100))>.01||Math.abs(qty-1)>.001;
-  return {grams,qty,totalGrams,ratio,changed};
+  const changed=(rawGrams>0&&Math.abs(rawGrams-(product.baseGrams||100))>.01)||(rawQty>0&&Math.abs(rawQty-1)>.001);
+  return {grams,qty,totalGrams,ratio,changed,rawGrams:rawGrams||0,rawQty:rawQty||0};
 }
+
 
 function sortNutritionProductsByPopularity(a,b){
   const pa=nutritionProductPopularity(a.id);
@@ -2353,6 +2406,7 @@ function closeNutritionModal(evt){
   if(!evt||evt.target===el)el.classList.remove('open');
 }
 
+
 function saveNutritionEntry(){
   const ts=nowISO();
   let product,grams,qty;
@@ -2371,14 +2425,17 @@ function saveNutritionEntry(){
       createdAt:ts,updatedAt:ts,deviceId:S.deviceId
     });
     S.nutrition.products.push(product);
-    grams=parseFloat(document.getElementById('product-entry-grams').value)||product.baseGrams;
+    const rawEntryGrams=parseFloat(document.getElementById('product-entry-grams').value);
+    grams=rawEntryGrams>0?rawEntryGrams:product.baseGrams;
     qty=1;
   }else{
     product=visibleNutritionProducts().find(p=>String(p.id)===String(nutritionSelectedProductId));
     if(!product){toast('Выбери продукт');return;}
-    grams=parseFloat(document.getElementById('nutrition-grams').value)||product.baseGrams;
-    qty=parseFloat(document.getElementById('nutrition-qty').value)||1;
-    grams*=qty;
+    const rawGrams=parseFloat(document.getElementById('nutrition-grams').value);
+    const rawQty=parseFloat(document.getElementById('nutrition-qty').value);
+    const gramsPerUnit=rawGrams>0?rawGrams:product.baseGrams;
+    qty=rawQty>0?rawQty:1;
+    grams=gramsPerUnit*qty;
   }
 
   const ratio=grams/product.baseGrams;
@@ -2412,6 +2469,7 @@ function saveNutritionEntry(){
   renderNutrition();
   toast('✓ Сохранено');
 }
+
 
 function renderNutritionSettings(body){
   const goals=nutritionGoals();
@@ -2535,28 +2593,37 @@ function deleteNutritionMealType(id){
   renderNutrition();
 }
 
+
 function renderNutritionHistory(body){
   if(S.nutritionHistoryDate){
     renderNutritionDayHistory(body,S.nutritionHistoryDate);
     return;
   }
+  const showEspresso=nutritionSettings().showEspressoMeter===true;
   const map={};
   displayNutritionEntries().forEach(e=>{
     const k=localDateKey(new Date(e.ts));
     if(!map[k])map[k]=[];
     map[k].push(e);
   });
+  if(showEspresso){
+    visibleEspressoLogs().forEach(e=>{
+      const k=localDateKey(new Date(e.ts));
+      if(!map[k])map[k]=[];
+    });
+  }
   const days=Object.keys(map).sort((a,b)=>b.localeCompare(a));
   if(!days.length){body.innerHTML=`<div class="empty"><div class="big">ПУСТО</div><p>Нет приёмов пищи</p></div>`;return;}
   body.innerHTML=days.map(k=>{
     const total=sumNutrition(map[k]);
-    const espresso=espressoCountForDay(new Date(k+'T00:00:00'));
-    return `<div class="nut-day-row" onclick="openNutritionHistoryDay('${k}')">
+    const espresso=showEspresso?espressoCountForDay(new Date(k+'T00:00:00')):0;
+    return `<div class="nut-day-row ${espresso?'has-espresso':''}" onclick="openNutritionHistoryDay('${k}')">
       <div><div class="nut-day-date">${formatLocalDateKey(k)}</div><div class="nut-day-meta">${map[k].length} поз. · Б ${fmtMacro(total.protein)} Ж ${fmtMacro(total.fat)} У ${fmtMacro(total.carbs)}</div>${espresso?`<div class="nut-day-espresso">☕ x${espresso}</div>`:''}</div>
       <div class="nut-day-kcal">${fmtKcal(total.kcal)}</div>
     </div>`;
   }).join('');
 }
+
 
 function openNutritionHistoryDay(key){
   S.nutritionHistoryDate=key;
@@ -2564,11 +2631,14 @@ function openNutritionHistoryDay(key){
   renderNutrition();
 }
 
+
 function renderNutritionDayHistory(body,key){
+  const showEspresso=nutritionSettings().showEspressoMeter===true;
   const entries=displayNutritionEntries().filter(e=>localDateKey(new Date(e.ts))===key).sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+  const espresso=showEspresso?espressoCountForDay(new Date(key+'T00:00:00')):0;
   body.innerHTML=`<button class="nut-back-btn" onclick="S.nutritionHistoryDate=null;save();renderNutrition()">← К ДНЯМ</button>
-    <div class="ctitle">${formatLocalDateKey(key)}</div>
-    ${entries.map(e=>`<div class="nut-entry">
+    <div class="ctitle">${formatLocalDateKey(key)} ${espresso?`<span class="nut-day-espresso">☕ x${espresso}</span>`:''}</div>
+    ${entries.length?entries.map(e=>`<div class="nut-entry">
       <div class="nut-entry-main">
         <div class="product-emoji">${escapeAttr(e.emoji)}</div>
         <div class="nut-entry-info">
@@ -2581,8 +2651,9 @@ function renderNutritionDayHistory(body,key){
         <button class="hbtn" onclick="openMealModal('${e.mealType}','${e.id}')">✏️ ИЗМЕНИТЬ</button>
         <button class="hbtn" onclick="deleteNutritionEntry('${e.id}')">🗑 УДАЛИТЬ</button>
       </div>
-    </div>`).join('')}`;
+    </div>`).join(''):`<div class="empty"><p>В этот день нет приёмов пищи${espresso?', но есть эспрессо':''}</p></div>`}`;
 }
+
 
 function deleteNutritionEntry(id){
   if(!confirm('Удалить запись о еде?'))return;
@@ -2628,33 +2699,64 @@ function incrementEspresso(){
   toast('☕ Эспрессо x'+todayEspressoCount());
 }
 
-function renderNutritionStats(body){
+
+function startOfWeekMonday(date){
+  const d=startOfLocalDay(date);
+  const day=(d.getDay()+6)%7;
+  d.setDate(d.getDate()-day);
+  return d;
+}
+
+function weekGridDates(rowCount=8){
+  const start=startOfWeekMonday(new Date());
   const days=[];
-  const today=startOfLocalDay(new Date());
-  for(let i=0;i<56;i++){
-    const d=new Date(today);
-    d.setDate(today.getDate()-i);
-    days.push(d);
+  for(let row=0;row<rowCount;row++){
+    for(let col=0;col<7;col++){
+      const d=new Date(start);
+      d.setDate(start.getDate()-row*7+col);
+      days.push(d);
+    }
   }
+  return days;
+}
+
+function isSameLocalDay(a,b){
+  return localDateKey(a)===localDateKey(b);
+}
+
+function nutritionHeatTextClass(ratio){
+  return ratio>=0.58?'hot':'';
+}
+
+
+function renderNutritionStats(body){
+  const days=weekGridDates(8);
+  const today=startOfLocalDay(new Date());
   const goals=nutritionGoals();
-  body.innerHTML=`<div class="card"><div class="ctitle">ТЕПЛОВАЯ КАРТА КАЛОРИЙ · БЛИЖАЙШАЯ ДАТА СЛЕВА СВЕРХУ</div>
+  const showEspresso=nutritionSettings().showEspressoMeter===true;
+  const dn=['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
+  body.innerHTML=`<div class="card"><div class="ctitle">ТЕПЛОВАЯ КАРТА КАЛОРИЙ</div>
+    <div class="hl">${dn.map(d=>`<div style="font-size:7px;color:var(--mut);text-align:center">${d}</div>`).join('')}</div>
     <div class="nut-heat-grid">
       ${days.map(d=>{
-        const total=sumNutrition(nutritionEntriesForDay(d));
-        const espresso=espressoCountForDay(d);
+        const future=d>today;
+        const total=future?{kcal:0,protein:0,fat:0,carbs:0}:sumNutrition(nutritionEntriesForDay(d));
+        const espresso=(!future&&showEspresso)?espressoCountForDay(d):0;
         const ratio=goals.kcal?Math.min(1,total.kcal/goals.kcal):0;
         const alpha=total.kcal?Math.max(.18,ratio):0;
         const bg=total.kcal?`rgba(232,255,71,${alpha})`:'var(--sur2)';
-        return `<div class="nut-heat-cell" style="background:${bg}">
+        const cellClass=`nut-heat-cell ${isSameLocalDay(d,today)?'today':''} ${nutritionHeatTextClass(ratio)} ${future?'future':''}`;
+        return `<div class="${cellClass}" style="background:${bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${fmtKcal(total.kcal)} ккал">
           <div class="nut-heat-date">${pad(d.getDate())}.${pad(d.getMonth()+1)}</div>
-          <div class="nut-heat-kcal">${fmtKcal(total.kcal)}</div>
-          <div class="nut-heat-macro">Б ${fmtMacro(total.protein)}<br>Ж ${fmtMacro(total.fat)} У ${fmtMacro(total.carbs)}</div>
+          <div class="nut-heat-kcal">${future?'':fmtKcal(total.kcal)}</div>
+          <div class="nut-heat-macro">${future?'':`Б ${fmtMacro(total.protein)}<br>Ж ${fmtMacro(total.fat)} У ${fmtMacro(total.carbs)}`}</div>
           ${espresso?`<div class="nut-heat-espresso">☕ x${espresso}</div>`:''}
         </div>`;
       }).join('')}
     </div>
   </div>`;
 }
+
 
 function mealName(type){return allNutritionMealTypes().find(m=>String(m.id)===String(type))?.name||'Приём';}
 function localDateKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
@@ -3788,22 +3890,20 @@ function toggleCompareActivity(activityId){
 }
 
 
+
 function drawHeatmap(body,logs){
   const activities=activeActivities();
   const mode=S.heatmapMode||'fill';
   const selectedIds=(S.heatmapActivityIds||[]).filter(id=>activities.some(a=>String(a.id)===String(id)));
-  const today=new Date();
-  today.setHours(23,59,59,999);
-  const start=new Date(today);
-  start.setDate(today.getDate()-69);
-  start.setHours(0,0,0,0);
+  const today=startOfLocalDay(new Date());
+  const days=weekGridDates(10);
   const dn=['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
 
   const fillByDay={};
   const hoursByDay={};
   logs.forEach(l=>{
     const d=new Date(l.ts);
-    const key=d.toDateString();
+    const key=localDateKey(d);
     fillByDay[key]=(fillByDay[key]||0)+(l.durationSec||0);
     if(mode==='hours' && selectedIds.includes(String(l.activityId))){
       hoursByDay[key]=(hoursByDay[key]||0)+(l.durationSec||0);
@@ -3817,39 +3917,37 @@ function drawHeatmap(body,logs){
   </div>
   <div class="hl">${dn.map(d=>`<div style="font-size:7px;color:var(--mut);text-align:center">${d}</div>`).join('')}</div>
   <div class="hm-grid-days">`;
-  const dow0=(start.getDay()+6)%7;
-  for(let i=0;i<dow0;i++)html+=`<div class="hc" style="background:transparent"></div>`;
   const maxHoursSec=Math.max(...Object.values(hoursByDay),1);
-  for(let i=0;i<70;i++){
-    const d=new Date(start);
-    d.setDate(start.getDate()+i);
-    if(d>today)break;
-    const key=d.toDateString();
+  days.forEach(d=>{
+    const future=d>today;
+    const key=localDateKey(d);
+    const todayClass=isSameLocalDay(d,today)?' today':'';
     if(mode==='fill'){
-      const sec=Math.min(86400,fillByDay[key]||0);
+      const sec=future?0:Math.min(86400,fillByDay[key]||0);
       const alpha=sec>0?Math.max(.18,sec/86400):0;
       const bg=sec>0?`rgba(232,255,71,${alpha})`:'var(--bor)';
       const pct=Math.round(sec/86400*100);
-      html+=`<div class="hc" style="background:${bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${pct}% заполнено"></div>`;
+      html+=`<div class="hc${todayClass}" style="background:${future?'var(--sur2)':bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${future?'будущий день':pct+'% заполнено'}"></div>`;
     }else{
-      const sec=hoursByDay[key]||0;
+      const sec=future?0:(hoursByDay[key]||0);
       const alpha=sec>0?Math.max(.18,sec/maxHoursSec):0;
       const bg=sec>0?`rgba(232,255,71,${alpha})`:'var(--bor)';
       const label=sec>0?fmtDayHours(sec):'';
-      html+=`<div class="hm-cell ${sec>0?'':'empty'}" style="background:${bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${fmtDurLong(sec)}"><span>${label}</span></div>`;
+      html+=`<div class="hm-cell ${sec>0?'':'empty'}${todayClass}" style="background:${future?'var(--sur2)':bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${future?'будущий день':fmtDurLong(sec)}"><span>${label}</span></div>`;
     }
-  }
+  });
   html+=`</div>`;
   if(mode==='fill'){
-    html+=`<div class="hm-note">Каждая клетка = один день. Яркость показывает, насколько день заполнен записями.</div>`;
+    html+=`<div class="hm-note">Сверху — текущая неделя. Яркость показывает, насколько день заполнен записями.</div>`;
   }else{
-    html+=`<div class="hm-note">Каждая клетка = один день. Внутри — сумма часов по выбранным активностям.</div>
+    html+=`<div class="hm-note">Сверху — текущая неделя. Внутри — сумма часов по выбранным активностям.</div>
     <div class="hm-acts-row">${activities.map(a=>`<button class="hm-act-btn ${selectedIds.includes(String(a.id))?'active':''}" onclick="toggleHeatmapActivity('${escapeAttr(a.id)}')">${a.emoji} ${escapeAttr(a.name)}</button>`).join('')}</div>`;
   }
   html+=`</div>`;
   body.innerHTML=html;
   requestAnimationFrame(scaleHeatmapHourLabels);
 }
+
 
 function scaleHeatmapHourLabels(){
   document.querySelectorAll('.hm-cell:not(.empty)').forEach(cell=>{
