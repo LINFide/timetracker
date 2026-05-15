@@ -197,12 +197,20 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .nut-macro-v{font-family:'Bebas Neue',sans-serif;font-size:23px;color:var(--txt);line-height:1;display:inline-flex;align-items:flex-end;justify-content:center;gap:4px}
 .nut-macro-l{font-size:8px;color:var(--mut);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
 .meal-grid{display:flex;flex-direction:column;gap:8px}
-.meal-card{background:var(--sur);border:1px solid var(--bor);border-radius:14px;padding:12px;min-height:92px;text-align:left;cursor:pointer;color:var(--txt);font-family:'IBM Plex Mono',monospace;position:relative;display:grid;grid-template-columns:44px 1fr auto;align-items:center;column-gap:10px}
+.meal-card{background:var(--sur);border:1px solid var(--bor);border-radius:14px;padding:12px;min-height:92px;text-align:left;cursor:pointer;color:var(--txt);font-family:'IBM Plex Mono',monospace;position:relative;display:grid;grid-template-columns:44px 1fr auto;align-items:center;column-gap:10px;overflow:hidden}
 .meal-card:active{border-color:var(--acc);transform:scale(.985)}
 .meal-emoji{font-size:26px;margin-bottom:0;text-align:center}
 .meal-name{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
 .meal-kcal{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--acc);letter-spacing:1px;line-height:1;text-align:right}
 .meal-sub{font-size:9px;color:var(--mut);margin-top:3px;line-height:1.4}
+
+.meal-food-emojis{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:54%;white-space:nowrap;overflow:hidden;text-overflow:clip;text-align:center;font-size:20px;letter-spacing:1px;pointer-events:none;opacity:.96;filter:saturate(1.05)}
+.product-code-row{display:grid;grid-template-columns:1fr auto;gap:7px;margin:8px 0}
+.product-code-row input{width:100%;background:var(--sur2);border:1px solid var(--bor);border-radius:9px;padding:9px;color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:10px;outline:none}
+.product-code-row input:focus{border-color:var(--acc)}
+.product-code-row button{border:1px solid var(--acc);background:var(--sur);color:var(--acc);border-radius:9px;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.nut-espresso-history-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(232,255,71,.10);border:1px solid rgba(232,255,71,.44);border-radius:12px;margin-bottom:7px;padding:10px 11px;color:var(--acc);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700}
+
 .product-list{max-height:250px;overflow-y:auto;margin:8px 0}
 .product-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--bor);border-radius:10px;background:var(--sur);margin-bottom:6px;cursor:pointer}
 .product-item:active,.product-item.sel{border-color:var(--acc)}
@@ -277,9 +285,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .nut-heat-cell.hot .nut-heat-macro{color:#11160a}
 .nut-heat-espresso{
   position:absolute;
-  top:-5px;
-  right:-4px;
-  z-index:2;
+  left:50%;
+  bottom:7px;
+  transform:translateX(-50%);
+  z-index:3;
   font-family:'IBM Plex Mono',monospace;
   font-size:7px;
   font-weight:700;
@@ -290,12 +299,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
   padding:2px 5px;
   line-height:1;
   box-shadow:0 0 0 1px rgba(0,0,0,.45);
+  white-space:nowrap;
 }
 .nut-day-row.has-espresso{background:linear-gradient(90deg,rgba(232,255,71,.10),var(--sur) 42%)}
 .nut-day-espresso{display:inline-block;background:rgba(232,255,71,.14);border:1px solid rgba(232,255,71,.5);border-radius:999px;padding:2px 7px}
 
 
 .hc.today,.hm-cell.today{border-color:var(--acc)!important;box-shadow:0 0 0 1px var(--acc) inset}
+.hc.future{opacity:.35;border-color:rgba(255,255,255,.05)!important}
 .nut-heat-cell.future{opacity:.45}
 
 .nut-switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--sur2);border:1px solid var(--bor);border-radius:10px;padding:10px;margin-top:8px}
@@ -811,6 +822,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
    </div>
   </div>
   <div id="nutrition-new-panel" style="display:none">
+   <div class="product-code-row">
+    <input type="text" id="product-code" placeholder="код продукта: ☕️;Раф;100;250;6;10;32">
+    <button onclick="applyProductCodeToModal()">КОД</button>
+   </div>
    <div class="nut-form-grid">
     <input class="date-inp" type="text" id="product-emoji" placeholder="эмодзи" value="🍽">
     <input class="date-inp" type="text" id="product-name" placeholder="Название">
@@ -1259,11 +1274,29 @@ function goScreen(id){
 // ══════════════════════════════════════════════════════
 // PING
 // ══════════════════════════════════════════════════════
+function orderedActiveActivities(){
+  const cutoff=Date.now()-30*86400000;
+  const score=new Map();
+  visibleLogs().forEach(l=>{
+    if(l.skipped)return;
+    const t=new Date(l.ts).getTime();
+    if(!Number.isFinite(t)||t<cutoff)return;
+    const id=String(l.activityId);
+    score.set(id,(score.get(id)||0)+1);
+  });
+  return activeActivities().slice().sort((a,b)=>{
+    const sa=score.get(String(a.id))||0;
+    const sb=score.get(String(b.id))||0;
+    if(sb!==sa)return sb-sa;
+    return (a.createdAt||'').localeCompare(b.createdAt||'');
+  });
+}
+
 function renderPG(){
   const g=document.getElementById('ping-grid');
   if(!g)return;
   g.innerHTML='';
-  activeActivities().slice(0,16).forEach(a=>{
+  orderedActiveActivities().slice(0,16).forEach(a=>{
     const b=document.createElement('button');
     b.className='abt';
     if(S.showDetailedActivityCards)b.classList.add('detailed');
@@ -1931,34 +1964,26 @@ function drawHeatmap(body,logs){
   const daySec={};
   logs.forEach(l=>{
     const d=new Date(l.ts);
-    const key=d.toDateString();
-    daySec[key]=(daySec[key]||0)+(l.durationSec||0);
+    daySec[localDateKey(d)]=(daySec[localDateKey(d)]||0)+(l.durationSec||0);
   });
-  const today=new Date();
-  today.setHours(23,59,59,999);
-  const start=new Date(today);
-  start.setDate(today.getDate()-69);
-  start.setHours(0,0,0,0);
+  const today=startOfLocalDay(new Date());
+  const days=weekGridDates(10);
   const dn=['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
   let html=`<div class="card">
   <div class="ctitle">ТЕПЛОВАЯ КАРТА — каждая клетка = один день. Яркость = процент заполнения дня.</div>
   <div class="hl">${dn.map(d=>`<div style="font-size:7px;color:var(--mut);text-align:center">${d}</div>`).join('')}</div>
   <div class="hg">`;
-  const dow0=(start.getDay()+6)%7;
-  for(let i=0;i<dow0;i++)html+=`<div class="hc" style="background:transparent"></div>`;
-  for(let i=0;i<70;i++){
-    const d=new Date(start);
-    d.setDate(start.getDate()+i);
-    if(d>today)break;
-    const sec=Math.min(86400,daySec[d.toDateString()]||0);
+  days.forEach(d=>{
+    const future=d>today;
+    const sec=future?0:Math.min(86400,daySec[localDateKey(d)]||0);
     const fillPct=Math.round(sec/86400*100);
     const alpha=sec>0?Math.max(.18,sec/86400):0;
     const bg=sec>0?`rgba(232,255,71,${alpha})`:'var(--bor)';
-    html+=`<div class="hc" style="background:${bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — заполнено ${fillPct}% (${fmtDurShort(sec)})"></div>`;
-  }
+    html+=`<div class="hc ${isSameLocalDay(d,today)?'today':''} ${future?'future':''}" style="background:${future?'transparent':bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — заполнено ${fillPct}% (${fmtDurShort(sec)})"></div>`;
+  });
   html+=`</div>
   <div class="legr"><span>0%</span><div class="legc">${[.18,.35,.52,.72,1].map(o=>`<div class="lc" style="background:rgba(232,255,71,${o})"></div>`).join('')}</div><span>100%</span></div>
-  <div style="font-size:9px;color:var(--mut);margin-top:8px">Последние 10 недель. Чем ярче клетка, тем больше суток заполнено записями.</div>
+  <div style="font-size:9px;color:var(--mut);margin-top:8px">Сверху текущая неделя. Чем ярче клетка, тем больше суток заполнено записями.</div>
   </div>`;
   const dowC=Array(7).fill(0);
   logs.forEach(l=>{dowC[(new Date(l.ts).getDay()+6)%7]+=(l.durationSec||0);});
@@ -2293,14 +2318,18 @@ function macroGoalHtml(label,current,goal){
 }
 
 function mealCardHtml(meal){
-  const entries=nutritionEntriesForDay(new Date()).filter(e=>e.mealType===meal.id);
+  const entries=nutritionEntriesForDay(new Date())
+    .filter(e=>e.mealType===meal.id)
+    .sort((a,b)=>new Date(a.ts)-new Date(b.ts));
   const total=sumNutrition(entries);
+  const emojiTrail=entries.map(e=>escapeAttr(e.emoji||'🍽')).join('');
   return `<button class="meal-card" onclick="openMealModal('${escapeAttr(meal.id)}')">
     <div class="meal-emoji">${escapeAttr(meal.emoji)}</div>
     <div>
       <div class="meal-name">${escapeAttr(meal.name)}</div>
       <div class="meal-sub">${entries.length?entries.length+' поз.':'нет записей'}<br>Б ${fmtMacro(total.protein)} · Ж ${fmtMacro(total.fat)} · У ${fmtMacro(total.carbs)}</div>
     </div>
+    ${emojiTrail?`<div class="meal-food-emojis">${emojiTrail}</div>`:''}
     <div class="meal-kcal">${fmtKcal(total.kcal)}</div>
   </button>`;
 }
@@ -2337,6 +2366,50 @@ function setNutritionModalTab(tab){
   document.getElementById('nutrition-new-panel').style.display=tab==='new'?'block':'none';
 }
 
+
+function parseProductCode(raw){
+  const parts=String(raw||'').split(';').map(x=>x.trim()).filter((x,i)=>i<7);
+  if(parts.length<7)return null;
+  const num=v=>parseFloat(String(v||'').replace(',','.'))||0;
+  const [emoji,name,baseGrams,kcal,protein,fat,carbs]=parts;
+  if(!name)return null;
+  return {
+    emoji:emoji||'🍽',
+    name,
+    baseGrams:Math.max(1,num(baseGrams)||100),
+    kcal:Math.max(0,num(kcal)),
+    protein:Math.max(0,num(protein)),
+    fat:Math.max(0,num(fat)),
+    carbs:Math.max(0,num(carbs)),
+  };
+}
+
+function applyProductCodeToModal(){
+  const input=document.getElementById('product-code');
+  const parsed=parseProductCode(input?.value);
+  if(!parsed){toast('Формат: ☕️;Раф;100;250;6;10;32');return;}
+  document.getElementById('product-emoji').value=parsed.emoji;
+  document.getElementById('product-name').value=parsed.name;
+  document.getElementById('product-base-grams').value=parsed.baseGrams;
+  document.getElementById('product-kcal').value=parsed.kcal;
+  document.getElementById('product-protein').value=parsed.protein;
+  document.getElementById('product-fat').value=parsed.fat;
+  document.getElementById('product-carbs').value=parsed.carbs;
+  document.getElementById('product-entry-grams').value=0;
+  toast('Код применён');
+}
+
+function addNutritionProductFromCodeSetting(){
+  const input=document.getElementById('nutrition-product-code-setting');
+  const parsed=parseProductCode(input?.value);
+  if(!parsed){toast('Формат: ☕️;Раф;100;250;6;10;32');return;}
+  const now=nowISO();
+  if(!S.nutrition.products)S.nutrition.products=[];
+  S.nutrition.products.push(normalizeNutritionProduct({...parsed,id:genId(),createdAt:now,updatedAt:now,deviceId:S.deviceId}));
+  save();
+  renderNutrition();
+  toast('Блюдо добавлено');
+}
 
 function currentExistingNutritionScale(product){
   const gramsEl=document.getElementById('nutrition-grams');
@@ -2494,6 +2567,10 @@ function renderNutritionSettings(body){
   </div>
   <div class="nut-settings-card">
     <div class="ctitle">БЛЮДА / ПРОДУКТЫ</div>
+    <div class="product-code-row">
+      <input type="text" id="nutrition-product-code-setting" placeholder="код: ☕️;Раф;100;250;6;10;32">
+      <button onclick="addNutritionProductFromCodeSetting()">КОД</button>
+    </div>
     <div id="nutrition-product-settings">${visibleNutritionProducts().map(nutritionProductSettingsRow).join('')}</div>
     <button class="dbtn" onclick="addNutritionProductSetting()">+ ДОБАВИТЬ БЛЮДО</button>
   </div>`;
