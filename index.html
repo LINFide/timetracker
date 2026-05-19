@@ -322,6 +322,30 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
   .nut-kcal-goal{font-size:24px}
 }
 
+
+.nut-modal-meal-select{
+  width:100%;
+  margin:6px 0 8px;
+  background:var(--sur2);
+  border:1px solid var(--bor);
+  border-radius:10px;
+  padding:9px;
+  color:var(--txt);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  outline:none;
+}
+.nut-modal-meal-select:focus{border-color:var(--acc)}
+.nut-history-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 0 9px}
+.nut-history-actions .dbtn{margin:0}
+.nut-day-espresso-edit{display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(232,255,71,.10);border:1px solid rgba(232,255,71,.45);border-radius:12px;padding:9px 10px;margin:8px 0 10px}
+.nut-day-espresso-edit .v{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--acc);letter-spacing:1px}
+.nut-day-espresso-edit button{border:1px solid var(--acc);background:var(--sur);color:var(--acc);border-radius:9px;padding:7px 9px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.oneoff-hint{font-size:8px;color:var(--acc);letter-spacing:.8px;margin-top:-2px;margin-bottom:6px;min-height:10px;text-transform:uppercase}
+
 /* ── SETTINGS ── */
 #sset{overflow:hidden}
 .sscroll{flex:1;overflow-y:auto;padding:13px}
@@ -808,6 +832,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 <div class="overlay" id="nutrition-modal" onclick="closeNutritionModal(event)">
  <div class="modal">
   <div class="modal-title" id="nutrition-modal-title">ДОБАВИТЬ ПРИЁМ ПИЩИ</div>
+  <select id="nutrition-meal-type-select" class="nut-modal-meal-select" onchange="nutritionMealType=this.value"></select>
   <div class="nut-tabs">
    <button class="nut-tab active" id="nut-tab-existing" onclick="setNutritionModalTab('existing')">ИЗ СПИСКА</button>
    <button class="nut-tab" id="nut-tab-new" onclick="setNutritionModalTab('new')">НОВЫЙ ПРОДУКТ</button>
@@ -823,9 +848,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
   </div>
   <div id="nutrition-new-panel" style="display:none">
    <div class="product-code-row">
-    <input type="text" id="product-code" placeholder="код продукта: ☕️;Раф;100;250;6;10;32">
+    <input type="text" id="product-code" placeholder="код: ☕️;Раф;100;250;6;10;32;0">
     <button onclick="applyProductCodeToModal()">КОД</button>
    </div>
+   <div class="oneoff-hint" id="product-code-oneoff-hint"></div>
    <div class="nut-form-grid">
     <input class="date-inp" type="text" id="product-emoji" placeholder="эмодзи" value="🍽">
     <input class="date-inp" type="text" id="product-name" placeholder="Название">
@@ -2237,6 +2263,8 @@ let nutritionMealType='snack';
 let nutritionSelectedProductId=null;
 let nutritionModalTab='existing';
 let editingNutritionEntryId=null;
+let nutritionHistoryAddDateKey=null;
+let nutritionProductCodeOneOff=false;
 
 function updateTimerNavVisibility(){
   const btn=document.getElementById('nb-stimer');
@@ -2335,9 +2363,11 @@ function mealCardHtml(meal){
 }
 
 
-function openMealModal(mealType,entryId=null){
+function openMealModal(mealType,entryId=null,dateKey=null){
   nutritionMealType=mealType||visibleNutritionMealTypes()[0]?.id||'snack';
   editingNutritionEntryId=entryId;
+  nutritionHistoryAddDateKey=entryId?null:dateKey;
+  nutritionProductCodeOneOff=false;
   nutritionSelectedProductId=null;
   nutritionModalTab='existing';
   const entry=entryId?visibleNutritionEntries().find(e=>String(e.id)===String(entryId)):null;
@@ -2345,10 +2375,24 @@ function openMealModal(mealType,entryId=null){
     nutritionMealType=entry.mealType;
     nutritionSelectedProductId=entry.productId;
   }
-  document.getElementById('nutrition-modal-title').textContent=entry?'ИЗМЕНИТЬ ПРИЁМ ПИЩИ':'ДОБАВИТЬ · '+mealName(nutritionMealType);
-  setNutritionModalTab('existing');
+  document.getElementById('nutrition-modal-title').textContent=entry?'ИЗМЕНИТЬ ПРИЁМ ПИЩИ':(dateKey?'ДОБАВИТЬ · '+formatLocalDateKey(dateKey):'ДОБАВИТЬ · '+mealName(nutritionMealType));
+  updateNutritionMealSelect();
+  setNutritionModalTab(entry&&!nutritionSelectedProductId?'new':'existing');
   renderNutritionProductList();
   const product=entry?visibleNutritionProducts().find(p=>String(p.id)===String(entry.productId)):null;
+  if(entry&&!product){
+    document.getElementById('product-emoji').value=entry.emoji||'🍽';
+    document.getElementById('product-name').value=entry.name||'';
+    document.getElementById('product-base-grams').value=Math.max(1,Math.round(entry.grams||100));
+    document.getElementById('product-kcal').value=fmtMacro(entry.kcal||0);
+    document.getElementById('product-protein').value=fmtMacro(entry.protein||0);
+    document.getElementById('product-fat').value=fmtMacro(entry.fat||0);
+    document.getElementById('product-carbs').value=fmtMacro(entry.carbs||0);
+    document.getElementById('product-entry-grams').value=0;
+    nutritionProductCodeOneOff=true;
+    const hint=document.getElementById('product-code-oneoff-hint');
+    if(hint)hint.textContent='одноразовая запись';
+  }
   const entryQty=entry?Math.max(1,parseFloat(entry.qty)||1):0;
   const entryGrams=entry?(product?Math.round((entry.grams||product.baseGrams)/entryQty):Math.round(entry.grams||100)):0;
   document.getElementById('nutrition-grams').value=entry?entryGrams:0;
@@ -2357,9 +2401,23 @@ function openMealModal(mealType,entryId=null){
   document.getElementById('nutrition-modal').classList.add('open');
 }
 
+function updateNutritionMealSelect(){
+  const select=document.getElementById('nutrition-meal-type-select');
+  if(!select)return;
+  select.innerHTML=visibleNutritionMealTypes().map(m=>`<option value="${escapeAttr(m.id)}">${escapeAttr(m.emoji)} ${escapeAttr(m.name)}</option>`).join('');
+  select.value=nutritionMealType;
+}
+
+function openMealModalForDate(dateKey){
+  openMealModal(visibleNutritionMealTypes()[0]?.id||'snack',null,dateKey);
+}
 
 function setNutritionModalTab(tab){
   nutritionModalTab=tab;
+  if(tab==='new'){
+    const hint=document.getElementById('product-code-oneoff-hint');
+    if(hint&&!nutritionProductCodeOneOff)hint.textContent='';
+  }
   document.getElementById('nut-tab-existing')?.classList.toggle('active',tab==='existing');
   document.getElementById('nut-tab-new')?.classList.toggle('active',tab==='new');
   document.getElementById('nutrition-existing-panel').style.display=tab==='existing'?'block':'none';
@@ -2368,10 +2426,10 @@ function setNutritionModalTab(tab){
 
 
 function parseProductCode(raw){
-  const parts=String(raw||'').split(';').map(x=>x.trim()).filter((x,i)=>i<7);
+  const parts=String(raw||'').split(';').map(x=>x.trim());
   if(parts.length<7)return null;
   const num=v=>parseFloat(String(v||'').replace(',','.'))||0;
-  const [emoji,name,baseGrams,kcal,protein,fat,carbs]=parts;
+  const [emoji,name,baseGrams,kcal,protein,fat,carbs,mode]=parts;
   if(!name)return null;
   return {
     emoji:emoji||'🍽',
@@ -2381,13 +2439,15 @@ function parseProductCode(raw){
     protein:Math.max(0,num(protein)),
     fat:Math.max(0,num(fat)),
     carbs:Math.max(0,num(carbs)),
+    oneOff:String(mode||'').trim()==='0',
   };
 }
 
 function applyProductCodeToModal(){
   const input=document.getElementById('product-code');
   const parsed=parseProductCode(input?.value);
-  if(!parsed){toast('Формат: ☕️;Раф;100;250;6;10;32');return;}
+  if(!parsed){toast('Формат: ☕️;Раф;100;250;6;10;32 или ...;0');return;}
+  nutritionProductCodeOneOff=parsed.oneOff===true;
   document.getElementById('product-emoji').value=parsed.emoji;
   document.getElementById('product-name').value=parsed.name;
   document.getElementById('product-base-grams').value=parsed.baseGrams;
@@ -2396,19 +2456,61 @@ function applyProductCodeToModal(){
   document.getElementById('product-fat').value=parsed.fat;
   document.getElementById('product-carbs').value=parsed.carbs;
   document.getElementById('product-entry-grams').value=0;
-  toast('Код применён');
+  const hint=document.getElementById('product-code-oneoff-hint');
+  if(hint)hint.textContent=nutritionProductCodeOneOff?'одноразово: не сохранять в список блюд':'будет сохранено в список блюд';
+  toast(nutritionProductCodeOneOff?'Код применён · одноразово':'Код применён');
 }
 
 function addNutritionProductFromCodeSetting(){
   const input=document.getElementById('nutrition-product-code-setting');
   const parsed=parseProductCode(input?.value);
-  if(!parsed){toast('Формат: ☕️;Раф;100;250;6;10;32');return;}
+  if(!parsed){toast('Формат: ☕️;Раф;100;250;6;10;32 или ...;0');return;}
+  if(parsed.oneOff){
+    const meal=visibleNutritionMealTypes()[0]?.id||'snack';
+    createOneOffNutritionEntry(parsed,meal,localDateKey(new Date()));
+    if(input)input.value='';
+    renderNutrition();
+    toast('Одноразово добавлено на сегодня');
+    return;
+  }
   const now=nowISO();
   if(!S.nutrition.products)S.nutrition.products=[];
-  S.nutrition.products.push(normalizeNutritionProduct({...parsed,id:genId(),createdAt:now,updatedAt:now,deviceId:S.deviceId}));
+  const {oneOff,...productData}=parsed;
+  S.nutrition.products.push(normalizeNutritionProduct({...productData,id:genId(),createdAt:now,updatedAt:now,deviceId:S.deviceId}));
   save();
   renderNutrition();
   toast('Блюдо добавлено');
+}
+
+function createOneOffNutritionEntry(productData,mealType,dateKey){
+  const ts=nutritionDateKeyToISO(dateKey);
+  const ratio=1;
+  const payload=normalizeNutritionEntry({
+    id:genId(),
+    productId:null,
+    mealType,
+    emoji:productData.emoji,
+    name:productData.name,
+    grams:productData.baseGrams,
+    qty:1,
+    kcal:productData.kcal*ratio,
+    protein:productData.protein*ratio,
+    fat:productData.fat*ratio,
+    carbs:productData.carbs*ratio,
+    ts,
+    createdAt:ts,
+    updatedAt:nowISO(),
+    deviceId:S.deviceId,
+  });
+  if(!S.nutrition.entries)S.nutrition.entries=[];
+  S.nutrition.entries.push(payload);
+  save();
+}
+
+function nutritionDateKeyToISO(key){
+  if(!key)return nowISO();
+  const d=new Date(key+'T12:00:00');
+  return isNaN(d.getTime())?nowISO():d.toISOString();
 }
 
 function currentExistingNutritionScale(product){
@@ -2481,8 +2583,10 @@ function closeNutritionModal(evt){
 
 
 function saveNutritionEntry(){
-  const ts=nowISO();
-  let product,grams,qty;
+  const now=nowISO();
+  const entryTs=editingNutritionEntryId?null:(nutritionHistoryAddDateKey?nutritionDateKeyToISO(nutritionHistoryAddDateKey):now);
+  nutritionMealType=document.getElementById('nutrition-meal-type-select')?.value||nutritionMealType;
+  let product,grams,qty,productId;
   if(nutritionModalTab==='new'){
     const name=document.getElementById('product-name').value.trim();
     if(!name){toast('Укажи название продукта');return;}
@@ -2495,15 +2599,18 @@ function saveNutritionEntry(){
       protein:parseFloat(document.getElementById('product-protein').value)||0,
       fat:parseFloat(document.getElementById('product-fat').value)||0,
       carbs:parseFloat(document.getElementById('product-carbs').value)||0,
-      createdAt:ts,updatedAt:ts,deviceId:S.deviceId
+      createdAt:now,updatedAt:now,deviceId:S.deviceId
     });
-    S.nutrition.products.push(product);
+    const shouldSaveProduct=!nutritionProductCodeOneOff&&!editingNutritionEntryId;
+    if(shouldSaveProduct)S.nutrition.products.push(product);
+    productId=shouldSaveProduct?product.id:null;
     const rawEntryGrams=parseFloat(document.getElementById('product-entry-grams').value);
     grams=rawEntryGrams>0?rawEntryGrams:product.baseGrams;
     qty=1;
   }else{
     product=visibleNutritionProducts().find(p=>String(p.id)===String(nutritionSelectedProductId));
     if(!product){toast('Выбери продукт');return;}
+    productId=product.id;
     const rawGrams=parseFloat(document.getElementById('nutrition-grams').value);
     const rawQty=parseFloat(document.getElementById('nutrition-qty').value);
     const gramsPerUnit=rawGrams>0?rawGrams:product.baseGrams;
@@ -2511,11 +2618,11 @@ function saveNutritionEntry(){
     grams=gramsPerUnit*qty;
   }
 
-  const ratio=grams/product.baseGrams;
+  const ratio=grams/(product.baseGrams||100);
   const oldEntry=editingNutritionEntryId?visibleNutritionEntries().find(e=>String(e.id)===String(editingNutritionEntryId)):null;
   const payload=normalizeNutritionEntry({
     id:editingNutritionEntryId||genId(),
-    productId:product.id,
+    productId,
     mealType:nutritionMealType,
     emoji:product.emoji,
     name:product.name,
@@ -2525,9 +2632,9 @@ function saveNutritionEntry(){
     protein:product.protein*ratio,
     fat:product.fat*ratio,
     carbs:product.carbs*ratio,
-    ts:oldEntry?.ts||ts,
-    createdAt:oldEntry?.createdAt||ts,
-    updatedAt:ts,
+    ts:oldEntry?.ts||entryTs||now,
+    createdAt:oldEntry?.createdAt||entryTs||now,
+    updatedAt:now,
     deviceId:S.deviceId,
   });
 
@@ -2537,12 +2644,14 @@ function saveNutritionEntry(){
   }else{
     S.nutrition.entries.push(payload);
   }
+  const returnToHistory=!!nutritionHistoryAddDateKey;
+  nutritionHistoryAddDateKey=null;
+  nutritionProductCodeOneOff=false;
   save();
   closeModal('nutrition-modal');
   renderNutrition();
-  toast('✓ Сохранено');
+  toast(returnToHistory?'✓ Добавлено в день':'✓ Сохранено');
 }
-
 
 function renderNutritionSettings(body){
   const goals=nutritionGoals();
@@ -2568,7 +2677,7 @@ function renderNutritionSettings(body){
   <div class="nut-settings-card">
     <div class="ctitle">БЛЮДА / ПРОДУКТЫ</div>
     <div class="product-code-row">
-      <input type="text" id="nutrition-product-code-setting" placeholder="код: ☕️;Раф;100;250;6;10;32">
+      <input type="text" id="nutrition-product-code-setting" placeholder="код: ☕️;Раф;100;250;6;10;32;0">
       <button onclick="addNutritionProductFromCodeSetting()">КОД</button>
     </div>
     <div id="nutrition-product-settings">${visibleNutritionProducts().map(nutritionProductSettingsRow).join('')}</div>
@@ -2714,7 +2823,12 @@ function renderNutritionDayHistory(body,key){
   const entries=displayNutritionEntries().filter(e=>localDateKey(new Date(e.ts))===key).sort((a,b)=>new Date(b.ts)-new Date(a.ts));
   const espresso=showEspresso?espressoCountForDay(new Date(key+'T00:00:00')):0;
   body.innerHTML=`<button class="nut-back-btn" onclick="S.nutritionHistoryDate=null;save();renderNutrition()">← К ДНЯМ</button>
-    <div class="ctitle">${formatLocalDateKey(key)} ${espresso?`<span class="nut-day-espresso">☕ x${espresso}</span>`:''}</div>
+    <div class="ctitle">${formatLocalDateKey(key)}</div>
+    <div class="nut-history-actions">
+      <button class="dbtn" onclick="openMealModalForDate('${key}')">+ ПРИЁМ ПИЩИ</button>
+      ${showEspresso?`<button class="dbtn" onclick="editEspressoForDay('${key}')">☕ ЭСПРЕССО</button>`:''}
+    </div>
+    ${showEspresso?`<div class="nut-day-espresso-edit"><div><div style="font-size:9px;color:var(--mut);letter-spacing:1px">ЭСПРЕССО ЗА ДЕНЬ</div><div class="v">☕ x${espresso}</div></div><button onclick="editEspressoForDay('${key}')">ИЗМЕНИТЬ</button></div>`:''}
     ${entries.length?entries.map(e=>`<div class="nut-entry">
       <div class="nut-entry-main">
         <div class="product-emoji">${escapeAttr(e.emoji)}</div>
@@ -2731,6 +2845,37 @@ function renderNutritionDayHistory(body,key){
     </div>`).join(''):`<div class="empty"><p>В этот день нет приёмов пищи${espresso?', но есть эспрессо':''}</p></div>`}`;
 }
 
+function editEspressoForDay(key){
+  const current=espressoCountForDay(new Date(key+'T00:00:00'));
+  const raw=prompt('Сколько эспрессо за '+formatLocalDateKey(key)+'?',String(current));
+  if(raw===null)return;
+  const target=Math.max(0,Math.floor(parseFloat(String(raw).replace(',','.'))||0));
+  setEspressoCountForDay(key,target);
+  renderNutrition();
+  toast('☕ x'+target);
+}
+
+function setEspressoCountForDay(key,target){
+  if(!S.nutrition.espressoLogs)S.nutrition.espressoLogs=[];
+  const start=new Date(key+'T00:00:00');
+  const end=new Date(start);end.setDate(start.getDate()+1);
+  const active=S.nutrition.espressoLogs.filter(e=>{
+    if(e.deletedAt)return false;
+    const d=new Date(e.ts);
+    return d>=start&&d<end;
+  }).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  const now=nowISO();
+  if(active.length>target){
+    active.slice(target).forEach(e=>{e.deletedAt=now;touchItem(e);});
+  }else if(active.length<target){
+    for(let i=active.length;i<target;i++){
+      const ts=new Date(start);
+      ts.setHours(12,0,i,0);
+      S.nutrition.espressoLogs.push(normalizeEspressoLog({id:genId(),ts:ts.toISOString(),createdAt:now,updatedAt:now,deviceId:S.deviceId}));
+    }
+  }
+  save();
+}
 
 function deleteNutritionEntry(id){
   if(!confirm('Удалить запись о еде?'))return;
