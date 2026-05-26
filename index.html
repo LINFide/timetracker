@@ -1162,6 +1162,16 @@ function visibleNutritionProducts(){return (S.nutrition?.products||[]).filter(p=
 function visibleNutritionEntries(){return (S.nutrition?.entries||[]).filter(e=>!isDeleted(e));}
 function visibleEspressoLogs(){return (S.nutrition?.espressoLogs||[]).filter(e=>!isDeleted(e));}
 function visibleNutritionWeights(){return (S.nutrition?.weights||[]).map(normalizeNutritionWeight).filter(w=>!isDeleted(w));}
+function snapshotNutritionWeights(){
+  return (S.nutrition?.weights||[]).map(normalizeNutritionWeight);
+}
+function restoreNutritionWeights(snapshot){
+  if(!snapshot||!snapshot.length)return;
+  if(!S.nutrition||typeof S.nutrition!=='object'){
+    S.nutrition={products:[],entries:[],mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),goals:{...DEFAULT_NUTRITION_GOALS},espressoLogs:[],weights:[],settings:{showEspressoMeter:false}};
+  }
+  S.nutrition.weights=mergeNutritionWeights(S.nutrition.weights||[],snapshot);
+}
 function displayNutritionEntries(){return S.debugMode?getDebugNutritionEntries():visibleNutritionEntries();}
 
 function isDeleted(item){return !!item?.deletedAt;}
@@ -3225,6 +3235,7 @@ async function runCloudAction(mode,buttonId=null){
   }
 
   try{
+    const localWeightsBeforeCloud=snapshotNutritionWeights();
     S.gFolder=document.getElementById('g-folder').value||'TimeTracker';
     save();
 
@@ -3234,6 +3245,8 @@ async function runCloudAction(mode,buttonId=null){
       if(remote){
         const merged=buildMergedState(remote);
         applyState(merged);
+        restoreNutritionWeights(localWeightsBeforeCloud);
+        save();
         await gUpdateFile(cloud.mainFileId,buildExport());
       }else{
         await gUpdateFile(cloud.mainFileId,buildExport());
@@ -3260,6 +3273,7 @@ async function runCloudAction(mode,buttonId=null){
         throw new Error('В облаке нет данных для восстановления');
       }
       applyState(normalizeState(remote));
+      restoreNutritionWeights(localWeightsBeforeCloud);
       S.gFolder=document.getElementById('g-folder').value||S.gFolder||'TimeTracker';
       S.gRootFolderId=cloud.rootFolderId;
       S.gBackupFolderId=cloud.backupFolderId;
@@ -3353,15 +3367,17 @@ function normalizeState(raw){
   };
 }
 
-function applyState(state){
+function applyState(state, options={}){
   const incoming=normalizeState(state);
-  const preservedWeights=mergeNutritionWeights(S.nutrition?.weights||[],incoming.nutrition?.weights||[]);
+  const shouldPreserveWeights=options.preserveWeights!==false;
+  const localWeights=shouldPreserveWeights?snapshotNutritionWeights():[];
+  const incomingWeights=incoming.nutrition?.weights||[];
   S={
     ...S,
     ...incoming,
     nutrition:{
       ...incoming.nutrition,
-      weights:preservedWeights,
+      weights:shouldPreserveWeights?mergeNutritionWeights(localWeights,incomingWeights):incomingWeights,
     },
   };
   migrateState();
@@ -3689,19 +3705,41 @@ function buildExportObject(){
     lifeDisplayMode:S.lifeDisplayMode||'precise',
     birthAt:S.birthAt||null,
     lifeExpectancyYears:parseFloat(S.lifeExpectancyYears)||75,
+    settingsSection:S.settingsSection||'data',
     heatmapMode:S.heatmapMode||'fill',
     heatmapActivityIds:S.heatmapActivityIds||[],
+    graphActivityIds:S.graphActivityIds||[],
+    graphP1From:S.graphP1From||null,
+    graphP1To:S.graphP1To||null,
+    graphP2From:S.graphP2From||null,
+    graphP2To:S.graphP2To||null,
+    debugMode:S.debugMode===true,
+    intervalMinutes:S.intervalMinutes||15,
+    nextPingTime:S.nextPingTime||null,
+    customFrom:S.customFrom||null,
+    customTo:S.customTo||null,
     activities:S.activities.map(a=>normalizeActivity(a)),
     logs:S.logs.map(l=>normalizeLog(l)),
     nutrition:{
       products:(S.nutrition?.products||[]).map(normalizeNutritionProduct),
       entries:(S.nutrition?.entries||[]).map(normalizeNutritionEntry),
+      mealTypes:(S.nutrition?.mealTypes||DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType),
+      goals:normalizeNutritionGoals(S.nutrition?.goals),
+      espressoLogs:(S.nutrition?.espressoLogs||[]).map(normalizeEspressoLog),
+      weights:(S.nutrition?.weights||[]).map(normalizeNutritionWeight),
+      settings:normalizeNutritionSettings(S.nutrition?.settings),
     },
   };
 }
 
 function normalizeState(raw){
   const state=raw&&typeof raw==='object'?raw:{};
+  const nutritionRaw=state.nutrition&&typeof state.nutrition==='object'?state.nutrition:{};
+  const rawWeights=[
+    ...(Array.isArray(nutritionRaw.weights)?nutritionRaw.weights:[]),
+    ...(Array.isArray(nutritionRaw.weightHistory)?nutritionRaw.weightHistory:[]),
+    ...(Array.isArray(state.weights)?state.weights:[]),
+  ];
   return {
     schemaVersion:4,
     deviceId:state.deviceId||S.deviceId||genId(),
@@ -3715,8 +3753,10 @@ function normalizeState(raw){
     showDayRemaining:typeof state.showDayRemaining==='boolean'?state.showDayRemaining:(S.showDayRemaining!==false),
     showMainMilliseconds:typeof state.showMainMilliseconds==='boolean'?state.showMainMilliseconds:(S.showMainMilliseconds!==false),
     showDetailedActivityCards:typeof state.showDetailedActivityCards==='boolean'?state.showDetailedActivityCards:(S.showDetailedActivityCards===true),
+    showTimerTab:typeof state.showTimerTab==='boolean'?state.showTimerTab:(S.showTimerTab===true),
     detailedActivityRange:['week','month','all'].includes(state.detailedActivityRange||S.detailedActivityRange)?(state.detailedActivityRange||S.detailedActivityRange):'week',
     lifeDisplayMode:state.lifeDisplayMode||S.lifeDisplayMode||'precise',
+    debugMode:typeof state.debugMode==='boolean'?state.debugMode:(S.debugMode===true),
     intervalMinutes:parseInt(state.intervalMinutes||S.intervalMinutes||15)||15,
     nextPingTime:state.nextPingTime||S.nextPingTime||null,
     customFrom:state.customFrom||S.customFrom||null,
@@ -3726,20 +3766,39 @@ function normalizeState(raw){
     settingsSection:state.settingsSection||S.settingsSection||'data',
     heatmapMode:state.heatmapMode||S.heatmapMode||'fill',
     heatmapActivityIds:Array.isArray(state.heatmapActivityIds)?state.heatmapActivityIds.map(String):(S.heatmapActivityIds||[]),
+    graphActivityIds:Array.isArray(state.graphActivityIds)?state.graphActivityIds.map(String):(S.graphActivityIds||[]),
+    graphP1From:state.graphP1From||S.graphP1From||null,
+    graphP1To:state.graphP1To||S.graphP1To||null,
+    graphP2From:state.graphP2From||S.graphP2From||null,
+    graphP2To:state.graphP2To||S.graphP2To||null,
     activities:(state.activities||S.activities||[]).map((a,idx)=>normalizeActivity(a,idx+1)),
     logs:(state.logs||S.logs||[]).map(normalizeLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
-    showTimerTab:typeof state.showTimerTab==='boolean'?state.showTimerTab:(S.showTimerTab===true),
     nutritionView:state.nutritionView||S.nutritionView||'main',
     nutritionHistoryDate:state.nutritionHistoryDate||S.nutritionHistoryDate||null,
     nutrition:{
-      products:(state.nutrition?.products||S.nutrition?.products||[]).map(normalizeNutritionProduct),
-      entries:(state.nutrition?.entries||S.nutrition?.entries||[]).map(normalizeNutritionEntry).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      products:(nutritionRaw.products||S.nutrition?.products||[]).map(normalizeNutritionProduct),
+      entries:(nutritionRaw.entries||S.nutrition?.entries||[]).map(normalizeNutritionEntry).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      mealTypes:(nutritionRaw.mealTypes||S.nutrition?.mealTypes||DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType),
+      goals:normalizeNutritionGoals({...S.nutrition?.goals,...nutritionRaw.goals}),
+      espressoLogs:(nutritionRaw.espressoLogs||S.nutrition?.espressoLogs||[]).map(normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      weights:mergeNutritionWeights(S.nutrition?.weights||[],rawWeights),
+      settings:normalizeNutritionSettings({...S.nutrition?.settings,...nutritionRaw.settings}),
     },
   };
 }
 
-function applyState(state){
-  S={...S,...normalizeState(state)};
+function applyState(state, options={}){
+  const incoming=normalizeState(state);
+  const shouldPreserveWeights=options.preserveWeights!==false;
+  const localWeights=shouldPreserveWeights?snapshotNutritionWeights():[];
+  S={
+    ...S,
+    ...incoming,
+    nutrition:{
+      ...incoming.nutrition,
+      weights:shouldPreserveWeights?mergeNutritionWeights(localWeights,incoming.nutrition?.weights||[]):(incoming.nutrition?.weights||[]),
+    },
+  };
   migrateState();
   save();
 }
