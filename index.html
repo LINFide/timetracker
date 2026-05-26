@@ -3320,6 +3320,12 @@ function buildExport(){return JSON.stringify(buildExportObject(),null,2);}
 
 function normalizeState(raw){
   const state=raw&&typeof raw==='object'?raw:{};
+  const nutritionRaw=state.nutrition&&typeof state.nutrition==='object'?state.nutrition:{};
+  const rawWeights=[
+    ...(Array.isArray(nutritionRaw.weights)?nutritionRaw.weights:[]),
+    ...(Array.isArray(nutritionRaw.weightHistory)?nutritionRaw.weightHistory:[]),
+    ...(Array.isArray(state.weights)?state.weights:[]),
+  ];
   return {
     schemaVersion:3,
     deviceId:S.deviceId||state.deviceId||genId(),
@@ -3336,21 +3342,27 @@ function normalizeState(raw){
     activities:(state.activities||[]).map((a,idx)=>normalizeActivity(a,idx+1)),
     logs:(state.logs||[]).map(normalizeLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
     nutrition:{
-      products:(state.nutrition?.products||[]).map(normalizeNutritionProduct),
-      entries:(state.nutrition?.entries||[]).map(normalizeNutritionEntry).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
-      mealTypes:(state.nutrition?.mealTypes||DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType),
-      goals:normalizeNutritionGoals(state.nutrition?.goals),
-      espressoLogs:(state.nutrition?.espressoLogs||[]).map(normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
-      weights:(state.nutrition?.weights||[]).map(normalizeNutritionWeight).sort((a,b)=>new Date(a.weekStart)-new Date(b.weekStart)),
-      settings:normalizeNutritionSettings(state.nutrition?.settings),
+      products:(nutritionRaw.products||[]).map(normalizeNutritionProduct),
+      entries:(nutritionRaw.entries||[]).map(normalizeNutritionEntry).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      mealTypes:(nutritionRaw.mealTypes||DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType),
+      goals:normalizeNutritionGoals(nutritionRaw.goals),
+      espressoLogs:(nutritionRaw.espressoLogs||[]).map(normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      weights:mergeNutritionWeights([],rawWeights),
+      settings:normalizeNutritionSettings(nutritionRaw.settings),
     },
   };
 }
 
 function applyState(state){
+  const incoming=normalizeState(state);
+  const preservedWeights=mergeNutritionWeights(S.nutrition?.weights||[],incoming.nutrition?.weights||[]);
   S={
     ...S,
-    ...normalizeState(state),
+    ...incoming,
+    nutrition:{
+      ...incoming.nutrition,
+      weights:preservedWeights,
+    },
   };
   migrateState();
   save();
@@ -3371,7 +3383,7 @@ function buildMergedState(remoteState){
       mealTypes:mergeGenericEntities(S.nutrition?.mealTypes||[],remote.nutrition?.mealTypes||[],normalizeNutritionMealType),
       goals:normalizeNutritionGoals({...remote.nutrition?.goals,...S.nutrition?.goals}),
       espressoLogs:mergeGenericEntities(S.nutrition?.espressoLogs||[],remote.nutrition?.espressoLogs||[],normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
-      weights:mergeGenericEntities(S.nutrition?.weights||[],remote.nutrition?.weights||[],normalizeNutritionWeight).sort((a,b)=>new Date(a.weekStart)-new Date(b.weekStart)),
+      weights:mergeNutritionWeights(S.nutrition?.weights||[],remote.nutrition?.weights||[]),
       settings:normalizeNutritionSettings({...remote.nutrition?.settings,...S.nutrition?.settings}),
     },
   };
@@ -3412,6 +3424,26 @@ function mergeGenericEntities(localItems,remoteItems,normalizer){
   });
   return Array.from(map.values());
 }
+
+function mergeNutritionWeights(localItems,remoteItems){
+  const map=new Map();
+  [...(localItems||[]),...(remoteItems||[])].forEach(item=>{
+    const normalized=normalizeNutritionWeight(item);
+    const key=String(normalized.weekStart||normalized.id);
+    const existing=map.get(key);
+    if(!existing){
+      map.set(key,normalized);
+      return;
+    }
+    const existingTs=new Date(existing.updatedAt||existing.createdAt||0).getTime();
+    const currentTs=new Date(normalized.updatedAt||normalized.createdAt||0).getTime();
+    if(currentTs>=existingTs){
+      map.set(key,{...existing,...normalized,weekStart:key});
+    }
+  });
+  return Array.from(map.values()).sort((a,b)=>new Date(a.weekStart)-new Date(b.weekStart));
+}
+
 
 
 async function gEnsureCloudState(){
