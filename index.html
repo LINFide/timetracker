@@ -355,6 +355,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .nut-day-espresso-edit button{border:1px solid var(--acc);background:var(--sur);color:var(--acc);border-radius:9px;padding:7px 9px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
 .oneoff-hint{font-size:8px;color:var(--acc);letter-spacing:.8px;margin-top:-2px;margin-bottom:6px;min-height:10px;text-transform:uppercase}
 
+
+.settings-version-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.settings-version-header .sh-title{margin-bottom:0}
+.app-version-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);white-space:nowrap}
+
 /* ── SETTINGS ── */
 #sset{overflow:hidden}
 .sscroll{flex:1;overflow-y:auto;padding:13px}
@@ -662,7 +667,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 
   <!-- ══ SETTINGS ══ -->
   <div class="screen" id="sset">
-   <div class="sh"><div class="sh-title">НАСТРОЙКИ</div></div>
+   <div class="sh settings-version-header"><div class="sh-title">НАСТРОЙКИ</div><div class="app-version-badge">v18.0</div></div>
    <div class="sscroll">
     <div class="settings-home-grid">
       <button class="settings-home-btn" data-ss="data" onclick="setSettingsSection('data')">☁️ НАСТРОЙКИ ДАННЫХ</button>
