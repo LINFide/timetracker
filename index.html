@@ -236,6 +236,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .nut-entry-meta{font-size:9px;color:var(--mut);margin-top:2px}
 .nut-entry-kcal{font-family:'Bebas Neue',sans-serif;font-size:25px;color:var(--acc);letter-spacing:1px}
 .nut-heat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.nut-heat-week-grid{display:grid;grid-template-columns:minmax(42px,.78fr) repeat(7,1fr);gap:4px}
+.nut-heat-weight-head{font-size:7px;color:var(--mut);text-align:center}
+.nut-weight-cell{aspect-ratio:1;border-radius:7px;background:var(--sur2);border:1px solid var(--bor);padding:4px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:hidden;cursor:pointer}
+.nut-weight-cell:active{border-color:var(--acc);transform:scale(.97)}
+.nut-weight-value{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--acc);line-height:.95;letter-spacing:.6px;white-space:nowrap}
+.nut-weight-value.empty{color:var(--mut);opacity:.62}
+.nut-weight-label{font-size:6px;color:var(--mut);letter-spacing:.8px;text-transform:uppercase;margin-top:2px}
 .nut-heat-cell{aspect-ratio:1;border-radius:7px;background:var(--sur);border:1px solid var(--bor);padding:4px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:hidden}
 .nut-heat-date{font-size:7px;color:var(--mut);letter-spacing:.5px;margin-bottom:2px}
 .nut-heat-kcal{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc);line-height:1;letter-spacing:1px}
@@ -245,6 +252,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
   .nut-kcal{font-size:42px}
   .meal-card{min-height:102px;padding:10px}
   .nut-heat-kcal{font-size:15px}
+  .nut-weight-value{font-size:14px}
+  .nut-weight-label{font-size:5px}
 }
 
 
@@ -928,7 +937,7 @@ let S={
   showTimerTab:false,
   nutritionView:'main',
   nutritionHistoryDate:null,
-  nutrition:{products:[],entries:[],mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),goals:{...DEFAULT_NUTRITION_GOALS},espressoLogs:[],settings:{showEspressoMeter:false}},
+  nutrition:{products:[],entries:[],mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),goals:{...DEFAULT_NUTRITION_GOALS},espressoLogs:[],weights:[],settings:{showEspressoMeter:false}},
   customFrom:null,customTo:null,
 };
 
@@ -980,12 +989,13 @@ function migrateState(){
   if(typeof S.showTimerTab==='undefined')S.showTimerTab=false;
   if(typeof S.nutritionView==='undefined')S.nutritionView='main';
   if(typeof S.nutritionHistoryDate==='undefined')S.nutritionHistoryDate=null;
-  if(!S.nutrition||typeof S.nutrition!=='object')S.nutrition={products:[],entries:[],mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),goals:{...DEFAULT_NUTRITION_GOALS},espressoLogs:[],settings:{showEspressoMeter:false}};
+  if(!S.nutrition||typeof S.nutrition!=='object')S.nutrition={products:[],entries:[],mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),goals:{...DEFAULT_NUTRITION_GOALS},espressoLogs:[],weights:[],settings:{showEspressoMeter:false}};
   S.nutrition.products=(S.nutrition.products||[]).map(normalizeNutritionProduct);
   S.nutrition.entries=(S.nutrition.entries||[]).map(normalizeNutritionEntry).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
   S.nutrition.mealTypes=(S.nutrition.mealTypes&&S.nutrition.mealTypes.length?S.nutrition.mealTypes:DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType);
   S.nutrition.goals=normalizeNutritionGoals(S.nutrition.goals);
   S.nutrition.espressoLogs=(S.nutrition.espressoLogs||[]).map(normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  S.nutrition.weights=(S.nutrition.weights||[]).map(normalizeNutritionWeight).sort((a,b)=>new Date(a.weekStart)-new Date(b.weekStart));
   S.nutrition.settings=normalizeNutritionSettings(S.nutrition.settings);
   if(!Array.isArray(S.graphActivityIds))S.graphActivityIds=[];
   if(typeof S.graphP1From==='undefined')S.graphP1From=null;
@@ -1100,6 +1110,21 @@ function normalizeEspressoLog(e){
   };
 }
 
+function normalizeNutritionWeight(w){
+  const createdAt=w?.createdAt||w?.updatedAt||nowISO();
+  const rawWeekStart=w?.weekStart||w?.weekStartDate||localDateKey(startOfWeekMonday(new Date()));
+  const weightValue=parseFloat(w?.weightKg);
+  return {
+    id:String(w?.id??('weight-'+rawWeekStart)),
+    weekStart:String(rawWeekStart),
+    weightKg:Number.isFinite(weightValue)&&weightValue>0?weightValue:null,
+    createdAt,
+    updatedAt:w?.updatedAt||createdAt,
+    deletedAt:w?.deletedAt||null,
+    deviceId:w?.deviceId||S.deviceId||null,
+  };
+}
+
 function normalizeNutritionSettings(settings){
   const s=settings&&typeof settings==='object'?settings:{};
   return {
@@ -1136,6 +1161,7 @@ function nutritionSettings(){
 function visibleNutritionProducts(){return (S.nutrition?.products||[]).filter(p=>!isDeleted(p));}
 function visibleNutritionEntries(){return (S.nutrition?.entries||[]).filter(e=>!isDeleted(e));}
 function visibleEspressoLogs(){return (S.nutrition?.espressoLogs||[]).filter(e=>!isDeleted(e));}
+function visibleNutritionWeights(){return (S.nutrition?.weights||[]).map(normalizeNutritionWeight).filter(w=>!isDeleted(w));}
 function displayNutritionEntries(){return S.debugMode?getDebugNutritionEntries():visibleNutritionEntries();}
 
 function isDeleted(item){return !!item?.deletedAt;}
@@ -2950,35 +2976,97 @@ function nutritionHeatTextClass(ratio){
   return ratio>=0.58?'hot':'';
 }
 
+function nutritionWeightForWeek(weekStartDate){
+  const key=localDateKey(startOfWeekMonday(weekStartDate));
+  return visibleNutritionWeights().find(w=>w.weekStart===key)||null;
+}
+
+function fmtWeightKg(value){
+  const n=parseFloat(value);
+  if(!Number.isFinite(n)||n<=0)return '—.—';
+  return n.toFixed(1);
+}
+
+function setNutritionWeightForWeek(weekStartKey){
+  const existing=(S.nutrition?.weights||[]).find(w=>normalizeNutritionWeight(w).weekStart===weekStartKey&&!isDeleted(w));
+  const current=existing?.weightKg?String(existing.weightKg).replace('.',','):'';
+  const raw=prompt('Вес за неделю с '+formatLocalDateKey(weekStartKey)+' в кг',current);
+  if(raw===null)return;
+  const normalized=raw.replace(',','.').trim();
+  if(!normalized){
+    if(existing){
+      existing.deletedAt=nowISO();
+      existing.updatedAt=nowISO();
+      save();
+      renderNutrition();
+      toast('Вес удалён');
+    }
+    return;
+  }
+  const weight=parseFloat(normalized);
+  if(!Number.isFinite(weight)||weight<=0){
+    toast('Укажи вес в кг');
+    return;
+  }
+  const now=nowISO();
+  if(existing){
+    existing.weightKg=weight;
+    existing.updatedAt=now;
+    existing.deviceId=S.deviceId;
+  }else{
+    S.nutrition.weights=S.nutrition.weights||[];
+    S.nutrition.weights.push(normalizeNutritionWeight({
+      id:'weight-'+weekStartKey,
+      weekStart:weekStartKey,
+      weightKg:weight,
+      createdAt:now,
+      updatedAt:now,
+      deviceId:S.deviceId,
+    }));
+  }
+  save();
+  renderNutrition();
+  toast('✓ Вес сохранён');
+}
 
 function renderNutritionStats(body){
   const days=weekGridDates(8);
+  const weeks=[];
+  for(let i=0;i<days.length;i+=7)weeks.push(days.slice(i,i+7));
   const today=startOfLocalDay(new Date());
   const goals=nutritionGoals();
   const showEspresso=nutritionSettings().showEspressoMeter===true;
-  const dn=['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
+  const dn=['ВЕС','ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
   body.innerHTML=`<div class="card"><div class="ctitle">ТЕПЛОВАЯ КАРТА КАЛОРИЙ</div>
-    <div class="hl">${dn.map(d=>`<div style="font-size:7px;color:var(--mut);text-align:center">${d}</div>`).join('')}</div>
-    <div class="nut-heat-grid">
-      ${days.map(d=>{
-        const future=d>today;
-        const total=future?{kcal:0,protein:0,fat:0,carbs:0}:sumNutrition(nutritionEntriesForDay(d));
-        const espresso=(!future&&showEspresso)?espressoCountForDay(d):0;
-        const ratio=goals.kcal?Math.min(1,total.kcal/goals.kcal):0;
-        const alpha=total.kcal?Math.max(.18,ratio):0;
-        const bg=total.kcal?`rgba(232,255,71,${alpha})`:'var(--sur2)';
-        const cellClass=`nut-heat-cell ${isSameLocalDay(d,today)?'today':''} ${nutritionHeatTextClass(ratio)} ${future?'future':''}`;
-        return `<div class="${cellClass}" style="background:${bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${fmtKcal(total.kcal)} ккал">
-          <div class="nut-heat-date">${pad(d.getDate())}.${pad(d.getMonth()+1)}</div>
-          <div class="nut-heat-kcal">${future?'':fmtKcal(total.kcal)}</div>
-          <div class="nut-heat-macro">${future?'':`Б ${fmtMacro(total.protein)}<br>Ж ${fmtMacro(total.fat)} У ${fmtMacro(total.carbs)}`}</div>
-          ${espresso?`<div class="nut-heat-espresso">☕ x${espresso}</div>`:''}
-        </div>`;
+    <div class="nut-heat-week-grid">
+      ${dn.map((d,i)=>`<div class="${i===0?'nut-heat-weight-head':''}" style="font-size:7px;color:var(--mut);text-align:center">${d}</div>`).join('')}
+      ${weeks.map(week=>{
+        const weekStartKey=localDateKey(startOfWeekMonday(week[0]));
+        const weight=nutritionWeightForWeek(week[0]);
+        const weightText=fmtWeightKg(weight?.weightKg);
+        const weightClass=weight?'':' empty';
+        return `<button class="nut-weight-cell" onclick="setNutritionWeightForWeek('${weekStartKey}')" title="Вес за неделю с ${formatLocalDateKey(weekStartKey)}">
+          <div class="nut-weight-value${weightClass}">${weightText}</div>
+          <div class="nut-weight-label">kg</div>
+        </button>` + week.map(d=>{
+          const future=d>today;
+          const total=future?{kcal:0,protein:0,fat:0,carbs:0}:sumNutrition(nutritionEntriesForDay(d));
+          const espresso=(!future&&showEspresso)?espressoCountForDay(d):0;
+          const ratio=goals.kcal?Math.min(1,total.kcal/goals.kcal):0;
+          const alpha=total.kcal?Math.max(.18,ratio):0;
+          const bg=total.kcal?`rgba(232,255,71,${alpha})`:'var(--sur2)';
+          const cellClass=`nut-heat-cell ${isSameLocalDay(d,today)?'today':''} ${nutritionHeatTextClass(ratio)} ${future?'future':''}`;
+          return `<div class="${cellClass}" style="background:${bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${fmtKcal(total.kcal)} ккал">
+            <div class="nut-heat-date">${pad(d.getDate())}.${pad(d.getMonth()+1)}</div>
+            <div class="nut-heat-kcal">${future?'':fmtKcal(total.kcal)}</div>
+            <div class="nut-heat-macro">${future?'':`Б ${fmtMacro(total.protein)}<br>Ж ${fmtMacro(total.fat)} У ${fmtMacro(total.carbs)}`}</div>
+            ${espresso?`<div class="nut-heat-espresso">☕ x${espresso}</div>`:''}
+          </div>`;
+        }).join('');
       }).join('')}
     </div>
   </div>`;
 }
-
 
 function mealName(type){return allNutritionMealTypes().find(m=>String(m.id)===String(type))?.name||'Приём';}
 function localDateKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
@@ -3222,6 +3310,7 @@ function buildExportObject(){
       mealTypes:(S.nutrition?.mealTypes||DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType),
       goals:normalizeNutritionGoals(S.nutrition?.goals),
       espressoLogs:(S.nutrition?.espressoLogs||[]).map(normalizeEspressoLog),
+      weights:(S.nutrition?.weights||[]).map(normalizeNutritionWeight),
       settings:normalizeNutritionSettings(S.nutrition?.settings),
     },
   };
@@ -3252,6 +3341,7 @@ function normalizeState(raw){
       mealTypes:(state.nutrition?.mealTypes||DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType),
       goals:normalizeNutritionGoals(state.nutrition?.goals),
       espressoLogs:(state.nutrition?.espressoLogs||[]).map(normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      weights:(state.nutrition?.weights||[]).map(normalizeNutritionWeight).sort((a,b)=>new Date(a.weekStart)-new Date(b.weekStart)),
       settings:normalizeNutritionSettings(state.nutrition?.settings),
     },
   };
@@ -3281,6 +3371,7 @@ function buildMergedState(remoteState){
       mealTypes:mergeGenericEntities(S.nutrition?.mealTypes||[],remote.nutrition?.mealTypes||[],normalizeNutritionMealType),
       goals:normalizeNutritionGoals({...remote.nutrition?.goals,...S.nutrition?.goals}),
       espressoLogs:mergeGenericEntities(S.nutrition?.espressoLogs||[],remote.nutrition?.espressoLogs||[],normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts)),
+      weights:mergeGenericEntities(S.nutrition?.weights||[],remote.nutrition?.weights||[],normalizeNutritionWeight).sort((a,b)=>new Date(a.weekStart)-new Date(b.weekStart)),
       settings:normalizeNutritionSettings({...remote.nutrition?.settings,...S.nutrition?.settings}),
     },
   };
