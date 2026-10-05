@@ -359,6 +359,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .settings-version-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .settings-version-header .sh-title{margin-bottom:0}
 .app-version-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);white-space:nowrap}
+.nav-settings-list{display:flex;flex-direction:column;gap:6px;margin-bottom:7px}
+.nav-settings-item{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:9px;background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:8px 9px}
+.nav-settings-icon{font-size:18px;text-align:center}
+.nav-settings-main{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.nav-settings-name{font-size:10px;font-weight:700;letter-spacing:.7px;color:var(--txt);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-settings-main input[type="checkbox"]{width:18px;height:18px;flex-shrink:0}
+.nav-settings-order{display:flex;gap:4px}
+.nav-settings-note{font-size:8px;color:var(--mut);line-height:1.5;margin-bottom:10px}
+.nut-heat-cell.clickable{cursor:pointer}
+.nut-heat-cell.clickable:active{border-color:var(--acc);transform:scale(.96)}
+.nut-history-date-jump{display:grid;grid-template-columns:1fr auto;gap:7px;margin-bottom:10px}
 
 /* ── SETTINGS ── */
 #sset{overflow:hidden}
@@ -544,10 +555,88 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 .compare-act-btn.active{border-color:var(--acc);color:var(--acc)}
 .debug-note{font-size:10px;line-height:1.6;color:var(--mut);background:var(--sur2);border:1px dashed var(--bor);border-radius:10px;padding:10px;margin-top:6px}
 
+
+/* ── GLOBAL GOOGLE DRIVE SYNC REMINDER ── */
+.sync-reminder{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-height:44px;
+  padding:calc(env(safe-area-inset-top) + 7px) 10px 7px;
+  background:rgba(126,20,20,.72);
+  border-bottom:1px solid rgba(255,71,71,.58);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  color:#ffdada;
+  z-index:220;
+}
+.sync-reminder-icon{
+  flex:0 0 auto;
+  font-size:18px;
+  line-height:1;
+}
+.sync-reminder-copy{
+  flex:1;
+  min-width:0;
+}
+.sync-reminder-title{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:#ffe4e4;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.sync-reminder-meta{
+  margin-top:2px;
+  font-size:7px;
+  letter-spacing:.35px;
+  color:rgba(255,228,228,.65);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.sync-reminder-btn{
+  flex:0 0 auto;
+  min-width:66px;
+  padding:7px 9px;
+  border-radius:8px;
+  border:1px solid rgba(255,218,218,.55);
+  background:rgba(0,0,0,.22);
+  color:#fff0f0;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.7px;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.sync-reminder-btn:active{transform:scale(.97)}
+.sync-reminder-btn:disabled{opacity:.55;cursor:default;transform:none}
+.sync-reminder.hidden{display:none}
+@media(max-width:390px){
+  .sync-reminder{gap:7px;padding-left:8px;padding-right:8px}
+  .sync-reminder-icon{font-size:16px}
+  .sync-reminder-title{font-size:8px}
+  .sync-reminder-meta{font-size:6.5px}
+  .sync-reminder-btn{min-width:58px;padding:7px 7px;font-size:7.5px}
+}
+
 </style>
 </head>
 <body>
 <div id="app">
+ <div class="sync-reminder hidden" id="sync-reminder">
+  <div class="sync-reminder-icon" aria-hidden="true">⚠️</div>
+  <div class="sync-reminder-copy">
+   <div class="sync-reminder-title" id="sync-reminder-title">СИНХРОНИЗАЦИЯ С GOOGLE DRIVE</div>
+   <div class="sync-reminder-meta" id="sync-reminder-meta">Проверь, что данные сохранены в облаке</div>
+  </div>
+  <button class="sync-reminder-btn" id="sync-reminder-btn" onclick="syncFromReminder()">SYNC</button>
+ </div>
  <div id="content">
 
   <!-- ══ PING ══ -->
@@ -667,7 +756,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 
   <!-- ══ SETTINGS ══ -->
   <div class="screen" id="sset">
-   <div class="sh settings-version-header"><div class="sh-title">НАСТРОЙКИ</div><div class="app-version-badge">v18.0</div></div>
+   <div class="sh settings-version-header"><div class="sh-title">НАСТРОЙКИ</div><div class="app-version-badge">v22.0</div></div>
    <div class="sscroll">
     <div class="settings-home-grid">
       <button class="settings-home-btn" data-ss="data" onclick="setSettingsSection('data')">☁️ НАСТРОЙКИ ДАННЫХ</button>
@@ -733,7 +822,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
       <label class="toggle-row"><span class="toggle-label">Показывать блок оставшегося времени дня</span><input type="checkbox" id="show-day-remaining"></label>
       <label class="toggle-row"><span class="toggle-label">Показывать миллисекунды у часов</span><input type="checkbox" id="show-main-ms"></label>
       <label class="toggle-row"><span class="toggle-label">Подробный вид активностей</span><input type="checkbox" id="show-detailed-cards"></label>
-      <label class="toggle-row"><span class="toggle-label">Показывать вкладку таймера</span><input type="checkbox" id="show-timer-tab"></label>
+      <div class="slbl">НИЖНЕЕ МЕНЮ</div>
+      <div id="nav-app-settings" class="nav-settings-list"></div>
+      <div class="nav-settings-note">Можно скрывать приложения и менять их порядок. Настройки всегда остаются доступными.</div>
       <label class="toggle-row"><span class="toggle-label">Режим отладки</span><input type="checkbox" id="debug-mode"></label>
       <div class="debug-note">Режим отладки визуально подставляет случайные данные за последние 2 месяца. Реальная история, sync и backup не меняются.</div>
 
@@ -847,6 +938,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
  <div class="modal">
   <div class="modal-title" id="nutrition-modal-title">ДОБАВИТЬ ПРИЁМ ПИЩИ</div>
   <select id="nutrition-meal-type-select" class="nut-modal-meal-select" onchange="nutritionMealType=this.value"></select>
+  <div class="nut-form-grid" style="margin-top:8px">
+   <div>
+    <div class="modal-title" style="margin-bottom:6px">ДАТА</div>
+    <input class="date-inp" type="date" id="nutrition-entry-date">
+   </div>
+   <div>
+    <div class="modal-title" style="margin-bottom:6px">ВРЕМЯ ПРИЁМА</div>
+    <input class="date-inp" type="time" id="nutrition-entry-time" step="60">
+   </div>
+  </div>
   <div class="nut-tabs">
    <button class="nut-tab active" id="nut-tab-existing" onclick="setNutritionModalTab('existing')">ИЗ СПИСКА</button>
    <button class="nut-tab" id="nut-tab-new" onclick="setNutritionModalTab('new')">НОВЫЙ ПРОДУКТ</button>
@@ -903,6 +1004,17 @@ const DEFAULT_NUTRITION_MEAL_TYPES=[
   {id:'snack',emoji:'🍪',name:'Перекус',deletedAt:null},
 ];
 const DEFAULT_NUTRITION_GOALS={kcal:3400,protein:160,fat:100,carbs:420};
+const NAV_APPS=[
+  {id:'sp',icon:'⏱',label:'TIME TRACKER'},
+  {id:'snut',icon:'🍽',label:'КАЛОРИИ'},
+  {id:'stimer',icon:'⏲',label:'ТАЙМЕР'},
+  {id:'sa',icon:'📊',label:'АНАЛИТИКА'},
+  {id:'sh2',icon:'📋',label:'ИСТОРИЯ'},
+  {id:'sset',icon:'⚙️',label:'НАСТРОЙКИ'},
+];
+const DEFAULT_NAV_ORDER=NAV_APPS.map(x=>x.id);
+const DEFAULT_NAV_ENABLED={sp:true,snut:true,stimer:false,sa:true,sh2:true,sset:true};
+const LAST_SCREEN_KEY='ttv4-last-screen';
 
 let S={
   schemaVersion:3,
@@ -929,6 +1041,7 @@ let S={
   gBackupFolderId:null,
   gMainFileId:null,
   lastSyncAt:null,
+  syncReminderBaselineAt:null,
   badgeColor:'#e8ff47',
   showLifeTop:true,
   showDayRemaining:true,
@@ -940,6 +1053,8 @@ let S={
   graphActivityIds:[],
   graphP1From:null,graphP1To:null,graphP2From:null,graphP2To:null,
   showTimerTab:false,
+  navOrder:[...DEFAULT_NAV_ORDER],
+  navEnabled:{...DEFAULT_NAV_ENABLED},
   nutritionView:'main',
   nutritionHistoryDate:null,
   nutrition:{products:[],entries:[],mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),goals:{...DEFAULT_NUTRITION_GOALS},espressoLogs:[],weights:[],settings:{showEspressoMeter:false}},
@@ -950,6 +1065,8 @@ let period='today',aView='bars',histFilter='all';
 let epIdx=null,pingTimer=null;
 let editLogId=null,editMode='edit',editSelectedActId=null,splitLogId=null,splitSecondCatId=null;
 let gToken=null;
+let pendingSyncAfterAuth=false;
+let syncReminderTimer=null;
 
 // Timer/Stopwatch
 let timerMode='sw'; // 'sw' stopwatch, 'tm' timer
@@ -989,6 +1106,9 @@ function migrateState(){
   if(typeof S.gBackupFolderId==='undefined')S.gBackupFolderId=null;
   if(typeof S.gMainFileId==='undefined')S.gMainFileId=null;
   if(typeof S.lastSyncAt==='undefined')S.lastSyncAt=null;
+  if(typeof S.syncReminderBaselineAt==='undefined'||!S.syncReminderBaselineAt){
+    S.syncReminderBaselineAt=S.lastSyncAt||nowIso;
+  }
   if(typeof S.badgeColor==='undefined')S.badgeColor='#e8ff47';
   if(typeof S.debugMode==='undefined')S.debugMode=false;
   if(typeof S.showTimerTab==='undefined')S.showTimerTab=false;
@@ -1007,6 +1127,7 @@ function migrateState(){
   if(typeof S.graphP1To==='undefined')S.graphP1To=null;
   if(typeof S.graphP2From==='undefined')S.graphP2From=null;
   if(typeof S.graphP2To==='undefined')S.graphP2To=null;
+  save();
 }
 
 function nowISO(){return new Date().toISOString();}
@@ -1176,6 +1297,16 @@ function restoreNutritionWeights(snapshot){
     S.nutrition={products:[],entries:[],mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),goals:{...DEFAULT_NUTRITION_GOALS},espressoLogs:[],weights:[],settings:{showEspressoMeter:false}};
   }
   S.nutrition.weights=mergeNutritionWeights(S.nutrition.weights||[],snapshot);
+}
+function snapshotNutritionEspressoLogs(){
+  return (S.nutrition?.espressoLogs||[]).map(normalizeEspressoLog);
+}
+function restoreNutritionEspressoLogs(snapshot){
+  if(!snapshot||!snapshot.length)return;
+  if(!S.nutrition||typeof S.nutrition!=='object'){
+    S.nutrition={products:[],entries:[],mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),goals:{...DEFAULT_NUTRITION_GOALS},espressoLogs:[],weights:[],settings:{showEspressoMeter:false}};
+  }
+  S.nutrition.espressoLogs=mergeGenericEntities(S.nutrition.espressoLogs||[],snapshot,normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
 }
 function displayNutritionEntries(){return S.debugMode?getDebugNutritionEntries():visibleNutritionEntries();}
 
@@ -2404,6 +2535,48 @@ function mealCardHtml(meal){
 }
 
 
+
+function localTimeInputValue(date){
+  const d=date instanceof Date?date:new Date(date);
+  if(Number.isNaN(d.getTime()))return '12:00';
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function nutritionDefaultTimeValue(entry,dateKey=null){
+  if(entry?.ts)return localTimeInputValue(new Date(entry.ts));
+  if(dateKey){
+    const todayKey=localDateKey(new Date());
+    return dateKey===todayKey?localTimeInputValue(new Date()):'12:00';
+  }
+  return localTimeInputValue(new Date());
+}
+
+function nutritionEntryTsFromModal(oldEntry=null,dateKey=null,fallbackIso=nowISO()){
+  const timeInput=document.getElementById('nutrition-entry-time');
+  const dateInput=document.getElementById('nutrition-entry-date');
+  const rawTime=(timeInput?.value||'').trim();
+  const fallbackDateKey=oldEntry?.ts?localDateKey(new Date(oldEntry.ts)):(dateKey||localDateKey(new Date(fallbackIso)));
+  const baseKey=(dateInput?.value||fallbackDateKey).trim();
+  const d=new Date(baseKey+'T00:00:00');
+  if(Number.isNaN(d.getTime()))return fallbackIso;
+  const match=rawTime.match(/^(\d{1,2}):(\d{2})/);
+  if(match){
+    d.setHours(Math.min(23,parseInt(match[1],10)||0),Math.min(59,parseInt(match[2],10)||0),0,0);
+  }else if(oldEntry?.ts){
+    const old=new Date(oldEntry.ts);
+    d.setHours(old.getHours(),old.getMinutes(),0,0);
+  }else{
+    const fallback=new Date(fallbackIso);
+    d.setHours(fallback.getHours(),fallback.getMinutes(),0,0);
+  }
+  return d.toISOString();
+}
+function fmtNutritionEntryTime(iso){
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime()))return '—:—';
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 function openMealModal(mealType,entryId=null,dateKey=null){
   nutritionMealType=mealType||visibleNutritionMealTypes()[0]?.id||'snack';
   editingNutritionEntryId=entryId;
@@ -2418,6 +2591,11 @@ function openMealModal(mealType,entryId=null,dateKey=null){
   }
   document.getElementById('nutrition-modal-title').textContent=entry?'ИЗМЕНИТЬ ПРИЁМ ПИЩИ':(dateKey?'ДОБАВИТЬ · '+formatLocalDateKey(dateKey):'ДОБАВИТЬ · '+mealName(nutritionMealType));
   updateNutritionMealSelect();
+  const entryDateInput=document.getElementById('nutrition-entry-date');
+  const modalDateKey=entry?.ts?localDateKey(new Date(entry.ts)):(dateKey||localDateKey(new Date()));
+  if(entryDateInput)entryDateInput.value=modalDateKey;
+  const entryTimeInput=document.getElementById('nutrition-entry-time');
+  if(entryTimeInput)entryTimeInput.value=nutritionDefaultTimeValue(entry,dateKey);
   setNutritionModalTab(entry&&!nutritionSelectedProductId?'new':'existing');
   renderNutritionProductList();
   const product=entry?visibleNutritionProducts().find(p=>String(p.id)===String(entry.productId)):null;
@@ -2625,7 +2803,6 @@ function closeNutritionModal(evt){
 
 function saveNutritionEntry(){
   const now=nowISO();
-  const entryTs=editingNutritionEntryId?null:(nutritionHistoryAddDateKey?nutritionDateKeyToISO(nutritionHistoryAddDateKey):now);
   nutritionMealType=document.getElementById('nutrition-meal-type-select')?.value||nutritionMealType;
   let product,grams,qty,productId;
   if(nutritionModalTab==='new'){
@@ -2661,6 +2838,7 @@ function saveNutritionEntry(){
 
   const ratio=grams/(product.baseGrams||100);
   const oldEntry=editingNutritionEntryId?visibleNutritionEntries().find(e=>String(e.id)===String(editingNutritionEntryId)):null;
+  const entryTs=nutritionEntryTsFromModal(oldEntry,nutritionHistoryAddDateKey,now);
   const payload=normalizeNutritionEntry({
     id:editingNutritionEntryId||genId(),
     productId,
@@ -2673,7 +2851,7 @@ function saveNutritionEntry(){
     protein:product.protein*ratio,
     fat:product.fat*ratio,
     carbs:product.carbs*ratio,
-    ts:oldEntry?.ts||entryTs||now,
+    ts:entryTs,
     createdAt:oldEntry?.createdAt||entryTs||now,
     updatedAt:now,
     deviceId:S.deviceId,
@@ -2875,7 +3053,7 @@ function renderNutritionDayHistory(body,key){
         <div class="product-emoji">${escapeAttr(e.emoji)}</div>
         <div class="nut-entry-info">
           <div class="nut-entry-title">${escapeAttr(e.name)}</div>
-          <div class="nut-entry-meta">${mealName(e.mealType)} · ${fmtMacro(e.grams)}г · Б ${fmtMacro(e.protein)} Ж ${fmtMacro(e.fat)} У ${fmtMacro(e.carbs)}</div>
+          <div class="nut-entry-meta">${fmtNutritionEntryTime(e.ts)} · ${mealName(e.mealType)} · ${fmtMacro(e.grams)}г · Б ${fmtMacro(e.protein)} Ж ${fmtMacro(e.fat)} У ${fmtMacro(e.carbs)}</div>
         </div>
         <div class="nut-entry-kcal">${fmtKcal(e.kcal)}</div>
       </div>
@@ -3070,8 +3248,9 @@ function renderNutritionStats(body){
           const ratio=goals.kcal?Math.min(1,total.kcal/goals.kcal):0;
           const alpha=total.kcal?Math.max(.18,ratio):0;
           const bg=total.kcal?`rgba(232,255,71,${alpha})`:'var(--sur2)';
-          const cellClass=`nut-heat-cell ${isSameLocalDay(d,today)?'today':''} ${nutritionHeatTextClass(ratio)} ${future?'future':''}`;
-          return `<div class="${cellClass}" style="background:${bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${fmtKcal(total.kcal)} ккал">
+          const dayKey=localDateKey(d);
+          const cellClass=`nut-heat-cell ${isSameLocalDay(d,today)?'today':''} ${nutritionHeatTextClass(ratio)} ${future?'future':'clickable'}`;
+          return `<div class="${cellClass}" ${future?'':`onclick="openNutritionDayFromHeatmap('${dayKey}')"`} style="background:${bg}" title="${pad(d.getDate())}.${pad(d.getMonth()+1)} — ${fmtKcal(total.kcal)} ккал">
             <div class="nut-heat-date">${pad(d.getDate())}.${pad(d.getMonth()+1)}</div>
             <div class="nut-heat-kcal">${future?'':fmtKcal(total.kcal)}</div>
             <div class="nut-heat-macro">${future?'':`Б ${fmtMacro(total.protein)}<br>Ж ${fmtMacro(total.fat)} У ${fmtMacro(total.carbs)}`}</div>
@@ -3154,6 +3333,7 @@ function updateGUI(){
       mainSyncBtn.disabled=false;
     }
   }
+  updateSyncReminder();
 }
 
 function gAuth(){
@@ -3199,9 +3379,18 @@ function startGoogleTokenFlow(){
       if(r.access_token){
         gToken=r.access_token;
         try{localStorage.setItem('gToken',gToken);}catch(e){}
+        const shouldSync=pendingSyncAfterAuth;
+        pendingSyncAfterAuth=false;
         updateGUI();
-        toast('✓ Подключено к Google Drive');
+        if(shouldSync){
+          toast('✓ Вход выполнен · запускаю sync');
+          setTimeout(()=>runCloudAction('merge','sync-reminder-btn'),0);
+        }else{
+          toast('✓ Подключено к Google Drive');
+        }
       }else{
+        pendingSyncAfterAuth=false;
+        updateSyncReminder();
         toast('Ошибка авторизации');
       }
     }
@@ -3241,6 +3430,7 @@ async function runCloudAction(mode,buttonId=null){
 
   try{
     const localWeightsBeforeCloud=snapshotNutritionWeights();
+    const localEspressoBeforeCloud=snapshotNutritionEspressoLogs();
     S.gFolder=document.getElementById('g-folder').value||'TimeTracker';
     save();
 
@@ -3251,6 +3441,7 @@ async function runCloudAction(mode,buttonId=null){
         const merged=buildMergedState(remote);
         applyState(merged);
         restoreNutritionWeights(localWeightsBeforeCloud);
+        restoreNutritionEspressoLogs(localEspressoBeforeCloud);
         save();
         await gUpdateFile(cloud.mainFileId,buildExport());
       }else{
@@ -3279,6 +3470,7 @@ async function runCloudAction(mode,buttonId=null){
       }
       applyState(normalizeState(remote));
       restoreNutritionWeights(localWeightsBeforeCloud);
+      restoreNutritionEspressoLogs(localEspressoBeforeCloud);
       S.gFolder=document.getElementById('g-folder').value||S.gFolder||'TimeTracker';
       S.gRootFolderId=cloud.rootFolderId;
       S.gBackupFolderId=cloud.backupFolderId;
@@ -3299,8 +3491,10 @@ async function runCloudAction(mode,buttonId=null){
       console.error(e);
     }
   }finally{
-    btn.textContent=prevLabel;
-    btn.classList.remove('syncing');
+    if(btn){
+      btn.textContent=prevLabel;
+      btn.classList.remove('syncing');
+    }
     setCloudButtonsDisabled(false);
     updateGUI();
   }
@@ -3671,9 +3865,10 @@ let recoveryFilesCache=[];
 function migrateState(){
   const nowIso=nowISO();
   if(!S.deviceId)S.deviceId=genId();
-  S.schemaVersion=4;
-  S.activities=(S.activities||[]).map((a,idx)=>normalizeActivity(a, idx + 1, nowIso));
+  S.schemaVersion=6;
+  S.activities=(S.activities||[]).map((a,idx)=>normalizeActivity(a,idx+1,nowIso));
   S.logs=(S.logs||[]).map(normalizeLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+
   if(typeof S.gRootFolderId==='undefined')S.gRootFolderId=null;
   if(typeof S.gBackupFolderId==='undefined')S.gBackupFolderId=null;
   if(typeof S.gMainFileId==='undefined')S.gMainFileId=null;
@@ -3690,11 +3885,35 @@ function migrateState(){
   if(typeof S.settingsSection==='undefined')S.settingsSection='data';
   if(typeof S.heatmapMode==='undefined')S.heatmapMode='fill';
   if(!Array.isArray(S.heatmapActivityIds))S.heatmapActivityIds=[];
+  if(!Array.isArray(S.graphActivityIds))S.graphActivityIds=[];
+  if(typeof S.nutritionView==='undefined')S.nutritionView='main';
+  if(typeof S.nutritionHistoryDate==='undefined')S.nutritionHistoryDate=null;
+
+  if(!S.nutrition||typeof S.nutrition!=='object'){
+    S.nutrition={
+      products:[],
+      entries:[],
+      mealTypes:DEFAULT_NUTRITION_MEAL_TYPES.map(m=>({...m})),
+      goals:{...DEFAULT_NUTRITION_GOALS},
+      espressoLogs:[],
+      weights:[],
+      settings:{showEspressoMeter:false},
+    };
+  }
+  S.nutrition.products=(S.nutrition.products||[]).map(normalizeNutritionProduct);
+  S.nutrition.entries=(S.nutrition.entries||[]).map(normalizeNutritionEntry).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  S.nutrition.mealTypes=(S.nutrition.mealTypes?.length?S.nutrition.mealTypes:DEFAULT_NUTRITION_MEAL_TYPES).map(normalizeNutritionMealType);
+  S.nutrition.goals=normalizeNutritionGoals(S.nutrition.goals);
+  S.nutrition.espressoLogs=(S.nutrition.espressoLogs||[]).map(normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  S.nutrition.weights=mergeNutritionWeights([],S.nutrition.weights||[]);
+  S.nutrition.settings=normalizeNutritionSettings(S.nutrition.settings);
+
+  ensureNavConfig();
 }
 
 function buildExportObject(){
   return {
-    schemaVersion:4,
+    schemaVersion:6,
     exportedAt:nowISO(),
     deviceId:S.deviceId,
     rootFolderId:S.gRootFolderId||null,
@@ -3705,7 +3924,9 @@ function buildExportObject(){
     showDayRemaining:S.showDayRemaining!==false,
     showMainMilliseconds:S.showMainMilliseconds!==false,
     showDetailedActivityCards:S.showDetailedActivityCards===true,
-    showTimerTab:S.showTimerTab===true,
+    showTimerTab:S.navEnabled?.stimer===true,
+    navOrder:[...(S.navOrder||DEFAULT_NAV_ORDER)],
+    navEnabled:{...DEFAULT_NAV_ENABLED,...(S.navEnabled||{})},
     detailedActivityRange:S.detailedActivityRange||'week',
     lifeDisplayMode:S.lifeDisplayMode||'precise',
     birthAt:S.birthAt||null,
@@ -3746,7 +3967,7 @@ function normalizeState(raw){
     ...(Array.isArray(state.weights)?state.weights:[]),
   ];
   return {
-    schemaVersion:4,
+    schemaVersion:6,
     deviceId:state.deviceId||S.deviceId||genId(),
     gFolder:state.gFolder||S.gFolder||'TimeTracker',
     gRootFolderId:state.rootFolderId||state.gRootFolderId||S.gRootFolderId||null,
@@ -3759,6 +3980,8 @@ function normalizeState(raw){
     showMainMilliseconds:typeof state.showMainMilliseconds==='boolean'?state.showMainMilliseconds:(S.showMainMilliseconds!==false),
     showDetailedActivityCards:typeof state.showDetailedActivityCards==='boolean'?state.showDetailedActivityCards:(S.showDetailedActivityCards===true),
     showTimerTab:typeof state.showTimerTab==='boolean'?state.showTimerTab:(S.showTimerTab===true),
+    navOrder:Array.isArray(state.navOrder)?state.navOrder.map(String):(S.navOrder||DEFAULT_NAV_ORDER),
+    navEnabled:state.navEnabled&&typeof state.navEnabled==='object'?{...DEFAULT_NAV_ENABLED,...state.navEnabled}:{...DEFAULT_NAV_ENABLED,...(S.navEnabled||{}),stimer:typeof state.showTimerTab==='boolean'?state.showTimerTab:(S.navEnabled?.stimer??S.showTimerTab===true)},
     detailedActivityRange:['week','month','all'].includes(state.detailedActivityRange||S.detailedActivityRange)?(state.detailedActivityRange||S.detailedActivityRange):'week',
     lifeDisplayMode:state.lifeDisplayMode||S.lifeDisplayMode||'precise',
     debugMode:typeof state.debugMode==='boolean'?state.debugMode:(S.debugMode===true),
@@ -3795,12 +4018,17 @@ function normalizeState(raw){
 function applyState(state, options={}){
   const incoming=normalizeState(state);
   const shouldPreserveWeights=options.preserveWeights!==false;
+  const shouldPreserveEspresso=options.preserveEspresso!==false;
   const localWeights=shouldPreserveWeights?snapshotNutritionWeights():[];
+  const localEspresso=shouldPreserveEspresso?snapshotNutritionEspressoLogs():[];
   S={
     ...S,
     ...incoming,
     nutrition:{
       ...incoming.nutrition,
+      espressoLogs:shouldPreserveEspresso
+        ? mergeGenericEntities(localEspresso,incoming.nutrition?.espressoLogs||[],normalizeEspressoLog).sort((a,b)=>new Date(a.ts)-new Date(b.ts))
+        : (incoming.nutrition?.espressoLogs||[]),
       weights:shouldPreserveWeights?mergeNutritionWeights(localWeights,incoming.nutrition?.weights||[]):(incoming.nutrition?.weights||[]),
     },
   };
@@ -4041,6 +4269,8 @@ function renderSett(){
     if(birthTime)birthTime.value='00:00:00';
   }
   setSettingsSection(S.settingsSection||'data');
+  renderNavSettings();
+  renderBottomNav();
   updateGUI();
 }
 
@@ -4492,21 +4722,199 @@ async function gListBackups(parentId,limit=10){
   return (r.files||[]).slice(0,limit);
 }
 
-function goScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-  const screen=document.getElementById(id);
-  const nav=document.getElementById('nb-'+id);
-  if(screen)screen.classList.add('active');
-  if(nav)nav.classList.add('active');
-  if(id==='sa')renderA();
-  if(id==='sh2')renderH();
-  if(id==='sset')renderSett();
-  if(id==='snut')renderNutrition();
-  if(id==='sp'){renderPG();updatePQ();renderLifeStats();}
-  updateTimerNavVisibility();
+
+// ══════════════════════════════════════════════════════
+// V20 — NAVIGATION + NUTRITION HISTORY
+// ══════════════════════════════════════════════════════
+function ensureNavConfig(){
+  const known=new Set(DEFAULT_NAV_ORDER);
+  const incomingOrder=Array.isArray(S.navOrder)?S.navOrder.map(String):[];
+  const cleanOrder=[];
+  incomingOrder.forEach(id=>{
+    if(known.has(id)&&!cleanOrder.includes(id))cleanOrder.push(id);
+  });
+  DEFAULT_NAV_ORDER.forEach(id=>{
+    if(!cleanOrder.includes(id))cleanOrder.push(id);
+  });
+  S.navOrder=cleanOrder;
+
+  const incoming=S.navEnabled&&typeof S.navEnabled==='object'?S.navEnabled:{};
+  S.navEnabled={...DEFAULT_NAV_ENABLED,...incoming};
+  S.navEnabled.stimer=S.navEnabled.stimer===true||S.showTimerTab===true;
+  S.navEnabled.sset=true;
+  S.showTimerTab=S.navEnabled.stimer===true;
 }
 
+function getNavFallback(){
+  ensureNavConfig();
+  if(S.navEnabled.snut)return 'snut';
+  const first=S.navOrder.find(id=>S.navEnabled[id]);
+  return first||'sset';
+}
+
+function renderBottomNav(){
+  ensureNavConfig();
+  const nav=document.getElementById('bnav');
+  if(!nav)return;
+  S.navOrder.forEach(id=>{
+    const button=document.getElementById('nb-'+id);
+    if(!button)return;
+    button.style.display=S.navEnabled[id]?'flex':'none';
+    nav.appendChild(button);
+  });
+}
+
+function updateTimerNavVisibility(){
+  renderBottomNav();
+}
+
+function renderNavSettings(){
+  ensureNavConfig();
+  const root=document.getElementById('nav-app-settings');
+  if(!root)return;
+  root.innerHTML=S.navOrder.map((id,index)=>{
+    const app=NAV_APPS.find(x=>x.id===id);
+    if(!app)return '';
+    const locked=id==='sset';
+    return `<div class="nav-settings-item">
+      <div class="nav-settings-icon">${app.icon}</div>
+      <div class="nav-settings-main">
+        <div class="nav-settings-name">${escapeAttr(app.label)}</div>
+        <input type="checkbox" ${S.navEnabled[id]?'checked':''} ${locked?'disabled':''} onchange="toggleNavApp('${id}',this.checked)">
+      </div>
+      <div class="nav-settings-order">
+        <button class="movebtn" onclick="moveNavApp('${id}',-1)" ${index===0?'disabled':''}>↑</button>
+        <button class="movebtn" onclick="moveNavApp('${id}',1)" ${index===S.navOrder.length-1?'disabled':''}>↓</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleNavApp(id,enabled){
+  ensureNavConfig();
+  if(id==='sset'){
+    S.navEnabled.sset=true;
+    renderNavSettings();
+    return;
+  }
+  S.navEnabled[id]=!!enabled;
+  if(id==='stimer')S.showTimerTab=!!enabled;
+  save();
+  renderBottomNav();
+  renderNavSettings();
+}
+
+function moveNavApp(id,dir){
+  ensureNavConfig();
+  const index=S.navOrder.indexOf(id);
+  const target=index+dir;
+  if(index<0||target<0||target>=S.navOrder.length)return;
+  [S.navOrder[index],S.navOrder[target]]=[S.navOrder[target],S.navOrder[index]];
+  save();
+  renderBottomNav();
+  renderNavSettings();
+}
+
+function restoreLastActiveScreen(){
+  ensureNavConfig();
+  let last=null;
+  try{last=localStorage.getItem(LAST_SCREEN_KEY);}catch(e){}
+  const target=last&&S.navEnabled[last]?last:getNavFallback();
+  goScreen(target);
+}
+
+function openNutritionDayFromHeatmap(key){
+  S.nutritionView='history';
+  S.nutritionHistoryDate=key;
+  save();
+  renderNutrition();
+}
+
+function openNutritionHistoryDateInput(){
+  const input=document.getElementById('nutrition-history-date-jump');
+  const key=input?.value;
+  if(!key)return;
+  const chosen=new Date(key+'T00:00:00');
+  const today=startOfLocalDay(new Date());
+  if(Number.isNaN(chosen.getTime())||chosen>today){
+    toast('Выбери сегодняшний или прошедший день');
+    return;
+  }
+  openNutritionHistoryDay(key);
+}
+
+function renderNutritionHistory(body){
+  if(S.nutritionHistoryDate){
+    renderNutritionDayHistory(body,S.nutritionHistoryDate);
+    return;
+  }
+
+  const showEspresso=nutritionSettings().showEspressoMeter===true;
+  const map={};
+  displayNutritionEntries().forEach(e=>{
+    const k=localDateKey(new Date(e.ts));
+    if(!map[k])map[k]=[];
+    map[k].push(e);
+  });
+  if(showEspresso){
+    visibleEspressoLogs().forEach(e=>{
+      const k=localDateKey(new Date(e.ts));
+      if(!map[k])map[k]=[];
+    });
+  }
+
+  const today=startOfLocalDay(new Date());
+  const keys=new Set(Object.keys(map));
+  for(let i=0;i<90;i++){
+    const d=new Date(today);
+    d.setDate(today.getDate()-i);
+    keys.add(localDateKey(d));
+  }
+  const days=[...keys]
+    .filter(k=>{
+      const d=new Date(k+'T00:00:00');
+      return !Number.isNaN(d.getTime())&&d<=today;
+    })
+    .sort((a,b)=>b.localeCompare(a));
+
+  const todayKey=localDateKey(today);
+  body.innerHTML=`<div class="nut-history-date-jump">
+      <input class="date-inp" type="date" id="nutrition-history-date-jump" max="${todayKey}" value="${todayKey}">
+      <button class="date-apply" onclick="openNutritionHistoryDateInput()">ОТКРЫТЬ ДАТУ</button>
+    </div>
+    ${days.map(k=>{
+      const entries=map[k]||[];
+      const total=sumNutrition(entries);
+      const espresso=showEspresso?espressoCountForDay(new Date(k+'T00:00:00')):0;
+      return `<div class="nut-day-row ${espresso?'has-espresso':''}" onclick="openNutritionHistoryDay('${k}')">
+        <div>
+          <div class="nut-day-date">${formatLocalDateKey(k)}</div>
+          <div class="nut-day-meta">${entries.length} поз. · Б ${fmtMacro(total.protein)} Ж ${fmtMacro(total.fat)} У ${fmtMacro(total.carbs)}</div>
+          ${espresso?`<div class="nut-day-espresso">☕ x${espresso}</div>`:''}
+        </div>
+        <div class="nut-day-kcal">${fmtKcal(total.kcal)}</div>
+      </div>`;
+    }).join('')}`;
+}
+
+function goScreen(id){
+  ensureNavConfig();
+  const requested=NAV_APPS.some(x=>x.id===id)?id:'snut';
+  const target=S.navEnabled[requested]||requested==='sset'?requested:getNavFallback();
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  const screen=document.getElementById(target);
+  const nav=document.getElementById('nb-'+target);
+  if(screen)screen.classList.add('active');
+  if(nav)nav.classList.add('active');
+  try{localStorage.setItem(LAST_SCREEN_KEY,target);}catch(e){}
+  if(target==='sa')renderA();
+  if(target==='sh2')renderH();
+  if(target==='sset'){renderSett();renderNavSettings();}
+  if(target==='snut')renderNutrition();
+  if(target==='sp'){renderPG();updatePQ();renderLifeStats();}
+  renderBottomNav();
+}
 function rerenderAll(){
   applyTheme();
   renderPG();
@@ -4525,6 +4933,112 @@ const appleTitleMeta=document.querySelector('meta[name="apple-mobile-web-app-tit
 if(appleTitleMeta)appleTitleMeta.setAttribute('content','TIME');
 
 
+
+// ══════════════════════════════════════════════════════
+// V22 — GOOGLE DRIVE SYNC REMINDER AFTER 4 DAYS
+// ══════════════════════════════════════════════════════
+const SYNC_REMINDER_INTERVAL_MS=4*24*60*60*1000;
+
+function validTimestampMs(value){
+  if(!value)return null;
+  const ms=new Date(value).getTime();
+  return Number.isFinite(ms)?ms:null;
+}
+
+function getSyncReminderAnchorMs(){
+  const lastSyncMs=validTimestampMs(S.lastSyncAt);
+  if(lastSyncMs!==null)return lastSyncMs;
+
+  let baselineMs=validTimestampMs(S.syncReminderBaselineAt);
+  if(baselineMs===null){
+    S.syncReminderBaselineAt=nowISO();
+    save();
+    baselineMs=Date.now();
+  }
+  return baselineMs;
+}
+
+function isSyncReminderDue(){
+  return Date.now()-getSyncReminderAnchorMs()>=SYNC_REMINDER_INTERVAL_MS;
+}
+
+function formatSyncReminderStamp(iso){
+  if(!iso)return 'синхронизации ещё не было';
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime()))return 'время последней синхронизации неизвестно';
+  const today=localDateKey(new Date());
+  const key=localDateKey(d);
+  const time=`${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return key===today?`последний sync сегодня в ${time}`:`последний sync ${formatLocalDateKey(key)} в ${time}`;
+}
+
+function scheduleSyncReminderCheck(){
+  if(syncReminderTimer){
+    clearTimeout(syncReminderTimer);
+    syncReminderTimer=null;
+  }
+  const remaining=SYNC_REMINDER_INTERVAL_MS-(Date.now()-getSyncReminderAnchorMs());
+  if(remaining>0){
+    syncReminderTimer=setTimeout(()=>{
+      syncReminderTimer=null;
+      updateSyncReminder();
+    },Math.min(remaining+1000,2147483647));
+  }
+}
+
+function updateSyncReminder(){
+  const banner=document.getElementById('sync-reminder');
+  const title=document.getElementById('sync-reminder-title');
+  const meta=document.getElementById('sync-reminder-meta');
+  const btn=document.getElementById('sync-reminder-btn');
+  if(!banner||!title||!meta||!btn)return;
+
+  const due=isSyncReminderDue();
+  banner.classList.toggle('hidden',!due);
+  scheduleSyncReminderCheck();
+
+  if(!due)return;
+
+  if(gToken){
+    title.textContent='ПОРА СИНХРОНИЗИРОВАТЬ';
+    meta.textContent=formatSyncReminderStamp(S.lastSyncAt);
+    if(!btn.classList.contains('syncing'))btn.textContent='SYNC';
+  }else{
+    title.textContent='ПОРА СИНХРОНИЗИРОВАТЬ';
+    meta.textContent=S.lastSyncAt
+      ?`${formatSyncReminderStamp(S.lastSyncAt)} · нужен вход в Google`
+      :'4 дня без синхронизации · нужен вход в Google';
+    if(!btn.classList.contains('syncing'))btn.textContent='ВОЙТИ + SYNC';
+  }
+}
+
+async function syncFromReminder(){
+  if(gToken){
+    await runCloudAction('merge','sync-reminder-btn');
+    return;
+  }
+  pendingSyncAfterAuth=true;
+  updateSyncReminder();
+  toast('Войди в Google · после входа запущу sync');
+  gAuth();
+}
+
+function setCloudButtonsDisabled(disabled){
+  [
+    'g-sync-btn',
+    'g-force-sync-btn',
+    'g-recovery-btn',
+    'g-choose-recovery-btn',
+    'g-auth-btn',
+    'main-sync-btn',
+    'recovery-apply-btn',
+    'sync-reminder-btn',
+  ].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.disabled=disabled;
+  });
+}
+
 // ══════════════════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════════════════
@@ -4536,7 +5050,8 @@ renderLifeStats();
 renderDayStats();
 restorePingSchedule();
 updateGUI();
-updateTimerNavVisibility();
+renderBottomNav();
+restoreLastActiveScreen();
 tick();
 </script>
 </body>
