@@ -756,7 +756,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font
 
   <!-- ══ SETTINGS ══ -->
   <div class="screen" id="sset">
-   <div class="sh settings-version-header"><div class="sh-title">НАСТРОЙКИ</div><div class="app-version-badge">v22.0</div></div>
+   <div class="sh settings-version-header"><div class="sh-title">НАСТРОЙКИ</div><div class="app-version-badge">v22.1</div></div>
    <div class="sscroll">
     <div class="settings-home-grid">
       <button class="settings-home-btn" data-ss="data" onclick="setSettingsSection('data')">☁️ НАСТРОЙКИ ДАННЫХ</button>
@@ -4959,6 +4959,7 @@ function getSyncReminderAnchorMs(){
 }
 
 function isSyncReminderDue(){
+  if(S.debugMode===true)return true;
   return Date.now()-getSyncReminderAnchorMs()>=SYNC_REMINDER_INTERVAL_MS;
 }
 
@@ -5000,14 +5001,18 @@ function updateSyncReminder(){
   if(!due)return;
 
   if(gToken){
-    title.textContent='ПОРА СИНХРОНИЗИРОВАТЬ';
-    meta.textContent=formatSyncReminderStamp(S.lastSyncAt);
+    title.textContent=S.debugMode===true?'DEBUG · СИНХРОНИЗАЦИЯ':'ПОРА СИНХРОНИЗИРОВАТЬ';
+    meta.textContent=S.debugMode===true
+      ?`плашка всегда видна в режиме отладки · ${formatSyncReminderStamp(S.lastSyncAt)}`
+      :formatSyncReminderStamp(S.lastSyncAt);
     if(!btn.classList.contains('syncing'))btn.textContent='SYNC';
   }else{
-    title.textContent='ПОРА СИНХРОНИЗИРОВАТЬ';
-    meta.textContent=S.lastSyncAt
-      ?`${formatSyncReminderStamp(S.lastSyncAt)} · нужен вход в Google`
-      :'4 дня без синхронизации · нужен вход в Google';
+    title.textContent=S.debugMode===true?'DEBUG · СИНХРОНИЗАЦИЯ':'ПОРА СИНХРОНИЗИРОВАТЬ';
+    meta.textContent=S.debugMode===true
+      ?`плашка всегда видна в режиме отладки · нужен вход в Google`
+      :(S.lastSyncAt
+        ?`${formatSyncReminderStamp(S.lastSyncAt)} · нужен вход в Google`
+        :'4 дня без синхронизации · нужен вход в Google');
     if(!btn.classList.contains('syncing'))btn.textContent='ВОЙТИ + SYNC';
   }
 }
